@@ -26,10 +26,11 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
+using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.X509;
@@ -59,8 +60,8 @@ namespace MimeKit.Cryptography {
 		/// Gets a read-only list of certificates currently in the store.
 		/// </summary>
 		/// <value>The certificates.</value>
-		public ReadOnlyCollection<X509Certificate> Certificates {
-			get { return new ReadOnlyCollection<X509Certificate> (certs); }
+		public IEnumerable<X509Certificate> Certificates {
+			get { return certs; }
 		}
 
 		/// <summary>
@@ -240,7 +241,8 @@ namespace MimeKit.Cryptography {
 							certs.Add (chain[i].Certificate);
 					}
 
-					keys.Add (chain[0].Certificate, entry.Key);
+					if (entry.Key.IsPrivate)
+						keys.Add (chain[0].Certificate, entry.Key);
 				} else if (pkcs12.IsCertificateEntry (alias)) {
 					var entry = pkcs12.GetCertificate (alias);
 
@@ -260,8 +262,14 @@ namespace MimeKit.Cryptography {
 		/// <para>-or-</para>
 		/// <para><paramref name="password"/> is <c>null</c>.</para>
 		/// </exception>
+		/// <exception cref="System.ArgumentException">
+		/// The specified file path is empty.
+		/// </exception>
 		/// <exception cref="System.IO.FileNotFoundException">
 		/// The specified file could not be found.
+		/// </exception>
+		/// <exception cref="System.UnauthorizedAccessException">
+		/// The user does not have access to read the specified file.
 		/// </exception>
 		/// <exception cref="System.IO.IOException">
 		/// An error occurred reading the file.
@@ -270,6 +278,9 @@ namespace MimeKit.Cryptography {
 		{
 			if (fileName == null)
 				throw new ArgumentNullException ("fileName");
+
+			if (string.IsNullOrEmpty (fileName))
+				throw new ArgumentException ("The specified path is empty.", "fileName");
 
 			using (var stream = File.OpenRead (fileName))
 				Import (stream, password);
@@ -294,6 +305,108 @@ namespace MimeKit.Cryptography {
 				Import (stream, password);
 		}
 
+		/// <summary>
+		/// Export the specified stream and password to a pkcs12-formatted file.
+		/// </summary>
+		/// <param name="stream">The output stream.</param>
+		/// <param name="password">The password to use to lock the private keys.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="stream"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="password"/> is <c>null</c>.</para>
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An error occurred while writing to the stream.
+		/// </exception>
+		public void Export (Stream stream, string password)
+		{
+			if (stream == null)
+				throw new ArgumentNullException ("stream");
+
+			if (password == null)
+				throw new ArgumentNullException ("password");
+
+			var store = new Pkcs12Store ();
+			foreach (var certificate in certs) {
+				if (keys.ContainsKey (certificate))
+					continue;
+
+				var entry = new X509CertificateEntry (certificate);
+				var alias = certificate.GetCommonName ();
+				store.SetCertificateEntry (alias, entry);
+			}
+
+			foreach (var kvp in keys) {
+				var entry = new AsymmetricKeyEntry (kvp.Value);
+				var cert = new X509CertificateEntry (kvp.Key);
+				var chain = new List<X509CertificateEntry> ();
+				var alias = kvp.Key.GetCommonName ();
+
+				chain.Add (cert);
+
+				store.SetKeyEntry (alias, entry, chain.ToArray ());
+			}
+
+			store.Save (stream, password.ToCharArray (), new SecureRandom ());
+		}
+
+		/// <summary>
+		/// Export the specified stream and password to a pkcs12-formatted file.
+		/// </summary>
+		/// <param name="fileName">The file path to write to.</param>
+		/// <param name="password">The password to use to lock the private keys.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="fileName"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="password"/> is <c>null</c>.</para>
+		/// </exception>
+		/// <exception cref="System.ArgumentException">
+		/// The specified file path is empty.
+		/// </exception>
+		/// <exception cref="System.IO.PathTooLongException">
+		/// The specified path exceeds the maximum allowed path length of the system.
+		/// </exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException">
+		/// A directory in the specified path does not exist.
+		/// </exception>
+		/// <exception cref="System.UnauthorizedAccessException">
+		/// The user does not have access to create the specified file.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An error occurred while writing to the stream.
+		/// </exception>
+		public void Export (string fileName, string password)
+		{
+			if (fileName == null)
+				throw new ArgumentNullException ("fileName");
+
+			if (string.IsNullOrEmpty (fileName))
+				throw new ArgumentException ("The specified path is empty.", "fileName");
+
+			if (password == null)
+				throw new ArgumentNullException ("password");
+
+			using (var file = File.Create (fileName)) {
+				Export (file, password);
+			}
+		}
+
+		/// <summary>
+		/// Gets an enumerator of matching <see cref="Org.BouncyCastle.X509.X509Certificate"/>s
+		/// based on the specified selector.
+		/// </summary>
+		/// <returns>The matching certificates.</returns>
+		/// <param name="selector">The match criteria.</param>
+		public IEnumerable<X509Certificate> GetMatches (IX509Selector selector)
+		{
+			foreach (var certificate in certs) {
+				if (selector == null || selector.Match (certificate))
+					yield return certificate;
+			}
+
+			yield break;
+		}
+
 		#region IX509Store implementation
 
 		/// <summary>
@@ -302,7 +415,7 @@ namespace MimeKit.Cryptography {
 		/// </summary>
 		/// <returns>The matching certificates.</returns>
 		/// <param name="selector">The match criteria.</param>
-		public ICollection GetMatches (IX509Selector selector)
+		ICollection IX509Store.GetMatches (IX509Selector selector)
 		{
 			var matches = new List<X509Certificate> ();
 

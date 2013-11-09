@@ -209,7 +209,7 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Exports the keys for the specified mailboxes.
 		/// </summary>
-		/// <<returns>A new <see cref="MimeKit.MimePart"/> instance containing the exported keys.</returns>
+		/// <returns>A new <see cref="MimeKit.MimePart"/> instance containing the exported keys.</returns>
 		/// <param name="mailboxes">The mailboxes.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="mailboxes"/> is <c>null</c>.
@@ -226,8 +226,7 @@ namespace MimeKit.Cryptography {
 		/// Releases all resources used by the <see cref="MimeKit.Cryptography.CryptographyContext"/> object.
 		/// </summary>
 		/// <param name="disposing">If <c>true</c>, this method is being called by
-		/// <see cref="MimeKit.Cryptography.CryptographyContext.Dispose"/>;
-		/// otherwise it is being called by the finalizer.</param>
+		/// <see cref="Dispose()"/>; otherwise it is being called by the finalizer.</param>
 		protected virtual void Dispose (bool disposing)
 		{
 		}
@@ -272,7 +271,8 @@ namespace MimeKit.Cryptography {
 				case "application/pkcs7-keys":
 					if (SecureMimeContextConstructor != null)
 						return (CryptographyContext) SecureMimeContextConstructor.Invoke (new object[0]);
-					throw new NotSupportedException ();
+
+					return new DefaultSecureMimeContext ();
 				case "application/x-pgp-signature":
 				case "application/pgp-signature":
 				case "application/x-pgp-encrypted":
@@ -281,7 +281,8 @@ namespace MimeKit.Cryptography {
 				case "application/pgp-keys":
 					if (OpenPgpContextConstructor != null)
 						return (CryptographyContext) OpenPgpContextConstructor.Invoke (new object[0]);
-					throw new NotSupportedException ();
+
+					throw new NotSupportedException ("You need to subclass MimeKit.Cryptography.GnuPGContext and then registering it with MimeKit.Cryptography.CryptographyContext.Register().");
 				default:
 					throw new NotSupportedException ();
 				}

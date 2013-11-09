@@ -89,6 +89,7 @@
       <Type Name="CmsRecipientCollection" Kind="Class" />
       <Type Name="CmsSigner" Kind="Class" />
       <Type Name="CryptographyContext" Kind="Class" />
+      <Type Name="DefaultSecureMimeContext" Kind="Class" />
       <Type Name="DigestAlgorithm" Kind="Enumeration" />
       <Type Name="DigitalSignatureVerifyException" Kind="Class" />
       <Type Name="GnuPGContext" Kind="Class" />
@@ -105,7 +106,6 @@
       <Type Name="SecureMimeDigitalSignature" Kind="Class" />
       <Type Name="SecureMimeType" Kind="Enumeration" />
       <Type Name="SubjectIdentifierType" Kind="Enumeration" />
-      <Type Name="TrustLevel" Kind="Enumeration" />
       <Type Name="WindowsSecureMimeContext" Kind="Class" />
       <Type Name="X509CertificateExtensions" Kind="Class" />
       <Type Name="X509CertificateStore" Kind="Class" />

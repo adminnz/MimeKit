@@ -1,5 +1,5 @@
 //
-// MacSecureMimeContext.cs
+// DefaultSecureMimeContext.cs
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
@@ -26,35 +26,114 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 using Org.BouncyCastle.Pkix;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Store;
 
-using MimeKit.MacInterop;
-
 namespace MimeKit.Cryptography {
-	public class MacSecureMimeContext : SecureMimeContext
+	/// <summary>
+	/// A default <see cref="SecureMimeContext"/> implementation that uses a pkcs12 file as a certificate and private key store.
+	/// </summary>
+	public class DefaultSecureMimeContext : SecureMimeContext
 	{
-		SecKeychain keychain;
+		/// <summary>
+		/// The default root certificate store path.
+		/// </summary>
+		/// <remarks>
+		/// <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\root-certs.crt</c>.</para>
+		/// <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/root-certs.crt</c>.</para>
+		/// </remarks>
+		protected static readonly string DefaultRootCertificatesPath;
 
-		public MacSecureMimeContext (string path, string password)
+		/// <summary>
+		/// The default user certificate store path.
+		/// </summary>
+		/// <remarks>
+		/// <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\user-certs.p12</c>.</para>
+		/// <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/user-certs.p12</c>.</para>
+		/// </remarks>
+		protected static readonly string DefaultUserCertificatesPath;
+
+		readonly X509CertificateStore store;
+		readonly X509CertificateStore root;
+		readonly string password;
+		readonly string path;
+
+		static DefaultSecureMimeContext ()
 		{
-			if (path == null)
-				throw new ArgumentNullException ("path");
+			string path;
 
-			if (password == null)
-				throw new ArgumentNullException ("password");
+			if (Path.DirectorySeparatorChar == '\\') {
+				var appData = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+				path = Path.Combine (appData, "Roaming", "mimekit");
+			} else {
+				var home = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+				path = Path.Combine (home, ".mimekit");
+			}
 
-			keychain = SecKeychain.Create (path, password);
+			if (!Directory.Exists (path))
+				Directory.CreateDirectory (path);
+
+			DefaultRootCertificatesPath = Path.Combine (path, "root-certs.crt");
+			DefaultUserCertificatesPath = Path.Combine (path, "user-certs.p12");
 		}
 
-		public MacSecureMimeContext ()
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.DefaultSecureMimeContext"/> class.
+		/// </summary>
+		/// <param name="rootCertificatesPath">The path to the root certificates.</param>
+		/// <param name="userCertificatesPath">The path to the pkcs12-formatted user certificates.</param>
+		/// <param name="password">The password for the pkcs12 user certificates file.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="rootCertificatesPath"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="userCertificatesPath"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="password"/> is <c>null</c>.</para>
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An error occurred while reading the file.
+		/// </exception>
+		protected DefaultSecureMimeContext (string rootCertificatesPath, string userCertificatesPath, string password)
 		{
-			keychain = SecKeychain.Default;
+			store = new X509CertificateStore ();
+			root = new X509CertificateStore ();
+
+			try {
+				store.Import (userCertificatesPath, password);
+			} catch (FileNotFoundException) {
+			}
+
+			try {
+				root.Import (rootCertificatesPath);
+			} catch (FileNotFoundException) {
+			}
+
+			this.path = userCertificatesPath;
+			this.password = password;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.DefaultSecureMimeContext"/> class.
+		/// </summary>
+		/// <exception cref="System.IO.IOException">
+		/// An error occurred while reading the backing pkcs12 file.
+		/// </exception>
+		public DefaultSecureMimeContext () : this (DefaultRootCertificatesPath, DefaultUserCertificatesPath, "no.secret")
+		{
+		}
+
+		void Save ()
+		{
+			var dir = Path.GetDirectoryName (path);
+			if (!Directory.Exists (dir))
+				Directory.CreateDirectory (dir);
+
+			store.Export (path, password);
 		}
 
 		#region implemented abstract members of SecureMimeContext
@@ -66,12 +145,7 @@ namespace MimeKit.Cryptography {
 		/// <param name="selector">The search criteria for the certificate.</param>
 		protected override X509Certificate GetCertificate (IX509Selector selector)
 		{
-			foreach (var certificate in keychain.GetCertificates ((CssmKeyUse) 0)) {
-				if (selector.Match (certificate))
-					return certificate;
-			}
-
-			return null;
+			return store.GetMatches (selector).FirstOrDefault ();
 		}
 
 		/// <summary>
@@ -81,23 +155,28 @@ namespace MimeKit.Cryptography {
 		/// <param name="selector">The search criteria for the private key.</param>
 		protected override AsymmetricKeyParameter GetPrivateKey (IX509Selector selector)
 		{
-			foreach (var signer in keychain.GetAllCmsSigners ()) {
-				if (selector.Match (signer.Certificate))
-					return signer.PrivateKey;
+			foreach (var certificate in store.GetMatches (selector)) {
+				var key = store.GetPrivateKey (certificate);
+				if (key == null)
+					continue;
+
+				return key;
 			}
 
 			return null;
 		}
 
 		/// <summary>
-		/// Gets the trust anchors.
+		/// Gets the trusted anchors.
 		/// </summary>
-		/// <returns>The trust anchors.</returns>
+		/// <returns>The trusted anchors.</returns>
 		protected override Org.BouncyCastle.Utilities.Collections.HashSet GetTrustedAnchors ()
 		{
 			var anchors = new Org.BouncyCastle.Utilities.Collections.HashSet ();
 
-			// FIXME: how do we get the trusted root certs?
+			foreach (var certificate in root.Certificates) {
+				anchors.Add (new TrustAnchor (certificate, null));
+			}
 
 			return anchors;
 		}
@@ -108,12 +187,6 @@ namespace MimeKit.Cryptography {
 		/// <returns>The intermediate certificates.</returns>
 		protected override IX509Store GetIntermediateCertificates ()
 		{
-			var store = new X509CertificateStore ();
-
-			foreach (var certificate in keychain.GetCertificates ((CssmKeyUse) 0)) {
-				store.Add (certificate);
-			}
-
 			return store;
 		}
 
@@ -138,7 +211,7 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		protected override CmsRecipient GetCmsRecipient (MailboxAddress mailbox)
 		{
-			foreach (var certificate in keychain.GetCertificates (CssmKeyUse.Encrypt)) {
+			foreach (var certificate in store.Certificates) {
 				if (certificate.GetSubjectEmailAddress () == mailbox.Address)
 					return new CmsRecipient (certificate);
 			}
@@ -157,8 +230,11 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		protected override CmsSigner GetCmsSigner (MailboxAddress mailbox, DigestAlgorithm digestAlgo)
 		{
-			foreach (var signer in keychain.GetAllCmsSigners ()) {
-				if (signer.Certificate.GetSubjectEmailAddress () == mailbox.Address) {
+			foreach (var certificate in store.Certificates) {
+				var key = store.GetPrivateKey (certificate);
+
+				if (key != null && certificate.GetSubjectEmailAddress () == mailbox.Address) {
+					var signer = new CmsSigner (certificate, key);
 					signer.DigestAlgorithm = digestAlgo;
 					return signer;
 				}
@@ -171,7 +247,7 @@ namespace MimeKit.Cryptography {
 		/// Imports certificates and keys from a pkcs12-encoded stream.
 		/// </summary>
 		/// <param name="stream">The raw certificate and key data.</param>
-		/// <param name="password">The password to unlock the stream.</param>
+		/// <param name="password">The password to unlock the data.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <para><paramref name="stream"/> is <c>null</c>.</para>
 		/// <para>-or-</para>
@@ -182,27 +258,8 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		public override void Import (Stream stream, string password)
 		{
-			if (stream == null)
-				throw new ArgumentNullException ("stream");
-
-			if (password == null)
-				throw new ArgumentNullException ("password");
-
-			var pkcs12 = new Pkcs12Store (stream, password.ToCharArray ());
-			foreach (string alias in pkcs12.Aliases) {
-				if (pkcs12.IsKeyEntry (alias)) {
-					var chain = pkcs12.GetCertificateChain (alias);
-					var entry = pkcs12.GetKey (alias);
-
-					for (int i = 0; i < chain.Length; i++)
-						keychain.Add (chain[i].Certificate);
-
-					keychain.Add (entry.Key);
-				} else if (pkcs12.IsCertificateEntry (alias)) {
-					var entry = pkcs12.GetCertificate (alias);
-					keychain.Add (entry.Certificate);
-				}
-			}
+			store.Import (stream, password);
+			Save ();
 		}
 
 		#endregion
@@ -222,28 +279,10 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		public override void Import (Stream stream)
 		{
-			if (stream == null)
-				throw new ArgumentNullException ("stream");
-
-			// FIXME: implement this
+			store.Import (stream);
+			Save ();
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Releases all resources used by the <see cref="MimeKit.Cryptography.MacSecureMimeContext"/> object.
-		/// </summary>
-		/// <param name="disposing">If <c>true</c>, this method is being called by
-		/// <see cref="MimeKit.Cryptography.CryptographyContext.Dispose"/>;
-		/// otherwise it is being called by the finalizer.</param>
-		protected override void Dispose (bool disposing)
-		{
-			if (disposing && keychain != SecKeychain.Default) {
-				keychain.Dispose ();
-				keychain = null;
-			}
-
-			base.Dispose (disposing);
-		}
 	}
 }

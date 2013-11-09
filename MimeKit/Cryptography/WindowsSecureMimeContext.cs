@@ -26,18 +26,18 @@
 
 using System;
 using System.IO;
-using System.Text;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 
+using Org.BouncyCastle.Pkix;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509.Store;
 
 using MimeKit.IO;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
@@ -77,6 +77,8 @@ namespace MimeKit.Cryptography {
 			get; protected set;
 		}
 
+		#region implemented abstract members of SecureMimeContext
+
 		/// <summary>
 		/// Gets the X.509 certificate based on the selector.
 		/// </summary>
@@ -114,6 +116,58 @@ namespace MimeKit.Cryptography {
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Gets the trusted anchors.
+		/// </summary>
+		/// <returns>The trusted anchors.</returns>
+		protected override Org.BouncyCastle.Utilities.Collections.HashSet GetTrustedAnchors ()
+		{
+			var anchors = new Org.BouncyCastle.Utilities.Collections.HashSet ();
+			var root = new X509Store (StoreName.Root, StoreLocation.CurrentUser);
+
+			try {
+				root.Open (OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+			} catch {
+				return anchors;
+			}
+
+			foreach (var certificate in root.Certificates) {
+				var cert = DotNetUtilities.FromX509Certificate (certificate);
+				anchors.Add (new TrustAnchor (cert, null));
+			}
+
+			root.Close ();
+
+			return anchors;
+		}
+
+		/// <summary>
+		/// Gets the intermediate certificates.
+		/// </summary>
+		/// <returns>The intermediate certificates.</returns>
+		protected override IX509Store GetIntermediateCertificates ()
+		{
+			var store = new X509CertificateStore ();
+
+			foreach (var certificate in CertificateStore.Certificates) {
+				var cert = DotNetUtilities.FromX509Certificate (certificate);
+				store.Add (cert);
+			}
+
+			return store;
+		}
+
+		/// <summary>
+		/// Gets the certificate revocation lists.
+		/// </summary>
+		/// <returns>The certificate revocation lists.</returns>
+		protected override IX509Store GetCertificateRevocationLists ()
+		{
+			var crls = new List<X509Crl> ();
+
+			return X509StoreFactory.Create ("Crl/Collection", new X509CollectionStoreParameters (crls));
 		}
 
 		/// <summary>
@@ -172,6 +226,50 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
+		/// Imports certificates and keys from a pkcs12-encoded stream.
+		/// </summary>
+		/// <param name="stream">The raw certificate and key data.</param>
+		/// <param name="password">The password to unlock the stream.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="stream"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="password"/> is <c>null</c>.</para>
+		/// </exception>
+		/// <exception cref="System.NotSupportedException">
+		/// Importing keys is not supported by this cryptography context.
+		/// </exception>
+		public override void Import (Stream stream, string password)
+		{
+			if (stream == null)
+				throw new ArgumentNullException ("stream");
+
+			if (password == null)
+				throw new ArgumentNullException ("password");
+
+			byte[] rawData;
+
+			if (stream is MemoryBlockStream) {
+				rawData = ((MemoryBlockStream) stream).ToArray ();
+			} else if (stream is MemoryStream) {
+				rawData = ((MemoryStream) stream).ToArray ();
+			} else {
+				using (var memory = new MemoryStream ()) {
+					stream.CopyTo (memory, 4096);
+					rawData = memory.ToArray ();
+				}
+			}
+
+			var certs = new X509Certificate2Collection ();
+			certs.Import (rawData, password, X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.Exportable);
+
+			CertificateStore.AddRange (certs);
+		}
+
+		#endregion
+
+		#region implemented abstract members of CryptographyContext
+
+		/// <summary>
 		/// Imports certificates (as from a certs-only application/pkcs-mime part)
 		/// from the specified stream.
 		/// </summary>
@@ -206,45 +304,7 @@ namespace MimeKit.Cryptography {
 			CertificateStore.AddRange (signed.Certificates);
 		}
 
-		/// <summary>
-		/// Imports the pkcs12-encoded certificate and key data.
-		/// </summary>
-		/// <param name="stream">The raw certificate data.</param>
-		/// <param name="password">The password to unlock the stream.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <para><paramref name="stream"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="password"/> is <c>null</c>.</para>
-		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// Importing keys is not supported by this cryptography context.
-		/// </exception>
-		public override void ImportPkcs12 (Stream stream, string password)
-		{
-			if (stream == null)
-				throw new ArgumentNullException ("stream");
-
-			if (password == null)
-				throw new ArgumentNullException ("password");
-
-			byte[] rawData;
-
-			if (stream is MemoryBlockStream) {
-				rawData = ((MemoryBlockStream) stream).ToArray ();
-			} else if (stream is MemoryStream) {
-				rawData = ((MemoryStream) stream).ToArray ();
-			} else {
-				using (var memory = new MemoryStream ()) {
-					stream.CopyTo (memory, 4096);
-					rawData = memory.ToArray ();
-				}
-			}
-
-			var certs = new X509Certificate2Collection ();
-			certs.Import (rawData, password, X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.Exportable);
-
-			CertificateStore.AddRange (certs);
-		}
+		#endregion
 
 		/// <summary>
 		/// Dispose the specified disposing.

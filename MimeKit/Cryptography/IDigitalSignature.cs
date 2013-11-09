@@ -28,7 +28,7 @@ using System;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
-	/// A digital signature.
+	/// An interface for a digital signature.
 	/// </summary>
 	public interface IDigitalSignature
 	{
@@ -59,7 +59,7 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Verify the digital signature.
 		/// </summary>
-		/// <returns><c>true</c> if the signature is valid; otherwise <c>false</c>.
+		/// <returns><c>true</c> if the signature is valid; otherwise <c>false</c>.</returns>
 		/// <exception cref="DigitalSignatureVerifyException">
 		/// An error verifying the signature has occurred.
 		/// </exception>

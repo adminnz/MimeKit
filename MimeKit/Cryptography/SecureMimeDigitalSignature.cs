@@ -27,6 +27,8 @@
 using System;
 
 using Org.BouncyCastle.Cms;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Pkix;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
@@ -46,8 +48,20 @@ namespace MimeKit.Cryptography {
 		{
 		}
 
+		/// <summary>
+		/// Gets the signer info.
+		/// </summary>
+		/// <value>The signer info.</value>
 		public SignerInformation SignerInfo {
 			get; private set;
+		}
+
+		/// <summary>
+		/// Gets the certificate chain.
+		/// </summary>
+		/// <value>The certificate chain.</value>
+		public PkixCertPath Chain {
+			get; internal set;
 		}
 
 		#region IDigitalSignature implementation
@@ -87,7 +101,7 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Verify the digital signature.
 		/// </summary>
-		/// <returns><c>true</c> if the signature is valid; otherwise <c>false</c>.
+		/// <returns><c>true</c> if the signature is valid; otherwise <c>false</c>.</returns>
 		/// <exception cref="DigitalSignatureVerifyException">
 		/// An error verifying the signature has occurred.
 		/// </exception>

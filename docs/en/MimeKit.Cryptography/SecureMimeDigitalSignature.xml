@@ -20,6 +20,24 @@
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
+    <Member MemberName="Chain">
+      <MemberSignature Language="C#" Value="public Org.BouncyCastle.Pkix.PkixCertPath Chain { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class Org.BouncyCastle.Pkix.PkixCertPath Chain" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.11.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Org.BouncyCastle.Pkix.PkixCertPath</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets the certificate chain.
+            </summary>
+        <value>The certificate chain.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="CreationDate">
       <MemberSignature Language="C#" Value="public DateTime CreationDate { get; }" />
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.DateTime CreationDate" />
@@ -103,8 +121,10 @@
         <ReturnType>Org.BouncyCastle.Cms.SignerInformation</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets the signer info.
+            </summary>
+        <value>The signer info.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -120,9 +140,15 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <summary>
+            Verify the digital signature.
+            </summary>
+        <returns>
+          <c>true</c> if the signature is valid; otherwise <c>false</c>.</returns>
         <remarks>To be added.</remarks>
+        <exception cref="T:MimeKit.Cryptography.DigitalSignatureVerifyException">
+            An error verifying the signature has occurred.
+            </exception>
       </Docs>
     </Member>
   </Members>

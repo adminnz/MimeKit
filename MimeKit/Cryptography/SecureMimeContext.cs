@@ -29,17 +29,15 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-using Org.BouncyCastle;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Cms;
 using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Pkix;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Asn1.Pkcs;
-using Org.BouncyCastle.Cms;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Store;
+using Org.BouncyCastle.Utilities.Collections;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
@@ -164,6 +162,24 @@ namespace MimeKit.Cryptography {
 		protected abstract AsymmetricKeyParameter GetPrivateKey (IX509Selector selector);
 
 		/// <summary>
+		/// Gets the trusted anchors.
+		/// </summary>
+		/// <returns>The trusted anchors.</returns>
+		protected abstract HashSet GetTrustedAnchors ();
+
+		/// <summary>
+		/// Gets the intermediate certificates.
+		/// </summary>
+		/// <returns>The intermediate certificates.</returns>
+		protected abstract IX509Store GetIntermediateCertificates ();
+
+		/// <summary>
+		/// Gets the certificate revocation lists.
+		/// </summary>
+		/// <returns>The certificate revocation lists.</returns>
+		protected abstract IX509Store GetCertificateRevocationLists ();
+
+		/// <summary>
 		/// Gets the <see cref="CmsRecipient"/> for the specified mailbox.
 		/// </summary>
 		/// <returns>A <see cref="CmsRecipient"/>.</returns>
@@ -202,7 +218,7 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		protected abstract CmsSigner GetCmsSigner (MailboxAddress mailbox, DigestAlgorithm digestAlgo);
 
-		protected static string GetOid (DigestAlgorithm digestAlgo)
+		static string GetOid (DigestAlgorithm digestAlgo)
 		{
 			switch (digestAlgo) {
 			case DigestAlgorithm.MD5:        return PkcsObjectIdentifiers.MD5.Id;
@@ -318,46 +334,68 @@ namespace MimeKit.Cryptography {
 			return GetCertificate (signer);
 		}
 
+		PkixCertPath BuildCertPath (HashSet anchors, IX509Store certificates, IX509Store crls, X509Certificate certificate)
+		{
+			var intermediate = new X509CertificateStore ();
+			foreach (X509Certificate cert in certificates.GetMatches (null))
+				intermediate.Add (cert);
+
+			var selector = new X509CertStoreSelector ();
+			selector.Certificate = certificate;
+
+			var parameters = new PkixBuilderParameters (anchors, selector);
+			parameters.AddStore (GetIntermediateCertificates ());
+			parameters.AddStore (intermediate);
+
+			var localCrls = GetCertificateRevocationLists ();
+			parameters.AddStore (localCrls);
+			parameters.AddStore (crls);
+
+			// Note: we disable revocation unless we actually have non-empty revocation lists
+			parameters.IsRevocationEnabled = localCrls.GetMatches (null).Count > 0;
+
+			var result = new PkixCertPathBuilder ().Build (parameters);
+
+			return result.CertPath;
+		}
+
 		IList<IDigitalSignature> GetDigitalSignatures (CmsSignedDataParser parser)
 		{
 			var certificates = parser.GetCertificates ("Collection");
 			var signatures = new List<IDigitalSignature> ();
+			var crls = parser.GetCrls ("Collection");
 			var store = parser.GetSignerInfos ();
 
 			foreach (SignerInformation signerInfo in store.GetSigners ()) {
 				var certificate = GetCertificate (certificates, signerInfo.SignerID);
 				var signature = new SecureMimeDigitalSignature (signerInfo);
 
-				Asn1EncodableVector vector = signerInfo.UnsignedAttributes.GetAll (CmsAttributes.SigningTime);
-				foreach (Org.BouncyCastle.Asn1.Cms.Attribute attr in vector) {
-					Time time = (Time) ((DerSet) attr.AttrValues)[0];
-					signature.CreationDate = time.Date;
-					break;
+				if (signerInfo.SignedAttributes != null) {
+					Asn1EncodableVector vector = signerInfo.SignedAttributes.GetAll (CmsAttributes.SigningTime);
+					foreach (Org.BouncyCastle.Asn1.Cms.Attribute attr in vector) {
+						var signingTime = (DerUtcTime) ((DerSet) attr.AttrValues)[0];
+						signature.CreationDate = signingTime.ToAdjustedDateTime ();
+						break;
+					}
 				}
 
 				if (certificate != null)
 					signature.SignerCertificate = new SecureMimeDigitalCertificate (certificate);
 
-				// FIXME: verify the certificate chain with what we have in our local store
+				var anchors = GetTrustedAnchors ();
 
-//				var chain = new X509Chain ();
-//				chain.ChainPolicy.UrlRetrievalTimeout = OnlineCertificateRetrievalTimeout;
-//				chain.ChainPolicy.RevocationMode = AllowOnlineCertificateRetrieval ? X509RevocationMode.Online : X509RevocationMode.Offline;
-//				chain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain;
-//				//if (AllowSelfSignedCertificates)
-//				//	chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-//				chain.ChainPolicy.VerificationTime = DateTime.Now;
-//
-//				if (!chain.Build (signerInfo.Certificate)) {
-//					for (int i = 0; i < chain.ChainStatus.Length; i++) {
-//						if (chain.ChainStatus[i].Status.HasFlag (X509ChainStatusFlags.Revoked)) {
-//							signature.Errors |= DigitalSignatureError.CertificateRevoked;
-//							signature.Status = DigitalSignatureStatus.Error;
-//						}
-//
-//						certificate.ChainStatus |= chain.ChainStatus[i].Status;
-//					}
-//				}
+				var chain = BuildCertPath (anchors, certificates, crls, certificate);
+
+//				var parameters = new PkixParameters (anchors);
+//				var validator = new PkixCertPathValidator ();
+//				var result = validator.Validate (chain, parameters);
+
+				signature.Chain = chain;
+
+				Console.WriteLine ("Chain:");
+				foreach (X509Certificate cert in chain.Certificates) {
+					Console.WriteLine ("{0}", cert.GetCommonName ());
+				}
 
 				signatures.Add (signature);
 			}
@@ -615,9 +653,9 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Imports the pkcs12-encoded certificate and key data.
+		/// Imports certificates and keys from a pkcs12-encoded stream.
 		/// </summary>
-		/// <param name="stream">The raw certificate data.</param>
+		/// <param name="stream">The raw certificate and key data.</param>
 		/// <param name="password">The password to unlock the stream.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <para><paramref name="stream"/> is <c>null</c>.</para>
@@ -627,7 +665,7 @@ namespace MimeKit.Cryptography {
 		/// <exception cref="System.NotSupportedException">
 		/// Importing keys is not supported by this cryptography context.
 		/// </exception>
-		public virtual void ImportPkcs12 (Stream stream, string password)
+		public virtual void Import (Stream stream, string password)
 		{
 			throw new NotSupportedException ();
 		}

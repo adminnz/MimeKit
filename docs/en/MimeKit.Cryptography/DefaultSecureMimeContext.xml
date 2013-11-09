@@ -1,6 +1,6 @@
-<Type Name="WindowsSecureMimeContext" FullName="MimeKit.Cryptography.WindowsSecureMimeContext">
-  <TypeSignature Language="C#" Value="public class WindowsSecureMimeContext : MimeKit.Cryptography.SecureMimeContext" />
-  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit WindowsSecureMimeContext extends MimeKit.Cryptography.SecureMimeContext" />
+<Type Name="DefaultSecureMimeContext" FullName="MimeKit.Cryptography.DefaultSecureMimeContext">
+  <TypeSignature Language="C#" Value="public class DefaultSecureMimeContext : MimeKit.Cryptography.SecureMimeContext" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi DefaultSecureMimeContext extends MimeKit.Cryptography.SecureMimeContext" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
     <AssemblyVersion>0.11.0.0</AssemblyVersion>
@@ -11,13 +11,13 @@
   <Interfaces />
   <Docs>
     <summary>
-            An S/MIME cryptography context that uses Windows' <see cref="T:System.Security.Cryptography.X509Certificates.X509Store" />.
+            A default <see cref="T:MimeKit.Cryptography.SecureMimeContext" /> implementation that uses a pkcs12 file as a certificate and private key store.
             </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public WindowsSecureMimeContext ();" />
+      <MemberSignature Language="C#" Value="public DefaultSecureMimeContext ();" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
@@ -26,69 +26,87 @@
       <Parameters />
       <Docs>
         <summary>
-            Initializes a new instance of the <see cref="T:MimeKit.Cryptography.WindowsSecureMimeContext" /> class.
+            Initializes a new instance of the <see cref="T:MimeKit.Cryptography.DefaultSecureMimeContext" /> class.
             </summary>
         <remarks>To be added.</remarks>
+        <exception cref="T:System.IO.IOException">
+            An error occurred while reading the backing pkcs12 file.
+            </exception>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public WindowsSecureMimeContext (System.Security.Cryptography.X509Certificates.X509Store store);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class System.Security.Cryptography.X509Certificates.X509Store store) cil managed" />
+      <MemberSignature Language="C#" Value="protected DefaultSecureMimeContext (string rootCertificatesPath, string userCertificatesPath, string password);" />
+      <MemberSignature Language="ILAsm" Value=".method familyhidebysig specialname rtspecialname instance void .ctor(string rootCertificatesPath, string userCertificatesPath, string password) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.11.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
-        <Parameter Name="store" Type="System.Security.Cryptography.X509Certificates.X509Store" />
+        <Parameter Name="rootCertificatesPath" Type="System.String" />
+        <Parameter Name="userCertificatesPath" Type="System.String" />
+        <Parameter Name="password" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="store">The X509 certificate store.</param>
+        <param name="rootCertificatesPath">The path to the root certificates.</param>
+        <param name="userCertificatesPath">The path to the pkcs12-formatted user certificates.</param>
+        <param name="password">The password for the pkcs12 user certificates file.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:MimeKit.Cryptography.WindowsSecureMimeContext" /> class.
+            Initializes a new instance of the <see cref="T:MimeKit.Cryptography.DefaultSecureMimeContext" /> class.
             </summary>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentNullException">
-          <paramref name="store" /> is <c>null</c>.
+          <para>
+            <paramref name="rootCertificatesPath" /> is <c>null</c>.</para>
+          <para>-or-</para>
+          <para>
+            <paramref name="userCertificatesPath" /> is <c>null</c>.</para>
+          <para>-or-</para>
+          <para>
+            <paramref name="password" /> is <c>null</c>.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An error occurred while reading the file.
             </exception>
       </Docs>
     </Member>
-    <Member MemberName="CertificateStore">
-      <MemberSignature Language="C#" Value="public System.Security.Cryptography.X509Certificates.X509Store CertificateStore { get; protected set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance class System.Security.Cryptography.X509Certificates.X509Store CertificateStore" />
-      <MemberType>Property</MemberType>
+    <Member MemberName="DefaultRootCertificatesPath">
+      <MemberSignature Language="C#" Value="protected static readonly string DefaultRootCertificatesPath;" />
+      <MemberSignature Language="ILAsm" Value=".field family static initonly string DefaultRootCertificatesPath" />
+      <MemberType>Field</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.11.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.Security.Cryptography.X509Certificates.X509Store</ReturnType>
+        <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets the X509 certificate store.
+            The default root certificate store path.
             </summary>
-        <value>The X509 certificate store.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\root-certs.crt</c>.</para>
+          <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/root-certs.crt</c>.</para>
+        </remarks>
       </Docs>
     </Member>
-    <Member MemberName="Dispose">
-      <MemberSignature Language="C#" Value="protected override void Dispose (bool disposing);" />
-      <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void Dispose(bool disposing) cil managed" />
-      <MemberType>Method</MemberType>
+    <Member MemberName="DefaultUserCertificatesPath">
+      <MemberSignature Language="C#" Value="protected static readonly string DefaultUserCertificatesPath;" />
+      <MemberSignature Language="ILAsm" Value=".field family static initonly string DefaultUserCertificatesPath" />
+      <MemberType>Field</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.11.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
+        <ReturnType>System.String</ReturnType>
       </ReturnValue>
-      <Parameters>
-        <Parameter Name="disposing" Type="System.Boolean" />
-      </Parameters>
       <Docs>
-        <param name="disposing">If set to <c>true</c> disposing.</param>
         <summary>
-            Dispose the specified disposing.
+            The default user certificate store path.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\user-certs.p12</c>.</para>
+          <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/user-certs.p12</c>.</para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="GetCertificate">
@@ -148,9 +166,9 @@
       <Docs>
         <param name="mailbox">The mailbox.</param>
         <summary>
-            Gets the X509 certificate associated with the <see cref="T:MimeKit.MailboxAddress" />.
+            Gets the <see cref="T:MimeKit.Cryptography.CmsRecipient" /> for the specified mailbox.
             </summary>
-        <returns>The certificate.</returns>
+        <returns>A <see cref="T:MimeKit.Cryptography.CmsRecipient" />.</returns>
         <remarks>To be added.</remarks>
         <exception cref="T:MimeKit.Cryptography.CertificateNotFoundException">
             A certificate for the specified <paramref name="mailbox" /> could not be found.
@@ -175,9 +193,9 @@
         <param name="mailbox">The mailbox.</param>
         <param name="digestAlgo">The preferred digest algorithm.</param>
         <summary>
-            Gets the cms signer for the specified <see cref="T:MimeKit.MailboxAddress" />.
+            Gets the <see cref="T:MimeKit.Cryptography.CmsSigner" /> for the specified mailbox.
             </summary>
-        <returns>The cms signer.</returns>
+        <returns>A <see cref="T:MimeKit.Cryptography.CmsSigner" />.</returns>
         <remarks>To be added.</remarks>
         <exception cref="T:MimeKit.Cryptography.CertificateNotFoundException">
             A certificate for the specified <paramref name="mailbox" /> could not be found.
@@ -258,7 +276,7 @@
         <Parameter Name="stream" Type="System.IO.Stream" />
       </Parameters>
       <Docs>
-        <param name="stream">The raw certificate data.</param>
+        <param name="stream">The raw key data.</param>
         <summary>
             Imports certificates (as from a certs-only application/pkcs-mime part)
             from the specified stream.
@@ -267,8 +285,8 @@
         <exception cref="T:System.ArgumentNullException">
           <paramref name="stream" /> is <c>null</c>.
             </exception>
-        <exception cref="T:System.Security.Cryptography.CryptographicException">
-            An error occurred while importing.
+        <exception cref="T:System.NotSupportedException">
+            Importing keys is not supported by this cryptography context.
             </exception>
       </Docs>
     </Member>
@@ -288,7 +306,7 @@
       </Parameters>
       <Docs>
         <param name="stream">The raw certificate and key data.</param>
-        <param name="password">The password to unlock the stream.</param>
+        <param name="password">The password to unlock the data.</param>
         <summary>
             Imports certificates and keys from a pkcs12-encoded stream.
             </summary>

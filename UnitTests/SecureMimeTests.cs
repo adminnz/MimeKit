@@ -345,5 +345,39 @@ namespace UnitTests {
 				}
 			}
 		}
+
+        [Test]
+        public void TestSignAndEncryptToStream()
+        {
+            var part = new TextPart("plain");
+            part.Text = "Hello this is some text";
+
+            var self = new MailboxAddress("MimeKit UnitTests", "mimekit@example.com");
+            var recipients = new List<MailboxAddress>();
+            recipients.Add(self);
+
+            using (var messageStream = new MemoryStream())
+            {
+
+                using (var senderCtx = CreateContext())
+                {
+                    var encrypted = ApplicationPkcs7Mime.SignAndEncrypt(senderCtx, self, DigestAlgorithm.Sha1, recipients, part);
+                    MimeMessage msg = new MimeMessage(encrypted);
+                    msg.WriteTo(messageStream);
+                }
+                messageStream.Position = 0; //reset stream to beginning
+
+                using (var receiverCtx = CreateContext())
+                {
+                    var parser = new MimeParser(messageStream, MimeFormat.Entity);
+                    var message = parser.ParseMessage();
+                    var main = message.Body as ApplicationPkcs7Mime;
+                    IList<IDigitalSignature> signatures;
+                    var decrypted = main.Decrypt(receiverCtx, out signatures);
+
+                    Assert.AreEqual(part.Text, ((TextPart)decrypted).Text, "Not the same content");
+                }
+            }
+        }
 	}
 }

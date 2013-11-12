@@ -65,6 +65,56 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestSecureMimeCompression ()
+		{
+			var original = new TextPart ("plain");
+			original.Text = "This is some text that we'll end up compressing...";
+
+			using (var ctx = CreateContext ()) {
+				var compressed = ApplicationPkcs7Mime.Compress (ctx, original);
+
+				Assert.AreEqual (SecureMimeType.CompressedData, compressed.SecureMimeType, "S/MIME type did not match.");
+
+				var decompressed = compressed.Decompress (ctx);
+
+				Assert.IsInstanceOfType (typeof (TextPart), decompressed, "Decompressed part is not the expected type.");
+				Assert.AreEqual (original.Text, ((TextPart) decompressed).Text, "Decompressed content is not the same as the original.");
+			}
+		}
+
+		[Test]
+		public void TestSecureMimeEncapsulatedSigning ()
+		{
+			var self = new MailboxAddress ("MimeKit UnitTests", "mimekit@example.com");
+
+			var cleartext = new TextPart ("plain");
+			cleartext.Text = "This is some text that we'll end up signing...";
+
+			using (var ctx = CreateContext ()) {
+				var signed = ApplicationPkcs7Mime.Sign (ctx, self, DigestAlgorithm.Sha1, cleartext);
+				IList<IDigitalSignature> signatures;
+
+				Assert.AreEqual (SecureMimeType.SignedData, signed.SecureMimeType, "S/MIME type did not match.");
+
+				var decoded = signed.Verify (ctx, out signatures);
+
+				Assert.IsInstanceOfType (typeof (TextPart), decoded, "Decompressed part is not the expected type.");
+				Assert.AreEqual (cleartext.Text, ((TextPart) decoded).Text, "Decompressed content is not the same as the original.");
+
+				Assert.AreEqual (1, signatures.Count, "Verify returned an unexpected number of signatures.");
+				foreach (var signature in signatures) {
+					try {
+						bool valid = signature.Verify ();
+
+						Assert.IsTrue (valid, "Bad signature from {0}", signature.SignerCertificate.Email);
+					} catch (DigitalSignatureVerifyException ex) {
+						Assert.Fail ("Failed to verify signature: {0}", ex);
+					}
+				}
+			}
+		}
+
+		[Test]
 		public void TestSecureMimeSigning ()
 		{
 			var self = new MailboxAddress ("MimeKit UnitTests", "mimekit@example.com");
@@ -334,11 +384,7 @@ namespace UnitTests {
 				Assert.AreEqual (SecureMimeType.CertsOnly, pkcs7mime.SecureMimeType, "S/MIME type did not match.");
 
 				using (var imported = new DummySecureMimeContext ()) {
-					try {
-						pkcs7mime.Import (imported);
-					} catch (Exception ex) {
-						Assert.Fail ("Failed to import certificates: {0}", ex);
-					}
+					pkcs7mime.Import (imported);
 
 					Assert.AreEqual (1, imported.certificates.Count, "Unexpected number of imported certificates.");
 					Assert.IsFalse (imported.keys.Count > 0, "One or more of the certificates included the private key.");

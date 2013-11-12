@@ -50,6 +50,7 @@ namespace MimeKit {
 		/// Initializes a new instance of the <see cref="MimeKit.MimePart"/> class
 		/// based on the <see cref="MimeEntityConstructorInfo"/>.
 		/// </summary>
+		/// <remarks>This constructor is used by <see cref="MimeKit.MimeParser"/>.</remarks>
 		/// <param name="entity">Information used by the constructor.</param>
 		public MimePart (MimeEntityConstructorInfo entity) : base (entity)
 		{
@@ -202,8 +203,14 @@ namespace MimeKit {
 		}
 
 		/// <summary>
-		/// Gets the name of the file.
+		/// Gets or sets the name of the file.
 		/// </summary>
+		/// <remarks>
+		/// <para>First checks for the "filename" parameter on the Content-Disposition header. If
+		/// that does not exist, then the "name" parameter on the Content-Type header is used.</para>
+		/// <para>When setting the filename, both the "filename" parameter on the Content-Disposition
+		/// header and the "name" parameter on the Content-Type header are set.</para>
+		/// </remarks>
 		/// <value>The name of the file.</value>
 		public string FileName {
 			get {
@@ -220,6 +227,17 @@ namespace MimeKit {
 
 				return filename.Trim ();
 			}
+			set {
+				if (value != null) {
+					if (ContentDisposition == null)
+						ContentDisposition = new ContentDisposition ();
+					ContentDisposition.FileName = value;
+				} else if (ContentDisposition != null) {
+					ContentDisposition.FileName = value;
+				}
+
+				ContentType.Name = value;
+			}
 		}
 
 		/// <summary>
@@ -228,6 +246,24 @@ namespace MimeKit {
 		/// <value>The content of the mime part.</value>
 		public IContentObject ContentObject {
 			get; set;
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="MimePart"/> is an attachment.
+		/// </summary>
+		/// <value><c>true</c> if this <see cref="MimePart"/> is an attachment; otherwise, <c>false</c>.</value>
+		public bool IsAttachment {
+			get { return ContentDisposition != null && ContentDisposition.IsAttachment; }
+			set {
+				if (value) {
+					if (ContentDisposition == null)
+						ContentDisposition = new ContentDisposition (ContentDisposition.Attachment);
+					else if (!ContentDisposition.IsAttachment)
+						ContentDisposition.Disposition = ContentDisposition.Attachment;
+				} else if (ContentDisposition != null && ContentDisposition.IsAttachment) {
+					ContentDisposition.Disposition = ContentDisposition.Inline;
+				}
+			}
 		}
 
 		/// <summary>

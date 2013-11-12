@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
+using Org.BouncyCastle.Cms;
 using Org.BouncyCastle.Pkix;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.X509;
@@ -244,6 +245,37 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
+		/// Import the specified certificate.
+		/// </summary>
+		/// <param name="certificate">The certificate.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="certificate"/> is <c>null</c>.
+		/// </exception>
+		public override void Import (X509Certificate certificate)
+		{
+			if (certificate == null)
+				throw new ArgumentNullException ("certificate");
+
+			store.Add (certificate);
+			Save ();
+		}
+
+		/// <summary>
+		/// Import the specified certificate revocation list.
+		/// </summary>
+		/// <param name="crl">The certificate revocation list.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="crl"/> is <c>null</c>.
+		/// </exception>
+		public override void Import (X509Crl crl)
+		{
+			if (crl == null)
+				throw new ArgumentNullException ("crl");
+
+			// FIXME: implement this
+		}
+
+		/// <summary>
 		/// Imports certificates and keys from a pkcs12-encoded stream.
 		/// </summary>
 		/// <param name="stream">The raw certificate and key data.</param>
@@ -253,33 +285,18 @@ namespace MimeKit.Cryptography {
 		/// <para>-or-</para>
 		/// <para><paramref name="password"/> is <c>null</c>.</para>
 		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// Importing keys is not supported by this cryptography context.
+		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
+		/// An error occurred in the cryptographic message syntax subsystem.
 		/// </exception>
 		public override void Import (Stream stream, string password)
 		{
+			if (stream == null)
+				throw new ArgumentNullException ("stream");
+
+			if (password == null)
+				throw new ArgumentNullException ("password");
+
 			store.Import (stream, password);
-			Save ();
-		}
-
-		#endregion
-
-		#region implemented abstract members of CryptographyContext
-
-		/// <summary>
-		/// Imports certificates (as from a certs-only application/pkcs-mime part)
-		/// from the specified stream.
-		/// </summary>
-		/// <param name="stream">The raw key data.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="stream"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// Importing keys is not supported by this cryptography context.
-		/// </exception>
-		public override void Import (Stream stream)
-		{
-			store.Import (stream);
 			Save ();
 		}
 

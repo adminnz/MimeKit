@@ -43,6 +43,7 @@ namespace UnitTests {
 	{
 		internal readonly Dictionary<X509Certificate, AsymmetricKeyParameter> keys = new Dictionary<X509Certificate, AsymmetricKeyParameter> ();
 		internal readonly List<X509Certificate> certificates = new List<X509Certificate> ();
+		internal readonly List<X509Crl> crls = new List<X509Crl> ();
 
 		#region implemented abstract members of SecureMimeContext
 
@@ -119,8 +120,6 @@ namespace UnitTests {
 		/// <returns>The certificate revocation lists.</returns>
 		protected override IX509Store GetCertificateRevocationLists ()
 		{
-			var crls = new List<X509Crl> ();
-
 			return X509StoreFactory.Create ("Crl/Collection", new X509CollectionStoreParameters (crls));
 		}
 
@@ -170,6 +169,36 @@ namespace UnitTests {
 		}
 
 		/// <summary>
+		/// Import the specified certificate.
+		/// </summary>
+		/// <param name="certificate">The certificate.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="certificate"/> is <c>null</c>.
+		/// </exception>
+		public override void Import (X509Certificate certificate)
+		{
+			if (certificate == null)
+				throw new ArgumentNullException ("certificate");
+
+			certificates.Add (certificate);
+		}
+
+		/// <summary>
+		/// Import the specified certificate revocation list.
+		/// </summary>
+		/// <param name="crl">The certificate revocation list.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="crl"/> is <c>null</c>.
+		/// </exception>
+		public override void Import (X509Crl crl)
+		{
+			if (crl == null)
+				throw new ArgumentNullException ("crl");
+
+			crls.Add (crl);
+		}
+
+		/// <summary>
 		/// Imports certificates and keys from a pkcs12-encoded stream.
 		/// </summary>
 		/// <param name="stream">The raw certificate and key data.</param>
@@ -204,39 +233,6 @@ namespace UnitTests {
 				} else if (pkcs12.IsCertificateEntry (alias)) {
 					var entry = pkcs12.GetCertificate (alias);
 					certificates.Add (entry.Certificate);
-				}
-			}
-		}
-
-		#endregion
-
-		#region implemented abstract members of CryptographyContext
-
-		/// <summary>
-		/// Imports certificates (as from a certs-only application/pkcs-mime part)
-		/// from the specified stream.
-		/// </summary>
-		/// <param name="stream">The raw key data.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="stream"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// Importing keys is not supported by this cryptography context.
-		/// </exception>
-		public override void Import (Stream stream)
-		{
-			if (stream == null)
-				throw new ArgumentNullException ("stream");
-
-			var parser = new CmsSignedDataParser (stream);
-			var certs = parser.GetCertificates ("Collection");
-			var store = parser.GetSignerInfos ();
-
-			foreach (SignerInformation signerInfo in store.GetSigners ()) {
-				var matches = certs.GetMatches (signerInfo.SignerID);
-
-				foreach (X509Certificate certificate in matches) {
-					certificates.Add (certificate);
 				}
 			}
 		}

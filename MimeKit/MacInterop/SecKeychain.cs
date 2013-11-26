@@ -346,9 +346,9 @@ namespace MimeKit.MacInterop {
 									continue;
 
 								var chain = pkcs12.GetCertificateChain (alias);
-								var key = pkcs12.GetKey (alias);
+								var entry = pkcs12.GetKey (alias);
 
-								signers.Add (new CmsSigner (chain, key));
+								signers.Add (new CmsSigner (chain, entry.Key));
 							}
 						}
 					} catch (Exception ex) {
@@ -372,11 +372,9 @@ namespace MimeKit.MacInterop {
 
 		public bool Add (X509Certificate certificate)
 		{
-			if (Contains (certificate))
-				return true;
-
 			using (var cert = SecCertificate.Create (certificate.GetEncoded ())) {
-				return SecCertificateAddToKeychain (cert.Handle, Handle) == OSStatus.Ok;
+				var status = SecCertificateAddToKeychain (cert.Handle, Handle);
+				return status == OSStatus.Ok || status == OSStatus.DuplicateItem;
 			}
 		}
 

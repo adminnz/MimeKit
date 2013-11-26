@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed beforefieldinit ApplicationPkcs7Mime extends MimeKit.MimePart" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.12.0.0</AssemblyVersion>
+    <AssemblyVersion>0.16.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>MimeKit.MimePart</BaseTypeName>
@@ -21,7 +21,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class MimeKit.MimeEntityConstructorInfo entity) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="entity" Type="MimeKit.MimeEntityConstructorInfo" />
@@ -39,7 +39,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype MimeKit.Cryptography.SecureMimeType type, class System.IO.Stream stream) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="type" Type="MimeKit.Cryptography.SecureMimeType" />
@@ -80,7 +80,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Compress(class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -99,7 +99,7 @@
             even among those that support S/MIME.
             </remarks>
         <exception cref="T:System.ArgumentNullException">
-          <paramref name="entity" /> is<c>null</c>.
+          <paramref name="entity" /> is <c>null</c>.
             </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -111,7 +111,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Compress(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -136,7 +136,7 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -148,7 +148,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Decompress() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -173,7 +173,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Decompress(class MimeKit.Cryptography.SecureMimeContext ctx) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -204,7 +204,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Decrypt() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -229,7 +229,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Decrypt(class MimeKit.Cryptography.SecureMimeContext ctx) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -239,39 +239,6 @@
       </Parameters>
       <Docs>
         <param name="ctx">The S/MIME context to use for decrypting.</param>
-        <summary>
-            Decrypt using the specified <see cref="T:MimeKit.Cryptography.CryptographyContext" />.
-            </summary>
-        <returns>The decrypted <see cref="T:MimeKit.MimeEntity" />.</returns>
-        <remarks>To be added.</remarks>
-        <exception cref="T:System.ArgumentNullException">
-          <paramref name="ctx" /> is <c>null</c>.
-            </exception>
-        <exception cref="T:System.InvalidOperationException">
-            The "smime-type" parameter on the Content-Type header is not "enveloped-data".
-            </exception>
-        <exception cref="T:Org.BouncyCastle.Cms.CmsException">
-            An error occurred in the cryptographic message syntax subsystem.
-            </exception>
-      </Docs>
-    </Member>
-    <Member MemberName="Decrypt">
-      <MemberSignature Language="C#" Value="public MimeKit.MimeEntity Decrypt (MimeKit.Cryptography.SecureMimeContext ctx, out System.Collections.Generic.IList&lt;MimeKit.Cryptography.IDigitalSignature&gt; signatures);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Decrypt(class MimeKit.Cryptography.SecureMimeContext ctx, class System.Collections.Generic.IList`1&lt;class MimeKit.Cryptography.IDigitalSignature&gt; signatures) cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>MimeKit.MimeEntity</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="ctx" Type="MimeKit.Cryptography.SecureMimeContext" />
-        <Parameter Name="signatures" Type="System.Collections.Generic.IList&lt;MimeKit.Cryptography.IDigitalSignature&gt;&amp;" RefType="out" />
-      </Parameters>
-      <Docs>
-        <param name="ctx">The S/MIME context to use for decrypting.</param>
-        <param name="signatures">The list of digital signatures for this application/pkcs7-mime part.</param>
         <summary>
             Decrypt using the specified <see cref="T:MimeKit.Cryptography.CryptographyContext" />.
             </summary>
@@ -293,7 +260,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Encrypt(class MimeKit.Cryptography.CmsRecipientCollection recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -312,10 +279,10 @@
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentNullException">
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -327,7 +294,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Encrypt(class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -346,10 +313,10 @@
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentNullException">
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:System.ArgumentException">
             Valid certificates could not be found for one or more of the <paramref name="recipients" />.
@@ -367,7 +334,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Encrypt(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.Cryptography.CmsRecipientCollection recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -391,10 +358,10 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -406,7 +373,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Encrypt(class MimeKit.Cryptography.SecureMimeContext ctx, class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -430,10 +397,10 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:System.ArgumentException">
             Valid certificates could not be found for one or more of the <paramref name="recipients" />.
@@ -451,7 +418,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void Import(class MimeKit.Cryptography.SecureMimeContext ctx) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -478,7 +445,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype MimeKit.Cryptography.SecureMimeType SecureMimeType" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.SecureMimeType</ReturnType>
@@ -496,7 +463,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Sign(class MimeKit.Cryptography.CmsSigner signer, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -520,10 +487,10 @@
             </remarks>
         <exception cref="T:System.ArgumentNullException">
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -535,7 +502,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Sign(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.Cryptography.CmsSigner signer, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -564,10 +531,10 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -579,7 +546,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Sign(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -605,10 +572,10 @@
             </remarks>
         <exception cref="T:System.ArgumentNullException">
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:MimeKit.Cryptography.CertificateNotFoundException">
             A signing certificate could not be found for <paramref name="signer" />.
@@ -623,7 +590,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime Sign(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -654,10 +621,10 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:MimeKit.Cryptography.CertificateNotFoundException">
             A signing certificate could not be found for <paramref name="signer" />.
@@ -672,7 +639,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime SignAndEncrypt(class MimeKit.Cryptography.CmsSigner signer, class MimeKit.Cryptography.CmsRecipientCollection recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -693,13 +660,13 @@
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentNullException">
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -711,7 +678,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime SignAndEncrypt(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.Cryptography.CmsSigner signer, class MimeKit.Cryptography.CmsRecipientCollection recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -737,13 +704,13 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:Org.BouncyCastle.Cms.CmsException">
             An error occurred in the cryptographic message syntax subsystem.
@@ -755,7 +722,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime SignAndEncrypt(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -778,13 +745,13 @@
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentNullException">
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:MimeKit.Cryptography.CertificateNotFoundException">
           <para>A signing certificate could not be found for <paramref name="signer" />.</para>
@@ -801,7 +768,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.ApplicationPkcs7Mime SignAndEncrypt(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -829,13 +796,13 @@
             <paramref name="ctx" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="signer" /> is<c>null</c>.</para>
+            <paramref name="signer" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="recipients" /> is<c>null</c>.</para>
+            <paramref name="recipients" /> is <c>null</c>.</para>
           <para>-or-</para>
           <para>
-            <paramref name="entity" /> is<c>null</c>.</para>
+            <paramref name="entity" /> is <c>null</c>.</para>
         </exception>
         <exception cref="T:MimeKit.Cryptography.CertificateNotFoundException">
           <para>A signing certificate could not be found for <paramref name="signer" />.</para>
@@ -848,24 +815,24 @@
       </Docs>
     </Member>
     <Member MemberName="Verify">
-      <MemberSignature Language="C#" Value="public MimeKit.MimeEntity Verify (out System.Collections.Generic.IList&lt;MimeKit.Cryptography.IDigitalSignature&gt; signatures);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Verify(class System.Collections.Generic.IList`1&lt;class MimeKit.Cryptography.IDigitalSignature&gt; signatures) cil managed" />
+      <MemberSignature Language="C#" Value="public MimeKit.Cryptography.DigitalSignatureCollection Verify (out MimeKit.MimeEntity entity);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.Cryptography.DigitalSignatureCollection Verify(class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>MimeKit.MimeEntity</ReturnType>
+        <ReturnType>MimeKit.Cryptography.DigitalSignatureCollection</ReturnType>
       </ReturnValue>
       <Parameters>
-        <Parameter Name="signatures" Type="System.Collections.Generic.IList&lt;MimeKit.Cryptography.IDigitalSignature&gt;&amp;" RefType="out" />
+        <Parameter Name="entity" Type="MimeKit.MimeEntity&amp;" RefType="out" />
       </Parameters>
       <Docs>
-        <param name="signatures">The digital signatures.</param>
+        <param name="entity">The unencapsulated entity.</param>
         <summary>
             Verify the signed-data and return the unencapsulated <see cref="T:MimeKit.MimeEntity" />.
             </summary>
-        <returns>The unencapsulated <see cref="T:MimeKit.MimeEntity" />.</returns>
+        <returns>The list of digital signatures.</returns>
         <remarks>To be added.</remarks>
         <exception cref="T:System.InvalidOperationException">
             The "smime-type" parameter on the Content-Type header is not "signed-data".
@@ -876,26 +843,26 @@
       </Docs>
     </Member>
     <Member MemberName="Verify">
-      <MemberSignature Language="C#" Value="public MimeKit.MimeEntity Verify (MimeKit.Cryptography.SecureMimeContext ctx, out System.Collections.Generic.IList&lt;MimeKit.Cryptography.IDigitalSignature&gt; signatures);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Verify(class MimeKit.Cryptography.SecureMimeContext ctx, class System.Collections.Generic.IList`1&lt;class MimeKit.Cryptography.IDigitalSignature&gt; signatures) cil managed" />
+      <MemberSignature Language="C#" Value="public MimeKit.Cryptography.DigitalSignatureCollection Verify (MimeKit.Cryptography.SecureMimeContext ctx, out MimeKit.MimeEntity entity);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.Cryptography.DigitalSignatureCollection Verify(class MimeKit.Cryptography.SecureMimeContext ctx, class MimeKit.MimeEntity entity) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>MimeKit.MimeEntity</ReturnType>
+        <ReturnType>MimeKit.Cryptography.DigitalSignatureCollection</ReturnType>
       </ReturnValue>
       <Parameters>
         <Parameter Name="ctx" Type="MimeKit.Cryptography.SecureMimeContext" />
-        <Parameter Name="signatures" Type="System.Collections.Generic.IList&lt;MimeKit.Cryptography.IDigitalSignature&gt;&amp;" RefType="out" />
+        <Parameter Name="entity" Type="MimeKit.MimeEntity&amp;" RefType="out" />
       </Parameters>
       <Docs>
         <param name="ctx">The S/MIME context to use for verifying the signature.</param>
-        <param name="signatures">The digital signatures.</param>
+        <param name="entity">The unencapsulated entity.</param>
         <summary>
             Verify the signed-data and return the unencapsulated <see cref="T:MimeKit.MimeEntity" />.
             </summary>
-        <returns>The unencapsulated <see cref="T:MimeKit.MimeEntity" />.</returns>
+        <returns>The list of digital signatures.</returns>
         <remarks>To be added.</remarks>
         <exception cref="T:System.InvalidOperationException">
             The "smime-type" parameter on the Content-Type header is not "signed-data".

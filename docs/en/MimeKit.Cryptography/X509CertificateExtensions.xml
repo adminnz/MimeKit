@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi abstract sealed beforefieldinit X509CertificateExtensions extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.12.0.0</AssemblyVersion>
+    <AssemblyVersion>0.16.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.Object</BaseTypeName>
@@ -13,7 +13,9 @@
     <summary>
             X509Certificate extension methods.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            A collection of useful extension methods for an <see cref="T:Org.BouncyCastle.X509.X509Certificate" />.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName="GetCommonName">
@@ -21,7 +23,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig string GetCommonName(class Org.BouncyCastle.X509.X509Certificate certificate) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -38,12 +40,37 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="GetFingerprint">
+      <MemberSignature Language="C#" Value="public static string GetFingerprint (this Org.BouncyCastle.X509.X509Certificate certificate);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig string GetFingerprint(class Org.BouncyCastle.X509.X509Certificate certificate) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.String</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="certificate" Type="Org.BouncyCastle.X509.X509Certificate" RefType="this" />
+      </Parameters>
+      <Docs>
+        <param name="certificate">The certificate.</param>
+        <summary>
+            Gets the fingerprint of the certificate.
+            </summary>
+        <returns>The fingerprint.</returns>
+        <remarks>
+            A fingerprint is a SHA-1 hash of the raw certificate data and is often used
+            as a unique identifier for a particular certificate in a certificate store.
+            </remarks>
+      </Docs>
+    </Member>
     <Member MemberName="GetIssuerNameInfo">
       <MemberSignature Language="C#" Value="public static string GetIssuerNameInfo (this Org.BouncyCastle.X509.X509Certificate certificate, Org.BouncyCastle.Asn1.DerObjectIdentifier identifier);" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig string GetIssuerNameInfo(class Org.BouncyCastle.X509.X509Certificate certificate, class Org.BouncyCastle.Asn1.DerObjectIdentifier identifier) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -59,7 +86,34 @@
             Gets the issuer name info.
             </summary>
         <returns>The issuer name info.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            For a list of available identifiers, see <see cref="T:Org.BouncyCastle.Asn1.X509.X509Name" />.
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="GetKeyUsageFlags">
+      <MemberSignature Language="C#" Value="public static MimeKit.Cryptography.X509KeyUsageFlags GetKeyUsageFlags (this Org.BouncyCastle.X509.X509Certificate certificate);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig valuetype MimeKit.Cryptography.X509KeyUsageFlags GetKeyUsageFlags(class Org.BouncyCastle.X509.X509Certificate certificate) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MimeKit.Cryptography.X509KeyUsageFlags</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="certificate" Type="Org.BouncyCastle.X509.X509Certificate" RefType="this" />
+      </Parameters>
+      <Docs>
+        <param name="certificate">The certificate.</param>
+        <summary>
+            Gets the key usage flags.
+            </summary>
+        <returns>The key usage flags.</returns>
+        <remarks>
+            The X.509 Key Usage Flags are used to determine which operations a certificate
+            may be used for.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="GetSubjectEmailAddress">
@@ -67,7 +121,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig string GetSubjectEmailAddress(class Org.BouncyCastle.X509.X509Certificate certificate) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -81,7 +135,11 @@
             Gets the subject email address of the certificate.
             </summary>
         <returns>The subject email address.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The email address component of the certificate's Subject identifier is
+            sometimes used as a way of looking up certificates for a particular
+            user if a fingerprint is not available.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="GetSubjectName">
@@ -89,7 +147,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig string GetSubjectName(class Org.BouncyCastle.X509.X509Certificate certificate) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -111,7 +169,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig string GetSubjectNameInfo(class Org.BouncyCastle.X509.X509Certificate certificate, class Org.BouncyCastle.Asn1.DerObjectIdentifier identifier) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.12.0.0</AssemblyVersion>
+        <AssemblyVersion>0.16.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -127,7 +185,9 @@
             Gets the issuer name info.
             </summary>
         <returns>The issuer name info.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            For a list of available identifiers, see <see cref="T:Org.BouncyCastle.Asn1.X509.X509Name" />.
+            </remarks>
       </Docs>
     </Member>
   </Members>

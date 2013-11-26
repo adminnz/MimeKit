@@ -25,20 +25,28 @@
 //
 
 using System;
+using System.Text;
 
-using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
 	/// X509Certificate extension methods.
 	/// </summary>
+	/// <remarks>
+	/// A collection of useful extension methods for an <see cref="Org.BouncyCastle.X509.X509Certificate"/>.
+	/// </remarks>
 	public static class X509CertificateExtensions
 	{
 		/// <summary>
 		/// Gets the issuer name info.
 		/// </summary>
+		/// <remarks>
+		/// For a list of available identifiers, see <see cref="Org.BouncyCastle.Asn1.X509.X509Name"/>.
+		/// </remarks>
 		/// <returns>The issuer name info.</returns>
 		/// <param name="certificate">The certificate.</param>
 		/// <param name="identifier">The name identifier.</param>
@@ -55,6 +63,9 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets the issuer name info.
 		/// </summary>
+		/// <remarks>
+		/// For a list of available identifiers, see <see cref="Org.BouncyCastle.Asn1.X509.X509Name"/>.
+		/// </remarks>
 		/// <returns>The issuer name info.</returns>
 		/// <param name="certificate">The certificate.</param>
 		/// <param name="identifier">The name identifier.</param>
@@ -91,11 +102,90 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets the subject email address of the certificate.
 		/// </summary>
+		/// <remarks>
+		/// The email address component of the certificate's Subject identifier is
+		/// sometimes used as a way of looking up certificates for a particular
+		/// user if a fingerprint is not available.
+		/// </remarks>
 		/// <returns>The subject email address.</returns>
 		/// <param name="certificate">The certificate.</param>
 		public static string GetSubjectEmailAddress (this X509Certificate certificate)
 		{
 			return certificate.GetSubjectNameInfo (X509Name.EmailAddress);
+		}
+
+		/// <summary>
+		/// Gets the fingerprint of the certificate.
+		/// </summary>
+		/// <remarks>
+		/// A fingerprint is a SHA-1 hash of the raw certificate data and is often used
+		/// as a unique identifier for a particular certificate in a certificate store.
+		/// </remarks>
+		/// <returns>The fingerprint.</returns>
+		/// <param name="certificate">The certificate.</param>
+		public static string GetFingerprint (this X509Certificate certificate)
+		{
+			var encoded = certificate.GetEncoded ();
+			var fingerprint = new StringBuilder ();
+			var sha1 = new Sha1Digest ();
+			var data = new byte[20];
+
+			sha1.BlockUpdate (encoded, 0, encoded.Length);
+			sha1.DoFinal (data, 0);
+
+			for (int i = 0; i < data.Length; i++)
+				fingerprint.Append (data[i].ToString ("x2"));
+
+			return fingerprint.ToString ();
+		}
+
+		internal static X509KeyUsageFlags GetKeyUsageFlags (bool[] usage)
+		{
+			var flags = X509KeyUsageFlags.None;
+
+			if (usage != null) {
+				if (usage[(int) X509KeyUsageBits.DigitalSignature])
+					flags |= X509KeyUsageFlags.DigitalSignature;
+				if (usage[(int) X509KeyUsageBits.NonRepudiation])
+					flags |= X509KeyUsageFlags.NonRepudiation;
+				if (usage[(int) X509KeyUsageBits.KeyEncipherment])
+					flags |= X509KeyUsageFlags.KeyEncipherment;
+				if (usage[(int) X509KeyUsageBits.DataEncipherment])
+					flags |= X509KeyUsageFlags.DataEncipherment;
+				if (usage[(int) X509KeyUsageBits.KeyAgreement])
+					flags |= X509KeyUsageFlags.KeyAgreement;
+				if (usage[(int) X509KeyUsageBits.KeyCertSign])
+					flags |= X509KeyUsageFlags.KeyCertSign;
+				if (usage[(int) X509KeyUsageBits.CrlSign])
+					flags |= X509KeyUsageFlags.CrlSign;
+				if (usage[(int) X509KeyUsageBits.EncipherOnly])
+					flags |= X509KeyUsageFlags.EncipherOnly;
+				if (usage[(int) X509KeyUsageBits.DecipherOnly])
+					flags |= X509KeyUsageFlags.DecipherOnly;
+			}
+
+			return flags;
+		}
+
+		/// <summary>
+		/// Gets the key usage flags.
+		/// </summary>
+		/// <remarks>
+		/// The X.509 Key Usage Flags are used to determine which operations a certificate
+		/// may be used for.
+		/// </remarks>
+		/// <returns>The key usage flags.</returns>
+		/// <param name="certificate">The certificate.</param>
+		public static X509KeyUsageFlags GetKeyUsageFlags (this X509Certificate certificate)
+		{
+			return GetKeyUsageFlags (certificate.GetKeyUsage ());
+		}
+
+		internal static bool IsDelta (this X509Crl crl)
+		{
+			var critical = crl.GetCriticalExtensionOids ();
+
+			return critical.Contains (X509Extensions.DeltaCrlIndicator.Id);
 		}
 	}
 }

@@ -62,6 +62,7 @@ namespace MimeKit.Cryptography {
 		/// <value>The key exchange protocol.</value>
 		public abstract string KeyExchangeProtocol { get; }
 
+		#if NOT_YET
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="MimeKit.Cryptography.CryptographyContext"/> allows online
 		/// certificate retrieval.
@@ -74,6 +75,7 @@ namespace MimeKit.Cryptography {
 		/// </summary>
 		/// <value>The online certificate retrieval timeout.</value>
 		public TimeSpan OnlineCertificateRetrievalTimeout { get; set; }
+		#endif
 
 		/// <summary>
 		/// Checks whether or not the specified protocol is supported by the <see cref="CryptographyContext"/>.
@@ -140,7 +142,7 @@ namespace MimeKit.Cryptography {
 		/// <para>-or-</para>
 		/// <para><paramref name="signatureData"/> is <c>null</c>.</para>
 		/// </exception>
-		public abstract IList<IDigitalSignature> Verify (Stream content, Stream signatureData);
+		public abstract DigitalSignatureCollection Verify (Stream content, Stream signatureData);
 
 		/// <summary>
 		/// Encrypts the specified content for the specified recipients.
@@ -160,44 +162,14 @@ namespace MimeKit.Cryptography {
 		public abstract MimePart Encrypt (IEnumerable<MailboxAddress> recipients, Stream content);
 
 		/// <summary>
-		/// Signs and encrypts the specified content for the specified recipients.
-		/// </summary>
-		/// <returns>A new <see cref="MimeKit.MimePart"/> instance
-		/// containing the encrypted data.</returns>
-		/// <param name="signer">The signer.</param>
-		/// <param name="digestAlgo">The digest algorithm to use for signing.</param>
-		/// <param name="recipients">The recipients.</param>
-		/// <param name="content">The content.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <para><paramref name="signer"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="recipients"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="content"/> is <c>null</c>.</para>
-		/// </exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="digestAlgo"/> is out of range.
-		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// The specified <see cref="DigestAlgorithm"/> is not supported by this context.
-		/// </exception>
-		/// <exception cref="CertificateNotFoundException">
-		/// <para>A signing certificate could not be found for <paramref name="signer"/>.</para>
-		/// <para>-or-</para>
-		/// <para>A certificate could not be found for one or more of the <paramref name="recipients"/>.</para>
-		/// </exception>
-		public abstract MimePart SignAndEncrypt (MailboxAddress signer, DigestAlgorithm digestAlgo, IEnumerable<MailboxAddress> recipients, Stream content);
-
-		/// <summary>
 		/// Decrypt the specified encryptedData.
 		/// </summary>
 		/// <returns>The decrypted <see cref="MimeKit.MimeEntity"/>.</returns>
 		/// <param name="encryptedData">The encrypted data.</param>
-		/// <param name="signatures">A list of digital signatures if the data was both signed and encrypted.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="encryptedData"/> is <c>null</c>.
 		/// </exception>
-		public abstract MimeEntity Decrypt (Stream encryptedData, out IList<IDigitalSignature> signatures);
+		public abstract MimeEntity Decrypt (Stream encryptedData);
 
 		/// <summary>
 		/// Imports the public certificates or keys from the specified stream.

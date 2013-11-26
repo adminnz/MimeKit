@@ -30,39 +30,32 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Org.BouncyCastle.Cms;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Pkix;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Asn1.Smime;
 using Org.BouncyCastle.X509.Store;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
-	/// A default <see cref="SecureMimeContext"/> implementation that uses a pkcs12 file as a certificate and private key store.
+	/// A default <see cref="SecureMimeContext"/> implementation that uses
+	/// an SQLite database as a certificate and private key store.
 	/// </summary>
 	public class DefaultSecureMimeContext : SecureMimeContext
 	{
 		/// <summary>
-		/// The default root certificate store path.
+		/// The default database path for certificates, private keys and CRLs.
 		/// </summary>
 		/// <remarks>
-		/// <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\root-certs.crt</c>.</para>
-		/// <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/root-certs.crt</c>.</para>
+		/// <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\smime.db</c>.</para>
+		/// <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/smime.db</c>.</para>
 		/// </remarks>
-		protected static readonly string DefaultRootCertificatesPath;
+		protected static readonly string DefaultDatabasePath;
 
-		/// <summary>
-		/// The default user certificate store path.
-		/// </summary>
-		/// <remarks>
-		/// <para>On Microsoft Windows-based systems, this path will be something like <c>C:\Users\UserName\AppData\Roaming\mimekit\user-certs.p12</c>.</para>
-		/// <para>On Unix systems such as Linux and Mac OS X, this path will be <c>~/.mimekit/user-certs.p12</c>.</para>
-		/// </remarks>
-		protected static readonly string DefaultUserCertificatesPath;
-
-		readonly X509CertificateStore store;
-		readonly X509CertificateStore root;
-		readonly string password;
-		readonly string path;
+		readonly X509CertificateDatabase dbase;
 
 		static DefaultSecureMimeContext ()
 		{
@@ -79,62 +72,60 @@ namespace MimeKit.Cryptography {
 			if (!Directory.Exists (path))
 				Directory.CreateDirectory (path);
 
-			DefaultRootCertificatesPath = Path.Combine (path, "root-certs.crt");
-			DefaultUserCertificatesPath = Path.Combine (path, "user-certs.p12");
+			DefaultDatabasePath = Path.Combine (path, "smime.db");
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.DefaultSecureMimeContext"/> class.
 		/// </summary>
-		/// <param name="rootCertificatesPath">The path to the root certificates.</param>
-		/// <param name="userCertificatesPath">The path to the pkcs12-formatted user certificates.</param>
-		/// <param name="password">The password for the pkcs12 user certificates file.</param>
+		/// <param name="fileName">The path to the SQLite database.</param>
+		/// <param name="password">The password for SQLite database.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <para><paramref name="rootCertificatesPath"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="userCertificatesPath"/> is <c>null</c>.</para>
+		/// <para><paramref name="fileName"/> is <c>null</c>.</para>
 		/// <para>-or-</para>
 		/// <para><paramref name="password"/> is <c>null</c>.</para>
 		/// </exception>
-		/// <exception cref="System.IO.IOException">
-		/// An error occurred while reading the file.
+		/// <exception cref="System.ArgumentException">
+		/// The specified file path is empty.
 		/// </exception>
-		protected DefaultSecureMimeContext (string rootCertificatesPath, string userCertificatesPath, string password)
+		/// <exception cref="System.UnauthorizedAccessException">
+		/// The user does not have access to read the specified file.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An error occurred reading the file.
+		/// </exception>
+		public DefaultSecureMimeContext (string fileName, string password)
 		{
-			store = new X509CertificateStore ();
-			root = new X509CertificateStore ();
+			if (fileName == null)
+				throw new ArgumentNullException ("fileName");
 
-			try {
-				store.Import (userCertificatesPath, password);
-			} catch (FileNotFoundException) {
+			if (password == null)
+				throw new ArgumentNullException ("password");
+
+			var dir = Path.GetDirectoryName (fileName);
+			var exists = File.Exists (fileName);
+
+			if (!string.IsNullOrEmpty (dir) && !Directory.Exists (dir))
+				Directory.CreateDirectory (dir);
+
+			dbase = new X509CertificateDatabase (fileName, password);
+
+			if (!exists) {
+				// TODO: initialize our dbase with some root CA certificates.
 			}
-
-			try {
-				root.Import (rootCertificatesPath);
-			} catch (FileNotFoundException) {
-			}
-
-			this.path = userCertificatesPath;
-			this.password = password;
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.DefaultSecureMimeContext"/> class.
 		/// </summary>
-		/// <exception cref="System.IO.IOException">
-		/// An error occurred while reading the backing pkcs12 file.
+		/// <exception cref="System.UnauthorizedAccessException">
+		/// The user does not have access to read the database at the default location.
 		/// </exception>
-		public DefaultSecureMimeContext () : this (DefaultRootCertificatesPath, DefaultUserCertificatesPath, "no.secret")
+		/// <exception cref="System.IO.IOException">
+		/// An error occurred reading the database at the default location.
+		/// </exception>
+		public DefaultSecureMimeContext () : this (DefaultDatabasePath, "no.secret")
 		{
-		}
-
-		void Save ()
-		{
-			var dir = Path.GetDirectoryName (path);
-			if (!Directory.Exists (dir))
-				Directory.CreateDirectory (dir);
-
-			store.Export (path, password);
 		}
 
 		#region implemented abstract members of SecureMimeContext
@@ -146,7 +137,7 @@ namespace MimeKit.Cryptography {
 		/// <param name="selector">The search criteria for the certificate.</param>
 		protected override X509Certificate GetCertificate (IX509Selector selector)
 		{
-			return store.GetMatches (selector).FirstOrDefault ();
+			return dbase.FindCertificates (selector).FirstOrDefault ();
 		}
 
 		/// <summary>
@@ -156,15 +147,7 @@ namespace MimeKit.Cryptography {
 		/// <param name="selector">The search criteria for the private key.</param>
 		protected override AsymmetricKeyParameter GetPrivateKey (IX509Selector selector)
 		{
-			foreach (var certificate in store.GetMatches (selector)) {
-				var key = store.GetPrivateKey (certificate);
-				if (key == null)
-					continue;
-
-				return key;
-			}
-
-			return null;
+			return dbase.FindPrivateKeys (selector).FirstOrDefault ();
 		}
 
 		/// <summary>
@@ -174,9 +157,14 @@ namespace MimeKit.Cryptography {
 		protected override Org.BouncyCastle.Utilities.Collections.HashSet GetTrustedAnchors ()
 		{
 			var anchors = new Org.BouncyCastle.Utilities.Collections.HashSet ();
+			var selector = new X509CertStoreSelector ();
+			var keyUsage = new bool[9];
 
-			foreach (var certificate in root.Certificates) {
-				anchors.Add (new TrustAnchor (certificate, null));
+			keyUsage[(int) X509KeyUsageBits.KeyCertSign] = true;
+			selector.KeyUsage = keyUsage;
+
+			foreach (var record in dbase.Find (selector, true, X509CertificateRecordFields.Certificate)) {
+				anchors.Add (new TrustAnchor (record.Certificate, null));
 			}
 
 			return anchors;
@@ -188,7 +176,7 @@ namespace MimeKit.Cryptography {
 		/// <returns>The intermediate certificates.</returns>
 		protected override IX509Store GetIntermediateCertificates ()
 		{
-			return store;
+			return dbase;
 		}
 
 		/// <summary>
@@ -197,9 +185,30 @@ namespace MimeKit.Cryptography {
 		/// <returns>The certificate revocation lists.</returns>
 		protected override IX509Store GetCertificateRevocationLists ()
 		{
-			var crls = new List<X509Crl> ();
+			return dbase.GetCrlStore ();
+		}
 
-			return X509StoreFactory.Create ("Crl/Collection", new X509CollectionStoreParameters (crls));
+		static EncryptionAlgorithm[] DecodeEncryptionAlgorithms (byte[] rawData)
+		{
+			using (var memory = new MemoryStream (rawData, false)) {
+				using (var asn1 = new Asn1InputStream (memory)) {
+					var algorithms = new List<EncryptionAlgorithm> ();
+					var sequence = asn1.ReadObject () as Asn1Sequence;
+
+					if (sequence == null)
+						return null;
+
+					for (int i = 0; i < sequence.Count; i++) {
+						var identifier = AlgorithmIdentifier.GetInstance (sequence[i]);
+						EncryptionAlgorithm algorithm;
+
+						if (TryGetEncryptionAlgorithm (identifier, out algorithm))
+							algorithms.Add (algorithm);
+					}
+
+					return algorithms.ToArray ();
+				}
+			}
 		}
 
 		/// <summary>
@@ -212,9 +221,24 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		protected override CmsRecipient GetCmsRecipient (MailboxAddress mailbox)
 		{
-			foreach (var certificate in store.Certificates) {
-				if (certificate.GetSubjectEmailAddress () == mailbox.Address)
-					return new CmsRecipient (certificate);
+			foreach (var record in dbase.Find (mailbox, DateTime.Now, false, X509CertificateRecordFields.CmsRecipient)) {
+				if (record.KeyUsage != 0 && (record.KeyUsage & X509KeyUsageFlags.DataEncipherment) == 0)
+					continue;
+
+				var recipient = new CmsRecipient (record.Certificate);
+				if (record.Algorithms == null) {
+					var capabilities = record.Certificate.GetExtensionValue (SmimeAttributes.SmimeCapabilities);
+					if (capabilities != null) {
+						var algorithms = DecodeEncryptionAlgorithms (capabilities.GetOctets ());
+
+						if (algorithms != null)
+							recipient.EncryptionAlgorithms = algorithms;
+					}
+				} else {
+					recipient.EncryptionAlgorithms = record.Algorithms;
+				}
+
+				return recipient;
 			}
 
 			throw new CertificateNotFoundException (mailbox, "A valid certificate could not be found.");
@@ -231,17 +255,41 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		protected override CmsSigner GetCmsSigner (MailboxAddress mailbox, DigestAlgorithm digestAlgo)
 		{
-			foreach (var certificate in store.Certificates) {
-				var key = store.GetPrivateKey (certificate);
+			foreach (var record in dbase.Find (mailbox, DateTime.Now, true, X509CertificateRecordFields.CmsSigner)) {
+				if (record.KeyUsage != X509KeyUsageFlags.None && (record.KeyUsage & X509KeyUsageFlags.DigitalSignature) == 0)
+					continue;
 
-				if (key != null && certificate.GetSubjectEmailAddress () == mailbox.Address) {
-					var signer = new CmsSigner (certificate, key);
-					signer.DigestAlgorithm = digestAlgo;
-					return signer;
-				}
+				var signer = new CmsSigner (record.Certificate, record.PrivateKey);
+				signer.DigestAlgorithm = digestAlgo;
+
+				return signer;
 			}
 
 			throw new CertificateNotFoundException (mailbox, "A valid signing certificate could not be found.");
+		}
+
+		/// <summary>
+		/// Updates the known S/MIME capabilities of the client used by the recipient that owns the specified certificate.
+		/// </summary>
+		/// <param name="certificate">The certificate.</param>
+		/// <param name="algorithms">The encryption algorithm capabilities of the client (in preferred order).</param>
+		/// <param name="timestamp">The timestamp.</param>
+		protected override void UpdateSecureMimeCapabilities (X509Certificate certificate, EncryptionAlgorithm[] algorithms, DateTime timestamp)
+		{
+			X509CertificateRecord record;
+
+			if ((record = dbase.Find (certificate, X509CertificateRecordFields.UpdateAlgorithms)) == null) {
+				record = new X509CertificateRecord (certificate);
+				record.AlgorithmsUpdated = timestamp;
+				record.Algorithms = algorithms;
+
+				dbase.Add (record);
+			} else if (timestamp > record.AlgorithmsUpdated) {
+				record.AlgorithmsUpdated = timestamp;
+				record.Algorithms = algorithms;
+
+				dbase.Update (record, X509CertificateRecordFields.UpdateAlgorithms);
+			}
 		}
 
 		/// <summary>
@@ -256,8 +304,8 @@ namespace MimeKit.Cryptography {
 			if (certificate == null)
 				throw new ArgumentNullException ("certificate");
 
-			store.Add (certificate);
-			Save ();
+			if (dbase.Find (certificate, X509CertificateRecordFields.Id) == null)
+				dbase.Add (new X509CertificateRecord (certificate));
 		}
 
 		/// <summary>
@@ -272,7 +320,30 @@ namespace MimeKit.Cryptography {
 			if (crl == null)
 				throw new ArgumentNullException ("crl");
 
-			// FIXME: implement this
+			// check for an exact match...
+			if (dbase.Find (crl, X509CrlRecordFields.Id) != null)
+				return;
+
+			var obsolete = new List<X509CrlRecord> ();
+			var delta = crl.IsDelta ();
+
+			// scan over our list of CRLs by the same issuer to check if this CRL obsoletes any
+			// older CRLs or if there are any newer CRLs that obsolete that obsolete this one.
+			foreach (var record in dbase.Find (crl.IssuerDN, X509CrlRecordFields.AllExeptCrl)) {
+				if (!record.IsDelta && record.ThisUpdate >= crl.ThisUpdate) {
+					// we have a complete CRL that obsoletes this CRL
+					return;
+				}
+
+				if (!delta)
+					obsolete.Add (record);
+			}
+
+			// remove any obsoleted CRLs
+			foreach (var record in obsolete)
+				dbase.Remove (record);
+
+			dbase.Add (new X509CrlRecord (crl));
 		}
 
 		/// <summary>
@@ -296,10 +367,85 @@ namespace MimeKit.Cryptography {
 			if (password == null)
 				throw new ArgumentNullException ("password");
 
-			store.Import (stream, password);
-			Save ();
+			var pkcs12 = new Pkcs12Store (stream, password.ToCharArray ());
+			var enabledAlgorithms = EnabledEncryptionAlgorithms;
+			X509CertificateRecord record;
+
+			foreach (string alias in pkcs12.Aliases) {
+				if (pkcs12.IsKeyEntry (alias)) {
+					var chain = pkcs12.GetCertificateChain (alias);
+					var entry = pkcs12.GetKey (alias);
+					int startIndex = 0;
+
+					if (entry.Key.IsPrivate) {
+						if ((record = dbase.Find (chain[0].Certificate, X509CertificateRecordFields.ImportPkcs12)) == null) {
+							record = new X509CertificateRecord (chain[0].Certificate, entry.Key);
+							record.AlgorithmsUpdated = DateTime.Now;
+							record.Algorithms = enabledAlgorithms;
+							record.IsTrusted = true;
+							dbase.Add (record);
+						} else {
+							record.AlgorithmsUpdated = DateTime.Now;
+							record.Algorithms = enabledAlgorithms;
+							if (record.PrivateKey == null)
+								record.PrivateKey = entry.Key;
+							record.IsTrusted = true;
+							dbase.Update (record, X509CertificateRecordFields.ImportPkcs12);
+						}
+
+						startIndex = 1;
+					}
+
+					for (int i = startIndex; i < chain.Length; i++) {
+						if ((record = dbase.Find (chain[i].Certificate, X509CertificateRecordFields.Id)) == null)
+							dbase.Add (new X509CertificateRecord (chain[i].Certificate));
+					}
+				} else if (pkcs12.IsCertificateEntry (alias)) {
+					var entry = pkcs12.GetCertificate (alias);
+
+					if ((record = dbase.Find (entry.Certificate, X509CertificateRecordFields.Id)) == null)
+						dbase.Add (new X509CertificateRecord (entry.Certificate));
+				}
+			}
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Imports a DER-encoded certificate stream.
+		/// </summary>
+		/// <param name="stream">The raw certificate(s).</param>
+		/// <param name="trusted"><c>true</c> if the certificates are trusted.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="stream"/> is <c>null</c>.
+		/// </exception>
+		public void Import (Stream stream, bool trusted)
+		{
+			if (stream == null)
+				throw new ArgumentNullException ("stream");
+
+			var parser = new X509CertificateParser ();
+
+			foreach (X509Certificate certificate in parser.ReadCertificates (stream)) {
+				if (dbase.Find (certificate, X509CertificateRecordFields.Id) != null)
+					continue;
+
+				var record = new X509CertificateRecord (certificate);
+				record.IsTrusted = trusted;
+				dbase.Add (record);
+			}
+		}
+
+		/// <summary>
+		/// Releases all resources used by the <see cref="MimeKit.Cryptography.DefaultSecureMimeContext"/> object.
+		/// </summary>
+		/// <param name="disposing">If <c>true</c>, this method is being called by
+		/// <see cref="CryptographyContext.Dispose()"/>; otherwise it is being called by the finalizer.</param>
+		protected override void Dispose (bool disposing)
+		{
+			dbase.Dispose ();
+
+			base.Dispose (disposing);
+		}
 	}
 }

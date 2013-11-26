@@ -41,6 +41,7 @@ using Org.BouncyCastle.Pkix;
 namespace UnitTests {
 	public class DummySecureMimeContext : SecureMimeContext
 	{
+		readonly Dictionary<X509Certificate, EncryptionAlgorithm[]> capabilities = new Dictionary<X509Certificate, EncryptionAlgorithm[]> ();
 		internal readonly Dictionary<X509Certificate, AsymmetricKeyParameter> keys = new Dictionary<X509Certificate, AsymmetricKeyParameter> ();
 		internal readonly List<X509Certificate> certificates = new List<X509Certificate> ();
 		internal readonly List<X509Crl> crls = new List<X509Crl> ();
@@ -133,9 +134,25 @@ namespace UnitTests {
 		/// </exception>
 		protected override CmsRecipient GetCmsRecipient (MailboxAddress mailbox)
 		{
+			var now = DateTime.Now;
+
 			foreach (var certificate in certificates) {
-				if (certificate.GetSubjectEmailAddress () == mailbox.Address)
-					return new CmsRecipient (certificate);
+				if (certificate.NotBefore > now || certificate.NotAfter < now)
+					continue;
+
+				var keyUsage = certificate.GetKeyUsage ();
+				if (keyUsage != null && !keyUsage[4])
+					continue;
+
+				if (certificate.GetSubjectEmailAddress () == mailbox.Address) {
+					var recipient = new CmsRecipient (certificate);
+					EncryptionAlgorithm[] algorithms;
+
+					if (capabilities.TryGetValue (certificate, out algorithms))
+						recipient.EncryptionAlgorithms = algorithms;
+
+					return recipient;
+				}
 			}
 
 			throw new CertificateNotFoundException (mailbox, "A valid certificate could not be found.");
@@ -152,8 +169,17 @@ namespace UnitTests {
 		/// </exception>
 		protected override CmsSigner GetCmsSigner (MailboxAddress mailbox, DigestAlgorithm digestAlgo)
 		{
+			var now = DateTime.Now;
+
 			foreach (var certificate in certificates) {
 				AsymmetricKeyParameter key;
+
+				if (certificate.NotBefore > now || certificate.NotAfter < now)
+					continue;
+
+				var keyUsage = certificate.GetKeyUsage ();
+				if (keyUsage != null && !keyUsage[7])
+					continue;
 
 				if (!keys.TryGetValue (certificate, out key))
 					continue;
@@ -166,6 +192,17 @@ namespace UnitTests {
 			}
 
 			throw new CertificateNotFoundException (mailbox, "A valid signing certificate could not be found.");
+		}
+
+		/// <summary>
+		/// Updates the known S/MIME capabilities of the client used by the recipient that owns the specified certificate.
+		/// </summary>
+		/// <param name="certificate">The certificate.</param>
+		/// <param name="algorithms">The encryption algorithm capabilities of the client (in preferred order).</param>
+		/// <param name="timestamp">The timestamp.</param>
+		protected override void UpdateSecureMimeCapabilities (X509Certificate certificate, EncryptionAlgorithm[] algorithms, DateTime timestamp)
+		{
+			capabilities[certificate] = algorithms;
 		}
 
 		/// <summary>

@@ -37,7 +37,11 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.X509.Store;
+using Org.BouncyCastle.Utilities.Date;
 using Org.BouncyCastle.Utilities.Collections;
+using Org.BouncyCastle.Asn1.Smime;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Asn1.Ntt;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
@@ -50,6 +54,43 @@ namespace MimeKit.Cryptography {
 	/// </remarks>
 	public abstract class SecureMimeContext : CryptographyContext
 	{
+		static readonly int EncryptionAlgorithmCount = Enum.GetValues (typeof (EncryptionAlgorithm)).Length;
+		static readonly EncryptionAlgorithm[] DefaultEncryptionAlgorithmRank;
+		int enabled;
+
+		static SecureMimeContext ()
+		{
+			DefaultEncryptionAlgorithmRank = new EncryptionAlgorithm[] {
+				EncryptionAlgorithm.Camellia256,
+				EncryptionAlgorithm.Aes256,
+				EncryptionAlgorithm.Camellia192,
+				EncryptionAlgorithm.Aes192,
+				EncryptionAlgorithm.Camellia128,
+				EncryptionAlgorithm.Aes128,
+				EncryptionAlgorithm.Idea,
+				EncryptionAlgorithm.Cast5,
+				EncryptionAlgorithm.TripleDes,
+				EncryptionAlgorithm.RC2128,
+				EncryptionAlgorithm.RC264,
+				EncryptionAlgorithm.Des,
+				EncryptionAlgorithm.RC240
+			};
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.SecureMimeContext"/> class.
+		/// </summary>
+		protected SecureMimeContext ()
+		{
+			foreach (var algorithm in DefaultEncryptionAlgorithmRank) {
+				Enable (algorithm);
+
+				// Don't enable anything weaker than Triple-DES by default
+				if (algorithm == EncryptionAlgorithm.TripleDes)
+					break;
+			}
+		}
+
 		/// <summary>
 		/// Gets the signature protocol.
 		/// </summary>
@@ -71,7 +112,7 @@ namespace MimeKit.Cryptography {
 		/// </summary>
 		/// <value>The key exchange protocol.</value>
 		public override string KeyExchangeProtocol {
-			get { return "application/pkcs7-keys"; }
+			get { return "application/pkcs7-mime"; }
 		}
 
 		/// <summary>
@@ -153,6 +194,59 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
+		/// Gets the preferred rank order for the encryption algorithms; from the strongest to the weakest.
+		/// </summary>
+		/// <value>The preferred encryption algorithm ranking.</value>
+		protected virtual EncryptionAlgorithm[] EncryptionAlgorithmRank {
+			get { return DefaultEncryptionAlgorithmRank; }
+		}
+
+		/// <summary>
+		/// Gets the enabled encryption algorithms in ranked order.
+		/// </summary>
+		/// <value>The enabled encryption algorithms.</value>
+		protected EncryptionAlgorithm[] EnabledEncryptionAlgorithms {
+			get {
+				var algorithms = new List<EncryptionAlgorithm> ();
+
+				foreach (var algorithm in EncryptionAlgorithmRank) {
+					if (IsEnabled (algorithm))
+						algorithms.Add (algorithm);
+				}
+
+				return algorithms.ToArray ();
+			}
+		}
+
+		/// <summary>
+		/// Enables the encryption algorithm.
+		/// </summary>
+		/// <param name="algorithm">The encryption algorithm.</param>
+		public void Enable (EncryptionAlgorithm algorithm)
+		{
+			enabled |= 1 << (int) algorithm;
+		}
+
+		/// <summary>
+		/// Disables the encryption algorithm.
+		/// </summary>
+		/// <param name="algorithm">The encryption algorithm.</param>
+		public void Disable (EncryptionAlgorithm algorithm)
+		{
+			enabled &= ~(1 << (int) algorithm);
+		}
+
+		/// <summary>
+		/// Determines whether the specified encryption algorithm is enabled.
+		/// </summary>
+		/// <returns><c>true</c> if the specified encryption algorithm is enabled; otherwise, <c>false</c>.</returns>
+		/// <param name="algorithm">Algorithm.</param>
+		public bool IsEnabled (EncryptionAlgorithm algorithm)
+		{
+			return (enabled & (1 << (int) algorithm)) != 0;
+		}
+
+		/// <summary>
 		/// Gets the X.509 certificate based on the selector.
 		/// </summary>
 		/// <returns>The certificate on success; otherwise <c>null</c>.</returns>
@@ -223,7 +317,26 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		protected abstract CmsSigner GetCmsSigner (MailboxAddress mailbox, DigestAlgorithm digestAlgo);
 
-		static string GetOid (DigestAlgorithm digestAlgo)
+		/// <summary>
+		/// Updates the known S/MIME capabilities of the client used by the recipient that owns the specified certificate.
+		/// </summary>
+		/// <param name="certificate">The certificate.</param>
+		/// <param name="algorithms">The encryption algorithm capabilities of the client (in preferred order).</param>
+		/// <param name="timestamp">The timestamp.</param>
+		protected abstract void UpdateSecureMimeCapabilities (X509Certificate certificate, EncryptionAlgorithm[] algorithms, DateTime timestamp);
+
+		/// <summary>
+		/// Gets the digest oid.
+		/// </summary>
+		/// <returns>The digest oid.</returns>
+		/// <param name="digestAlgo">The digest algorithm.</param>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="digestAlgo"/> is out of range.
+		/// </exception>
+		/// <exception cref="System.NotSupportedException">
+		/// The specified <see cref="DigestAlgorithm"/> is not supported by this context.
+		/// </exception>
+		protected static string GetDigestOid (DigestAlgorithm digestAlgo)
 		{
 			switch (digestAlgo) {
 			case DigestAlgorithm.MD5:        return PkcsObjectIdentifiers.MD5.Id;
@@ -285,23 +398,79 @@ namespace MimeKit.Cryptography {
 			if (stream == null)
 				throw new ArgumentNullException ("stream");
 
-			var decompresser = new CmsCompressedDataParser (stream);
-			var content = decompresser.GetContent ();
-			var parser = new MimeParser (content.ContentStream, MimeFormat.Entity);
+			var parser = new CmsCompressedDataParser (stream);
+			var content = parser.GetContent ();
 
-			return parser.ParseEntity ();
+			return MimeEntity.Load (content.ContentStream);
+		}
+
+		Org.BouncyCastle.Asn1.Cms.AttributeTable AddSecureMimeCapabilities (Org.BouncyCastle.Asn1.Cms.AttributeTable signedAttributes)
+		{
+			var capabilities = new SmimeCapabilityVector ();
+
+			foreach (var algorithm in EncryptionAlgorithmRank) {
+				if (!IsEnabled (algorithm))
+					continue;
+
+				switch (algorithm) {
+				case EncryptionAlgorithm.Camellia256:
+					capabilities.AddCapability (NttObjectIdentifiers.IdCamellia256Cbc);
+					break;
+				case EncryptionAlgorithm.Camellia192:
+					capabilities.AddCapability (NttObjectIdentifiers.IdCamellia192Cbc);
+					break;
+				case EncryptionAlgorithm.Camellia128:
+					capabilities.AddCapability (NttObjectIdentifiers.IdCamellia128Cbc);
+					break;
+				case EncryptionAlgorithm.Aes256:
+					capabilities.AddCapability (SmimeCapabilities.Aes256Cbc);
+					break;
+				case EncryptionAlgorithm.Aes192:
+					capabilities.AddCapability (SmimeCapabilities.Aes192Cbc);
+					break;
+				case EncryptionAlgorithm.Aes128:
+					capabilities.AddCapability (SmimeCapabilities.Aes128Cbc);
+					break;
+				case EncryptionAlgorithm.Idea:
+					capabilities.AddCapability (SmimeCapabilities.IdeaCbc);
+					break;
+				case EncryptionAlgorithm.Cast5:
+					capabilities.AddCapability (SmimeCapabilities.Cast5Cbc);
+					break;
+				case EncryptionAlgorithm.TripleDes:
+					capabilities.AddCapability (SmimeCapabilities.DesEde3Cbc);
+					break;
+				case EncryptionAlgorithm.RC2128:
+					capabilities.AddCapability (SmimeCapabilities.RC2Cbc, 128);
+					break;
+				case EncryptionAlgorithm.RC264:
+					capabilities.AddCapability (SmimeCapabilities.RC2Cbc, 64);
+					break;
+				case EncryptionAlgorithm.RC240:
+					capabilities.AddCapability (SmimeCapabilities.RC2Cbc, 40);
+					break;
+				case EncryptionAlgorithm.Des:
+					capabilities.AddCapability (SmimeCapabilities.DesCbc);
+					break;
+				}
+			}
+
+			var attr = new SmimeCapabilitiesAttribute (capabilities);
+
+			// populate our signed attributes with some S/MIME capabilities
+			return signedAttributes.Add (attr.AttrType, attr.AttrValues[0]);
 		}
 
 		Stream Sign (CmsSigner signer, Stream content, bool encapsulate)
 		{
-			var cms = new CmsSignedDataStreamGenerator ();
+			var signedData = new CmsSignedDataStreamGenerator ();
 
-			cms.AddSigner (signer.PrivateKey, signer.Certificate, GetOid (signer.DigestAlgorithm),
-				signer.SignedAttributes, signer.UnsignedAttributes);
+			signedData.AddSigner (signer.PrivateKey, signer.Certificate, GetDigestOid (signer.DigestAlgorithm),
+				AddSecureMimeCapabilities (signer.SignedAttributes), signer.UnsignedAttributes);
 
 			var memory = new MemoryStream ();
 
-			using (var stream = cms.Open (memory, encapsulate)) {
+			using (var stream = signedData.Open (memory, encapsulate)) {
 				content.CopyTo (stream, 4096);
 			}
 
@@ -367,7 +536,7 @@ namespace MimeKit.Cryptography {
 		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
 		/// An error occurred in the cryptographic message syntax subsystem.
 		/// </exception>
-		public ApplicationPkcs7Mime EncapsulatedSign (MailboxAddress signer, DigestAlgorithm digestAlgo, Stream content)
+		public virtual ApplicationPkcs7Mime EncapsulatedSign (MailboxAddress signer, DigestAlgorithm digestAlgo, Stream content)
 		{
 			if (signer == null)
 				throw new ArgumentNullException ("signer");
@@ -461,7 +630,7 @@ namespace MimeKit.Cryptography {
 			return GetCertificate (signer);
 		}
 
-		PkixCertPath BuildCertPath (HashSet anchors, IX509Store certificates, IX509Store crls, X509Certificate certificate)
+		PkixCertPath BuildCertPath (HashSet anchors, IX509Store certificates, IX509Store crls, X509Certificate certificate, DateTime? signingTime)
 		{
 			var intermediate = new X509CertificateStore ();
 			foreach (X509Certificate cert in certificates.GetMatches (null))
@@ -478,62 +647,156 @@ namespace MimeKit.Cryptography {
 			parameters.AddStore (localCrls);
 			parameters.AddStore (crls);
 
-			// Note: we disable revocation unless we actually have non-empty revocation lists
-			parameters.IsRevocationEnabled = localCrls.GetMatches (null).Count > 0;
+			parameters.ValidityModel = PkixParameters.ChainValidityModel;
+			parameters.IsRevocationEnabled = true;
+
+			if (signingTime.HasValue)
+				parameters.Date = new DateTimeObject (signingTime.Value);
 
 			var result = new PkixCertPathBuilder ().Build (parameters);
 
 			return result.CertPath;
 		}
 
-		IList<IDigitalSignature> GetDigitalSignatures (CmsSignedDataParser parser)
+		/// <summary>
+		/// Attempts to map a <see cref="Org.BouncyCastle.Asn1.X509.AlgorithmIdentifier"/>
+		/// to a <see cref="EncryptionAlgorithm"/>.
+		/// </summary>
+		/// <returns><c>true</c> if the algorithm identifier was successfully mapped; <c>false</c> otherwise.</returns>
+		/// <param name="identifier">The algorithm identifier.</param>
+		/// <param name="algorithm">The encryption algorithm.</param>
+		protected static bool TryGetEncryptionAlgorithm (AlgorithmIdentifier identifier, out EncryptionAlgorithm algorithm)
+		{
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Aes256Cbc) {
+				algorithm = EncryptionAlgorithm.Aes256;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Aes192Cbc) {
+				algorithm = EncryptionAlgorithm.Aes192;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Aes128Cbc) {
+				algorithm = EncryptionAlgorithm.Aes128;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Camellia256Cbc) {
+				algorithm = EncryptionAlgorithm.Camellia256;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Camellia192Cbc) {
+				algorithm = EncryptionAlgorithm.Camellia192;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Camellia128Cbc) {
+				algorithm = EncryptionAlgorithm.Camellia128;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.Cast5Cbc) {
+				algorithm = EncryptionAlgorithm.Cast5;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.DesEde3Cbc) {
+				algorithm = EncryptionAlgorithm.TripleDes;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == SmimeCapability.DesCbc.Id) {
+				algorithm = EncryptionAlgorithm.Des;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.IdeaCbc) {
+				algorithm = EncryptionAlgorithm.Idea;
+				return true;
+			}
+
+			if (identifier.ObjectID.Id == CmsEnvelopedGenerator.RC2Cbc) {
+				var param = (DerInteger) identifier.Parameters;
+				int bits = param.Value.IntValue;
+
+				switch (bits) {
+				case 128: algorithm = EncryptionAlgorithm.RC2128; return true;
+				case 64: algorithm = EncryptionAlgorithm.RC264; return true;
+				case 40: algorithm = EncryptionAlgorithm.RC240; return true;
+				}
+			}
+
+			algorithm = EncryptionAlgorithm.RC240;
+
+			return false;
+		}
+
+		DigitalSignatureCollection GetDigitalSignatures (CmsSignedDataParser parser)
 		{
 			var certificates = parser.GetCertificates ("Collection");
 			var signatures = new List<IDigitalSignature> ();
 			var crls = parser.GetCrls ("Collection");
 			var store = parser.GetSignerInfos ();
 
+			// FIXME: validate the certificates before importing them?
 			foreach (X509Certificate certificate in certificates.GetMatches (null))
 				Import (certificate);
 
+			// FIXME: validate the CRLs before importing them?
 			foreach (X509Crl crl in crls.GetMatches (null))
 				Import (crl);
 
 			foreach (SignerInformation signerInfo in store.GetSigners ()) {
 				var certificate = GetCertificate (certificates, signerInfo.SignerID);
 				var signature = new SecureMimeDigitalSignature (signerInfo);
+				var algorithms = new List<EncryptionAlgorithm> ();
+				DateTime? signedDate = null;
 
 				if (signerInfo.SignedAttributes != null) {
 					Asn1EncodableVector vector = signerInfo.SignedAttributes.GetAll (CmsAttributes.SigningTime);
 					foreach (Org.BouncyCastle.Asn1.Cms.Attribute attr in vector) {
 						var signingTime = (DerUtcTime) ((DerSet) attr.AttrValues)[0];
 						signature.CreationDate = signingTime.ToAdjustedDateTime ();
+						signedDate = signature.CreationDate;
 						break;
 					}
+
+					vector = signerInfo.SignedAttributes.GetAll (SmimeAttributes.SmimeCapabilities);
+					foreach (Org.BouncyCastle.Asn1.Cms.Attribute attr in vector) {
+						foreach (Asn1Sequence sequence in attr.AttrValues) {
+							for (int i = 0; i < sequence.Count; i++) {
+								var identifier = AlgorithmIdentifier.GetInstance (sequence[i]);
+								EncryptionAlgorithm algorithm;
+
+								if (TryGetEncryptionAlgorithm (identifier, out algorithm))
+									algorithms.Add (algorithm);
+							}
+						}
+					}
+
+					signature.EncryptionAlgorithms = algorithms.ToArray ();
 				}
 
-				if (certificate != null)
+				if (certificate != null) {
 					signature.SignerCertificate = new SecureMimeDigitalCertificate (certificate);
+					if (algorithms.Count > 0 && signedDate.HasValue)
+						UpdateSecureMimeCapabilities (certificate, signature.EncryptionAlgorithms, signedDate.Value);
+				}
 
 				var anchors = GetTrustedAnchors ();
 
-				var chain = BuildCertPath (anchors, certificates, crls, certificate);
-
-//				var parameters = new PkixParameters (anchors);
-//				var validator = new PkixCertPathValidator ();
-//				var result = validator.Validate (chain, parameters);
-
-				signature.Chain = chain;
-
-				Console.WriteLine ("Chain:");
-				foreach (X509Certificate cert in chain.Certificates) {
-					Console.WriteLine ("{0}", cert.GetCommonName ());
+				try {
+					signature.Chain = BuildCertPath (anchors, certificates, crls, certificate, signedDate);
+				} catch (Exception ex) {
+					signature.ChainException = ex;
 				}
 
 				signatures.Add (signature);
 			}
 
-			return signatures;
+			return new DigitalSignatureCollection (signatures);
 		}
 
 		/// <summary>
@@ -550,7 +813,7 @@ namespace MimeKit.Cryptography {
 		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
 		/// An error occurred in the cryptographic message syntax subsystem.
 		/// </exception>
-		public override IList<IDigitalSignature> Verify (Stream content, Stream signatureData)
+		public override DigitalSignatureCollection Verify (Stream content, Stream signatureData)
 		{
 			if (content == null)
 				throw new ArgumentNullException ("content");
@@ -568,29 +831,77 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Verify the digital signatures of the specified signedData and extract the original content.
 		/// </summary>
-		/// <returns>The unencapsulated <see cref="MimeKit.MimeEntity"/>.</returns>
+		/// <returns>The list of digital signatures.</returns>
 		/// <param name="signedData">The signed data.</param>
-		/// <param name="signatures">The digital signatures.</param>
+		/// <param name="entity">The unencapsulated entity.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="signedData"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
 		/// An error occurred in the cryptographic message syntax subsystem.
 		/// </exception>
-		public MimeEntity Verify (Stream signedData, out IList<IDigitalSignature> signatures)
+		public DigitalSignatureCollection Verify (Stream signedData, out MimeEntity entity)
 		{
 			if (signedData == null)
 				throw new ArgumentNullException ("signedData");
 
-			var signedDataParser = new CmsSignedDataParser (signedData);
-			var signed = signedDataParser.GetSignedContent ();
+			var parser = new CmsSignedDataParser (signedData);
+			var signed = parser.GetSignedContent ();
 
-			var parser = new MimeParser (signed.ContentStream, MimeFormat.Entity);
-			var entity = parser.ParseEntity ();
+			entity = MimeEntity.Load (signed.ContentStream);
 
-			signatures = GetDigitalSignatures (signedDataParser);
+			return GetDigitalSignatures (parser);
+		}
 
-			return entity;
+		class VoteComparer : IComparer<int>
+		{
+			#region IComparer implementation
+			public int Compare (int x, int y)
+			{
+				return y - x;
+			}
+			#endregion
+		}
+
+		EncryptionAlgorithm GetPreferredEncryptionAlgorithm (CmsRecipientCollection recipients)
+		{
+			var votes = new int[EncryptionAlgorithmCount];
+
+			foreach (var recipient in recipients) {
+				int cast = EncryptionAlgorithmCount;
+
+				foreach (var algorithm in recipient.EncryptionAlgorithms) {
+					votes[(int) algorithm] += cast;
+					cast--;
+				}
+			}
+
+			// Starting with S/MIME v3 (published in 1999), Triple-DES is a REQUIRED algorithm.
+			// S/MIME v2.x and older only required RC2/40, but SUGGESTED Triple-DES.
+			// Considering the fact that Bruce Schneier was able to write a
+			// screensaver that could crack RC2/40 back in the late 90's, let's
+			// not default to anything weaker than Triple-DES...
+			EncryptionAlgorithm chosen = EncryptionAlgorithm.TripleDes;
+			int nvotes = 0;
+
+			// iterate through the algorithms, from strongest to weakest, keeping track
+			// of the algorithm with the most amount of votes (between algorithms with
+			// the same number of votes, choose the strongest of the 2 - i.e. the one
+			// that we arrive at first).
+			var algorithms = EncryptionAlgorithmRank;
+			for (int i = 0; i < algorithms.Length; i++) {
+				var algorithm = algorithms[i];
+
+				if (!IsEnabled (algorithm))
+					continue;
+
+				if (votes[(int) algorithm] > nvotes) {
+					nvotes = votes[(int) algorithm];
+					chosen = algorithm;
+				}
+			}
+
+			return chosen;
 		}
 
 		Stream Envelope (CmsRecipientCollection recipients, Stream content)
@@ -606,9 +917,47 @@ namespace MimeKit.Cryptography {
 			if (count == 0)
 				throw new ArgumentException ("No recipients specified.", "recipients");
 
-			// FIXME: how to decide which algorithm to use?
 			var input = new CmsProcessableInputStream (content);
-			var envelopedData = cms.Generate (input, CmsEnvelopedGenerator.DesEde3Cbc);
+			CmsEnvelopedData envelopedData;
+
+			switch (GetPreferredEncryptionAlgorithm (recipients)) {
+			case EncryptionAlgorithm.Camellia256:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Camellia256Cbc);
+				break;
+			case EncryptionAlgorithm.Camellia192:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Camellia192Cbc);
+				break;
+			case EncryptionAlgorithm.Camellia128:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Camellia128Cbc);
+				break;
+			case EncryptionAlgorithm.Aes256:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Aes256Cbc);
+				break;
+			case EncryptionAlgorithm.Aes192:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Aes192Cbc);
+				break;
+			case EncryptionAlgorithm.Aes128:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Aes128Cbc);
+				break;
+			case EncryptionAlgorithm.Cast5:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.Cast5Cbc);
+				break;
+			case EncryptionAlgorithm.Idea:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.IdeaCbc);
+				break;
+			case EncryptionAlgorithm.RC2128:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.RC2Cbc, 128);
+				break;
+			case EncryptionAlgorithm.RC264:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.RC2Cbc, 64);
+				break;
+			case EncryptionAlgorithm.RC240:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.RC2Cbc, 40);
+				break;
+			default:
+				envelopedData = cms.Generate (input, CmsEnvelopedGenerator.DesEde3Cbc);
+				break;
+			}
 
 			return new MemoryStream (envelopedData.GetEncoded (), false);
 		}
@@ -672,102 +1021,24 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Signs and encrypts the specified content for the specified recipients.
-		/// </summary>
-		/// <param name="signer">The signer.</param>
-		/// <param name="recipients">The recipients.</param>
-		/// <param name="content">The content.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <para><paramref name="signer"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="recipients"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="content"/> is <c>null</c>.</para>
-		/// </exception>
-		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
-		/// An error occurred in the cryptographic message syntax subsystem.
-		/// </exception>
-		public ApplicationPkcs7Mime SignAndEncrypt (CmsSigner signer, CmsRecipientCollection recipients, Stream content)
-		{
-			if (signer == null)
-				throw new ArgumentNullException ("signer");
-
-			if (recipients == null)
-				throw new ArgumentNullException ("recipients");
-
-			if (content == null)
-				throw new ArgumentNullException ("content");
-
-			using (var signed = Sign (signer, content, true)) {
-				return new ApplicationPkcs7Mime (SecureMimeType.EnvelopedData, Envelope (recipients, signed));
-			}
-		}
-
-		/// <summary>
-		/// Encrypt the specified content for the specified recipients, optionally
-		/// signing the content if the signer provided is not null.
-		/// </summary>
-		/// <returns>A new <see cref="MimeKit.MimePart"/> instance
-		/// containing the encrypted data.</returns>
-		/// <param name="signer">The signer.</param>
-		/// <param name="digestAlgo">The digest algorithm to use for signing.</param>
-		/// <param name="recipients">The recipients.</param>
-		/// <param name="content">The content.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <para><paramref name="signer"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="recipients"/> is <c>null</c>.</para>
-		/// <para>-or-</para>
-		/// <para><paramref name="content"/> is <c>null</c>.</para>
-		/// </exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="digestAlgo"/> is out of range.
-		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// The specified <see cref="DigestAlgorithm"/> is not supported by this context.
-		/// </exception>
-		/// <exception cref="CertificateNotFoundException">
-		/// <para>A signing certificate could not be found for <paramref name="signer"/>.</para>
-		/// <para>-or-</para>
-		/// <para>A certificate could not be found for one or more of the <paramref name="recipients"/>.</para>
-		/// </exception>
-		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
-		/// An error occurred in the cryptographic message syntax subsystem.
-		/// </exception>
-		public override MimePart SignAndEncrypt (MailboxAddress signer, DigestAlgorithm digestAlgo, IEnumerable<MailboxAddress> recipients, Stream content)
-		{
-			if (signer == null)
-				throw new ArgumentNullException ("signer");
-
-			if (recipients == null)
-				throw new ArgumentNullException ("recipients");
-
-			if (content == null)
-				throw new ArgumentNullException ("content");
-
-			return SignAndEncrypt (GetCmsSigner (signer, digestAlgo), GetCmsRecipients (recipients), content);
-		}
-
-		/// <summary>
 		/// Decrypt the specified encryptedData.
 		/// </summary>
 		/// <returns>The decrypted <see cref="MimeKit.MimeEntity"/>.</returns>
 		/// <param name="encryptedData">The encrypted data.</param>
-		/// <param name="signatures">A list of digital signatures if the data was both signed and encrypted.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="encryptedData"/> is <c>null</c>.
 		/// </exception>
 		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
 		/// An error occurred in the cryptographic message syntax subsystem.
 		/// </exception>
-		public override MimeEntity Decrypt (Stream encryptedData, out IList<IDigitalSignature> signatures)
+		public override MimeEntity Decrypt (Stream encryptedData)
 		{
 			if (encryptedData == null)
 				throw new ArgumentNullException ("encryptedData");
 
-			var enveloped = new CmsEnvelopedDataParser (encryptedData);
-			var recipients = enveloped.GetRecipientInfos ();
-			var algorithm = enveloped.EncryptionAlgorithmID;
+			var parser = new CmsEnvelopedDataParser (encryptedData);
+			var recipients = parser.GetRecipientInfos ();
+			var algorithm = parser.EncryptionAlgorithmID;
 			AsymmetricKeyParameter key;
 
 			foreach (RecipientInformation recipient in recipients.GetRecipients ()) {
@@ -776,28 +1047,12 @@ namespace MimeKit.Cryptography {
 
 				var content = recipient.GetContent (key);
 
-				try {
-					var parser = new CmsSignedDataParser (content);
-					var signed = parser.GetSignedContent ();
-
-					using (var memory = new MemoryStream ()) {
-						signed.ContentStream.CopyTo (memory, 4096);
-						content = memory.ToArray ();
-					}
-
-					signatures = GetDigitalSignatures (parser);
-				} catch (Exception ex) {
-					Console.WriteLine ("Failed to verify signed data: {0}", ex);
-					signatures = null;
-				}
-
 				using (var memory = new MemoryStream (content, false)) {
-					var parser = new MimeParser (memory, MimeFormat.Entity);
-					return parser.ParseEntity ();
+					return MimeEntity.Load (memory);
 				}
 			}
 
-			throw new CmsException ("Can't decrypt.");
+			throw new CmsException ("A suitable private key could not be found for decrypting.");
 		}
 
 		/// <summary>
@@ -813,10 +1068,7 @@ namespace MimeKit.Cryptography {
 		/// <exception cref="System.NotSupportedException">
 		/// Importing keys is not supported by this cryptography context.
 		/// </exception>
-		public virtual void Import (Stream stream, string password)
-		{
-			throw new NotSupportedException ();
-		}
+		public abstract void Import (Stream stream, string password);
 
 		/// <summary>
 		/// Exports the certificates for the specified mailboxes.

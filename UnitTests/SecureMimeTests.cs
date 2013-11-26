@@ -32,7 +32,6 @@ using NUnit.Framework;
 
 using MimeKit;
 using MimeKit.Cryptography;
-using Org.BouncyCastle.X509;
 
 namespace UnitTests {
 	[TestFixture]
@@ -44,24 +43,29 @@ namespace UnitTests {
 
 		static SecureMimeContext CreateContext ()
 		{
-			var dataDir = Path.Combine ("..", "..", "TestData", "smime");
-			var parser = new X509CertificateParser ();
-			var ctx = new DummySecureMimeContext ();
-			string path;
+			return new DefaultSecureMimeContext ("smime.db", "no.secret");
+		}
 
-			foreach (var filename in CertificateAuthorities) {
-				path = Path.Combine (dataDir, filename);
-				var certificate = parser.ReadCertificate (File.ReadAllBytes (path));
-				ctx.certificates.Add (certificate);
+		[TestFixtureSetUp]
+		public void SetUp ()
+		{
+			using (var ctx = (DefaultSecureMimeContext) CreateContext ()) {
+				var dataDir = Path.Combine ("..", "..", "TestData", "smime");
+				string path;
+
+				foreach (var filename in CertificateAuthorities) {
+					path = Path.Combine (dataDir, filename);
+					using (var file = File.OpenRead (path)) {
+						ctx.Import (file, true);
+					}
+				}
+
+				path = Path.Combine (dataDir, "smime.p12");
+
+				using (var file = File.OpenRead (path)) {
+					ctx.Import (file, "no.secret");
+				}
 			}
-
-			path = Path.Combine (dataDir, "smime.p12");
-
-			using (var file = File.OpenRead (path)) {
-				ctx.Import (file, "no.secret");
-			}
-
-			return ctx;
 		}
 
 		[Test]
@@ -92,14 +96,14 @@ namespace UnitTests {
 
 			using (var ctx = CreateContext ()) {
 				var signed = ApplicationPkcs7Mime.Sign (ctx, self, DigestAlgorithm.Sha1, cleartext);
-				IList<IDigitalSignature> signatures;
+				MimeEntity extracted;
 
 				Assert.AreEqual (SecureMimeType.SignedData, signed.SecureMimeType, "S/MIME type did not match.");
 
-				var decoded = signed.Verify (ctx, out signatures);
+				var signatures = signed.Verify (ctx, out extracted);
 
-				Assert.IsInstanceOfType (typeof (TextPart), decoded, "Decompressed part is not the expected type.");
-				Assert.AreEqual (cleartext.Text, ((TextPart) decoded).Text, "Decompressed content is not the same as the original.");
+				Assert.IsInstanceOfType (typeof (TextPart), extracted, "Extracted part is not the expected type.");
+				Assert.AreEqual (cleartext.Text, ((TextPart) extracted).Text, "Extracted content is not the same as the original.");
 
 				Assert.AreEqual (1, signatures.Count, "Verify returned an unexpected number of signatures.");
 				foreach (var signature in signatures) {
@@ -110,6 +114,21 @@ namespace UnitTests {
 					} catch (DigitalSignatureVerifyException ex) {
 						Assert.Fail ("Failed to verify signature: {0}", ex);
 					}
+
+					var algorithms = ((SecureMimeDigitalSignature) signature).EncryptionAlgorithms;
+					Assert.AreEqual (EncryptionAlgorithm.Camellia256, algorithms[0], "Expected Camellia-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes256, algorithms[1], "Expected AES-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Camellia192, algorithms[2], "Expected Camellia-192 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes192, algorithms[3], "Expected AES-192 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Camellia128, algorithms[4], "Expected Camellia-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes128, algorithms[5], "Expected AES-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Idea, algorithms[6], "Expected IDEA capability");
+					Assert.AreEqual (EncryptionAlgorithm.Cast5, algorithms[7], "Expected Cast5 capability");
+					Assert.AreEqual (EncryptionAlgorithm.TripleDes, algorithms[8], "Expected Triple-DES capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC2128, algorithms[9], "Expected RC2-128 capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC264, algorithms[10], "Expected RC2-64 capability");
+					//Assert.AreEqual (EncryptionAlgorithm.Des, algorithms[11], "Expected DES capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC240, algorithms[11], "Expected RC2-40 capability");
 				}
 			}
 		}
@@ -142,6 +161,21 @@ namespace UnitTests {
 					} catch (DigitalSignatureVerifyException ex) {
 						Assert.Fail ("Failed to verify signature: {0}", ex);
 					}
+
+					var algorithms = ((SecureMimeDigitalSignature) signature).EncryptionAlgorithms;
+					Assert.AreEqual (EncryptionAlgorithm.Camellia256, algorithms[0], "Expected Camellia-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes256, algorithms[1], "Expected AES-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Camellia192, algorithms[2], "Expected Camellia-192 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes192, algorithms[3], "Expected AES-192 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Camellia128, algorithms[4], "Expected Camellia-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes128, algorithms[5], "Expected AES-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Idea, algorithms[6], "Expected IDEA capability");
+					Assert.AreEqual (EncryptionAlgorithm.Cast5, algorithms[7], "Expected Cast5 capability");
+					Assert.AreEqual (EncryptionAlgorithm.TripleDes, algorithms[8], "Expected Triple-DES capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC2128, algorithms[9], "Expected RC2-128 capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC264, algorithms[10], "Expected RC2-64 capability");
+					//Assert.AreEqual (EncryptionAlgorithm.Des, algorithms[11], "Expected DES capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC240, algorithms[11], "Expected RC2-40 capability");
 				}
 			}
 		}
@@ -174,6 +208,15 @@ namespace UnitTests {
 					} catch (DigitalSignatureVerifyException ex) {
 						Assert.Fail ("Failed to verify signature: {0}", ex);
 					}
+
+					var algorithms = ((SecureMimeDigitalSignature) signature).EncryptionAlgorithms;
+					Assert.AreEqual (EncryptionAlgorithm.Aes256, algorithms[0], "Expected AES-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes128, algorithms[1], "Expected AES-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.TripleDes, algorithms[2], "Expected Triple-DES capability");
+					Assert.AreEqual (EncryptionAlgorithm.RC2128, algorithms[3], "Expected RC2-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.RC264, algorithms[4], "Expected RC2-64 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Des, algorithms[5], "Expected DES capability");
+					Assert.AreEqual (EncryptionAlgorithm.RC240, algorithms[6], "Expected RC2-40 capability");
 				}
 			}
 		}
@@ -218,7 +261,6 @@ namespace UnitTests {
 
 			using (var ctx = CreateContext ()) {
 				var encrypted = (ApplicationPkcs7Mime) message.Body;
-				IList<IDigitalSignature> signatures = null;
 				MimeEntity decrypted = null;
 
 				using (var file = File.OpenRead (p12)) {
@@ -229,13 +271,11 @@ namespace UnitTests {
 				Assert.AreEqual ("enveloped-data", type, "Unexpected smime-type parameter.");
 
 				try {
-					decrypted = encrypted.Decrypt (ctx, out signatures);
+					decrypted = encrypted.Decrypt (ctx);
 				} catch (Exception ex) {
 					Console.WriteLine (ex);
 					Assert.Fail ("Failed to decrypt thunderbird message: {0}", ex);
 				}
-
-				Assert.IsNull (signatures, "Did not expect to find any signatures from an encrypted message.");
 
 				// The decrypted part should be a multipart/mixed with a text/plain part and an image attachment,
 				// very much like the thunderbird-signed.txt message.
@@ -268,11 +308,7 @@ namespace UnitTests {
 			}
 
 			using (var ctx = CreateContext ()) {
-				IList<IDigitalSignature> signatures;
-
-				var decrypted = encrypted.Decrypt (ctx, out signatures);
-
-				Assert.IsNull (signatures, "Did not expect to find any signatures from an encrypted message.");
+				var decrypted = encrypted.Decrypt (ctx);
 
 				// The decrypted part should be a multipart/signed
 				Assert.IsInstanceOfType (typeof (MultipartSigned), decrypted, "Expected the decrypted part to be a multipart/signed.");
@@ -284,7 +320,7 @@ namespace UnitTests {
 				var extracted = (TextPart) signed[0];
 				Assert.AreEqual (cleartext.Text, extracted.Text, "The decrypted text part's text does not match the original.");
 
-				signatures = signed.Verify (ctx);
+				var signatures = signed.Verify (ctx);
 
 				Assert.AreEqual (1, signatures.Count, "Verify returned an unexpected number of signatures.");
 				foreach (var signature in signatures) {
@@ -295,6 +331,21 @@ namespace UnitTests {
 					} catch (DigitalSignatureVerifyException ex) {
 						Assert.Fail ("Failed to verify signature: {0}", ex);
 					}
+
+					var algorithms = ((SecureMimeDigitalSignature) signature).EncryptionAlgorithms;
+					Assert.AreEqual (EncryptionAlgorithm.Camellia256, algorithms[0], "Expected Camellia-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes256, algorithms[1], "Expected AES-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Camellia192, algorithms[2], "Expected Camellia-192 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes192, algorithms[3], "Expected AES-192 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Camellia128, algorithms[4], "Expected Camellia-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes128, algorithms[5], "Expected AES-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Idea, algorithms[6], "Expected IDEA capability");
+					Assert.AreEqual (EncryptionAlgorithm.Cast5, algorithms[7], "Expected Cast5 capability");
+					Assert.AreEqual (EncryptionAlgorithm.TripleDes, algorithms[8], "Expected Triple-DES capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC2128, algorithms[9], "Expected RC2-128 capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC264, algorithms[10], "Expected RC2-64 capability");
+					//Assert.AreEqual (EncryptionAlgorithm.Des, algorithms[11], "Expected DES capability");
+					//Assert.AreEqual (EncryptionAlgorithm.RC240, algorithms[11], "Expected RC2-40 capability");
 				}
 			}
 		}
@@ -315,7 +366,6 @@ namespace UnitTests {
 
 			using (var ctx = CreateContext ()) {
 				var encrypted = (ApplicationPkcs7Mime) message.Body;
-				IList<IDigitalSignature> signatures = null;
 				MimeEntity decrypted = null;
 
 				using (var file = File.OpenRead (p12)) {
@@ -326,13 +376,11 @@ namespace UnitTests {
 				Assert.AreEqual ("enveloped-data", type, "Unexpected smime-type parameter.");
 
 				try {
-					decrypted = encrypted.Decrypt (ctx, out signatures);
+					decrypted = encrypted.Decrypt (ctx);
 				} catch (Exception ex) {
 					Console.WriteLine (ex);
 					Assert.Fail ("Failed to decrypt thunderbird message: {0}", ex);
 				}
-
-				Assert.IsNull (signatures, "Did not expect to find any signatures from an encrypted message.");
 
 				// The decrypted part should be a multipart/signed
 				Assert.IsInstanceOfType (typeof (MultipartSigned), decrypted, "Expected the decrypted part to be a multipart/signed.");
@@ -349,7 +397,7 @@ namespace UnitTests {
 				Assert.IsInstanceOfType (typeof (MimePart), multipart[1], "Expected the second part of the decrypted multipart to be a MimePart.");
 				Assert.IsInstanceOfType (typeof (MimePart), multipart[2], "Expected the third part of the decrypted multipart to be a MimePart.");
 
-				signatures = signed.Verify (ctx);
+				var signatures = signed.Verify (ctx);
 
 				Assert.AreEqual (1, signatures.Count, "Verify returned an unexpected number of signatures.");
 				foreach (var signature in signatures) {
@@ -360,6 +408,15 @@ namespace UnitTests {
 					} catch (DigitalSignatureVerifyException ex) {
 						Assert.Fail ("Failed to verify signature: {0}", ex);
 					}
+
+					var algorithms = ((SecureMimeDigitalSignature) signature).EncryptionAlgorithms;
+					Assert.AreEqual (EncryptionAlgorithm.Aes256, algorithms[0], "Expected AES-256 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Aes128, algorithms[1], "Expected AES-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.TripleDes, algorithms[2], "Expected Triple-DES capability");
+					Assert.AreEqual (EncryptionAlgorithm.RC2128, algorithms[3], "Expected RC2-128 capability");
+					Assert.AreEqual (EncryptionAlgorithm.RC264, algorithms[4], "Expected RC2-64 capability");
+					Assert.AreEqual (EncryptionAlgorithm.Des, algorithms[5], "Expected DES capability");
+					Assert.AreEqual (EncryptionAlgorithm.RC240, algorithms[6], "Expected RC2-40 capability");
 				}
 			}
 		}

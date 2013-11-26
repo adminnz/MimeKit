@@ -39,24 +39,14 @@ namespace MimeKit.Cryptography {
 		/// <param name="message">A message explaining the error.</param>
 		public CertificateNotFoundException (MailboxAddress mailbox, string message) : base (message)
 		{
-			KeyId = mailbox.Address;
+			Mailbox = mailbox;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.CertificateNotFoundException"/> class.
+		/// Gets the mailbox address that could not be resolved to a certificate.
 		/// </summary>
-		/// <param name="keyid">The key id that could not be resolved to a valid certificate.</param>
-		/// <param name="message">A message explaining the error.</param>
-		public CertificateNotFoundException (string keyid, string message) : base (message)
-		{
-			KeyId = keyid;
-		}
-
-		/// <summary>
-		/// Gets the key id that could not be found.
-		/// </summary>
-		/// <value>The key id.</value>
-		public string KeyId {
+		/// <value>The mailbox address.</value>
+		public MailboxAddress Mailbox {
 			get; private set;
 		}
 	}

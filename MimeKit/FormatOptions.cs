@@ -98,7 +98,7 @@ namespace MimeKit {
 			get { return NewLineFormats[(int) NewLineFormat]; }
 		}
 
-		internal bool WriteHeaders {
+		public bool WriteHeaders {
 			get; set;
 		}
 

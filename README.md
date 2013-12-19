@@ -33,6 +33,7 @@ MimeKit is a C# library which may be used for the creation and parsing of messag
 * [3156](http://www.ietf.org/rfc/rfc3156.txt): MIME Security with OpenPGP (Updates rfc2015)
 * [3850](http://www.ietf.org/rfc/rfc3850.txt): S/MIME Version 3.1 Certificate Handling (Obsoletes rfc2632)
 * [3851](http://www.ietf.org/rfc/rfc3851.txt): S/MIME Version 3.1 Message Specification (Obsoletes rfc2633)
+* [4262](http://www.ietf.org/rfc/rfc4262.txt): X.509 Certificate Extension for S/MIME Capabilities
 * [5322](http://www.ietf.org/rfc/rfc5322.txt): Internet Message Format (Obsoletes rfc2822) 
 * [5750](http://www.ietf.org/rfc/rfc5750.txt): S/MIME Version 3.2 Certificate Handling (Obsoletes rfc3850)
 * [5751](http://www.ietf.org/rfc/rfc5751.txt): S/MIME Version 3.2 Message Specification (Obsoletes rfc3851)
@@ -493,8 +494,8 @@ The first thing you'll need to do is fork MimeKit to your own GitHub repository.
 
     git clone git@github.com/<your-account>/MimeKit.git
 
-If you use [Xamarin Studio](http://xamarin.com/studio) or [MonoDevelop](http://monodevelop.org), both MimeKit.sln
-and MimeKitDesktopOnly.sln are configured with the coding style used by MimeKit. If you use Visual Studio or some
+If you use [Xamarin Studio](http://xamarin.com/studio) or [MonoDevelop](http://monodevelop.org), all of the
+solution files are configured with the coding style used by MimeKit. If you use Visual Studio or some
 other editor, please try to maintain the existing coding style as best as you can.
 
 Once you've got some changes that you'd like to submit upstream to the official MimeKit repository,

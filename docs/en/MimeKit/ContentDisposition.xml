@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed beforefieldinit ContentDisposition extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.Object</BaseTypeName>
@@ -11,9 +11,12 @@
   <Interfaces />
   <Docs>
     <summary>
-            A class representing a Content-Type header value.
+            A class representing a Content-Disposition header value.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            The Content-Disposition header is a way for the originating client to
+            suggest to the receiving client how to present the part to the user.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -21,7 +24,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -39,7 +42,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string disposition) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="disposition" Type="System.String" />
@@ -66,7 +69,7 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal string Attachment" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -85,7 +88,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Nullable`1&lt;valuetype System.DateTimeOffset&gt; CreationDate" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Nullable&lt;System.DateTimeOffset&gt;</ReturnType>
@@ -95,7 +98,11 @@
             Gets or sets the creation-date parameter.
             </summary>
         <value>The creation date.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Refers to the date and time that the content file was created on the
+            originating system. This parameter serves little purpose and is
+            typically not used by mail clients.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Disposition">
@@ -103,7 +110,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string Disposition" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -113,7 +120,9 @@
             Gets or sets the disposition.
             </summary>
         <value>The disposition.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The disposition is typically either <c>"attachment"</c> or <c>"inline"</c>.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="value" /> is <c>null</c>.
             </exception>
@@ -127,7 +136,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string FileName" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -137,7 +146,10 @@
             Gets or sets the name of the file.
             </summary>
         <value>The name of the file.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            When set, this can provide a useful hint for a default file name for the
+            content when the user decides to save it to disk.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Inline">
@@ -145,7 +157,7 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal string Inline" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -164,7 +176,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool IsAttachment" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -175,7 +187,9 @@
             </summary>
         <value>
           <c>true</c> if the <see cref="T:MimeKit.MimePart" /> is an attachment; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            A convenience property to determine if the entity should be considered an attachment or not.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="ModificationDate">
@@ -183,7 +197,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Nullable`1&lt;valuetype System.DateTimeOffset&gt; ModificationDate" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Nullable&lt;System.DateTimeOffset&gt;</ReturnType>
@@ -193,7 +207,11 @@
             Gets or sets the modification-date parameter.
             </summary>
         <value>The modification date.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Refers to the date and time that the content file was last modified on
+            the originating system. This parameter serves little purpose and is
+            typically not used by mail clients.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Parameters">
@@ -201,7 +219,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance class MimeKit.ParameterList Parameters" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ParameterList</ReturnType>
@@ -211,7 +229,12 @@
             Gets the parameters.
             </summary>
         <value>The parameters.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            In addition to the specifying whether the entity should be treated as an
+            attachment vs displayed inline, the Content-Disposition header may also
+            contain parameters to provide further information to the receiving client
+            such as the file attributes.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Parse">
@@ -219,7 +242,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(unsigned int8[] buffer) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -247,7 +270,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(string text) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -275,7 +298,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(class MimeKit.ParserOptions options, unsigned int8[] buffer) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -309,7 +332,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(unsigned int8[] buffer, int32 startIndex) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -342,7 +365,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(class MimeKit.ParserOptions options, unsigned int8[] buffer, int32 startIndex) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -381,7 +404,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(unsigned int8[] buffer, int32 startIndex, int32 length) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -417,7 +440,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.ContentDisposition Parse(class MimeKit.ParserOptions options, unsigned int8[] buffer, int32 startIndex, int32 length) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentDisposition</ReturnType>
@@ -459,7 +482,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Nullable`1&lt;valuetype System.DateTimeOffset&gt; ReadDate" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Nullable&lt;System.DateTimeOffset&gt;</ReturnType>
@@ -469,7 +492,11 @@
             Gets or sets the read-date parameter.
             </summary>
         <value>The read date.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Refers to the date and time that the content file was last read on the
+            originating system. This parameter serves little purpose and is typically
+            not used by mail clients.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Size">
@@ -477,7 +504,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Nullable`1&lt;int64&gt; Size" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Nullable&lt;System.Int64&gt;</ReturnType>
@@ -487,7 +514,11 @@
             Gets or sets the size parameter.
             </summary>
         <value>The size.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            When set, the size parameter typically refers to the original size of the
+            content on disk. This parameter is rarely used by mail clients as it serves
+            little purpose.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="ToString">
@@ -495,7 +526,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance string ToString() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -508,7 +539,9 @@
             </summary>
         <returns>A <see cref="T:System.String" /> that represents the current
             <see cref="T:MimeKit.ContentDisposition" />.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Creates a string-representation of the <see cref="T:MimeKit.ContentDisposition" />.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="ToString">
@@ -516,7 +549,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance string ToString(class System.Text.Encoding charset, bool encode) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -533,7 +566,10 @@
             optionally encoding the parameters.
             </summary>
         <returns>The serialized string.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Creates a string-representation of the <see cref="T:MimeKit.ContentDisposition" />,
+            optionally encoding the parameters as they would be encoded for trabsport.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="TryParse">
@@ -541,7 +577,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(unsigned int8[] buffer, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -569,7 +605,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(string text, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -597,7 +633,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(class MimeKit.ParserOptions options, unsigned int8[] buffer, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -631,7 +667,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(unsigned int8[] buffer, int32 startIndex, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -664,7 +700,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(class MimeKit.ParserOptions options, unsigned int8[] buffer, int32 startIndex, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -703,7 +739,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(unsigned int8[] buffer, int32 startIndex, int32 length, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -739,7 +775,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(class MimeKit.ParserOptions options, unsigned int8[] buffer, int32 startIndex, int32 length, class MimeKit.ContentDisposition disposition) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>

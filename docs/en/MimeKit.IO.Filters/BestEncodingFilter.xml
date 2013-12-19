@@ -1,6 +1,6 @@
-<Type Name="PassThroughFilter" FullName="MimeKit.IO.Filters.PassThroughFilter">
-  <TypeSignature Language="C#" Value="public class PassThroughFilter : MimeKit.IO.Filters.IMimeFilter" />
-  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit PassThroughFilter extends System.Object implements class MimeKit.IO.Filters.IMimeFilter" />
+<Type Name="BestEncodingFilter" FullName="MimeKit.IO.Filters.BestEncodingFilter">
+  <TypeSignature Language="C#" Value="public class BestEncodingFilter : MimeKit.IO.Filters.IMimeFilter" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit BestEncodingFilter extends System.Object implements class MimeKit.IO.Filters.IMimeFilter" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
     <AssemblyVersion>0.18.0.0</AssemblyVersion>
@@ -15,13 +15,16 @@
   </Interfaces>
   <Docs>
     <summary>
-            A filter that simply passes data through without any processing.
+            A filter that can be used to determine the most efficient Content-Transfer-Encoding.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            Keeps track of the content that gets passed through the filter in order to
+            determine the most efficient <see cref="T:MimeKit.ContentEncoding" /> to use.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public PassThroughFilter ();" />
+      <MemberSignature Language="C#" Value="public BestEncodingFilter ();" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
@@ -30,7 +33,7 @@
       <Parameters />
       <Docs>
         <summary>
-            Initializes a new instance of the <see cref="T:MimeKit.IO.Filters.PassThroughFilter" /> class.
+            Initializes a new instance of the <see cref="T:MimeKit.IO.Filters.BestEncodingFilter" /> class.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -53,26 +56,23 @@
         <Parameter Name="outputLength" Type="System.Int32&amp;" RefType="out" />
       </Parameters>
       <Docs>
-        <param name="input">
-            The input buffer.
-            </param>
-        <param name="startIndex">
-            The starting index of the input buffer.
-            </param>
-        <param name="length">
-            The number of bytes of the input to filter.
-            </param>
-        <param name="outputIndex">
-            The starting index of the output in the returned buffer.
-            </param>
-        <param name="outputLength">
-            The length of the output buffer.
-            </param>
+        <param name="input">The input buffer.</param>
+        <param name="startIndex">The starting index of the input buffer.</param>
+        <param name="length">The number of bytes of the input to filter.</param>
+        <param name="outputIndex">The starting index of the output in the returned buffer.</param>
+        <param name="outputLength">The length of the output buffer.</param>
         <summary>
             Filters the specified input.
             </summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="input" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <paramref name="startIndex" /> and <paramref name="length" /> do not specify
+            a valid range in the <paramref name="input" /> byte array.
+            </exception>
       </Docs>
     </Member>
     <Member MemberName="Flush">
@@ -93,25 +93,44 @@
         <Parameter Name="outputLength" Type="System.Int32&amp;" RefType="out" />
       </Parameters>
       <Docs>
-        <param name="input">
-            The input buffer.
-            </param>
-        <param name="startIndex">
-            The starting index of the input buffer.
-            </param>
-        <param name="length">
-            The number of bytes of the input to filter.
-            </param>
-        <param name="outputIndex">
-            The starting index of the output in the returned buffer.
-            </param>
-        <param name="outputLength">
-            The length of the output buffer.
-            </param>
+        <param name="input">The input buffer.</param>
+        <param name="startIndex">The starting index of the input buffer.</param>
+        <param name="length">The number of bytes of the input to filter.</param>
+        <param name="outputIndex">The starting index of the output in the returned buffer.</param>
+        <param name="outputLength">The length of the output buffer.</param>
         <summary>
             Filters the specified input, flushing all internally buffered data to the output.
             </summary>
         <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="input" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <paramref name="startIndex" /> and <paramref name="length" /> do not specify
+            a valid range in the <paramref name="input" /> byte array.
+            </exception>
+      </Docs>
+    </Member>
+    <Member MemberName="GetBestEncoding">
+      <MemberSignature Language="C#" Value="public MimeKit.ContentEncoding GetBestEncoding (MimeKit.EncodingConstraint constraint);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance valuetype MimeKit.ContentEncoding GetBestEncoding(valuetype MimeKit.EncodingConstraint constraint) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MimeKit.ContentEncoding</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="constraint" Type="MimeKit.EncodingConstraint" />
+      </Parameters>
+      <Docs>
+        <param name="constraint">The encoding constraint.</param>
+        <summary>
+            Gets the best encoding given the specified constraints.
+            </summary>
+        <returns>The best encoding.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

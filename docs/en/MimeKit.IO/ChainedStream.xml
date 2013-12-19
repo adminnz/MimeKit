@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit ChainedStream extends System.IO.Stream" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.IO.Stream</BaseTypeName>
@@ -13,7 +13,11 @@
     <summary>
             A chained stream.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            Chains multiple streams together such that reading or writing beyond the end
+            of one stream spills over into the next stream in the chain. The idea is to
+            make it appear is if the chain of streams is all one continuous stream.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -21,7 +25,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -36,7 +40,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void Add(class System.IO.Stream stream) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -49,7 +53,9 @@
         <summary>
             Add the specified stream to the chained stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Adds the stream to the end of the chain.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="stream" /> is <c>null</c>.
             </exception>
@@ -60,7 +66,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanRead" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -71,7 +77,10 @@
             </summary>
         <value>
           <c>true</c> if the stream supports reading; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.ChainedStream" /> only supports reading if all of its
+            streams support it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanSeek">
@@ -79,7 +88,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanSeek" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -90,7 +99,10 @@
             </summary>
         <value>
           <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.ChainedStream" /> only supports seeking if all of its
+            streams support it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanTimeout">
@@ -98,7 +110,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanTimeout" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -109,7 +121,10 @@
             </summary>
         <value>
           <c>true</c> if I/O operations can timeout; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.ChainedStream" /> only supports timeouts if all of its
+            streams support them.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanWrite">
@@ -117,7 +132,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanWrite" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -128,7 +143,10 @@
             </summary>
         <value>
           <c>true</c> if the stream supports writing; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.ChainedStream" /> only supports writing if all of its
+            streams support it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -136,7 +154,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void Dispose(bool disposing) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -145,11 +163,14 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">If set to <c>true</c> disposing.</param>
+        <param name="disposing">If set to <c>true</c>, the stream is being disposed
+            via the <see cref="M:System.IO.Stream.Dispose" /> method.</param>
         <summary>
-            Dispose the specified disposing.
+            Disposes the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Sets the internal disposed state to <c>true</c>.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Flush">
@@ -157,7 +178,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Flush() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -165,14 +186,21 @@
       <Parameters />
       <Docs>
         <summary>
-            Flushes any internal output buffers.
+            Clears all buffers for this stream and causes any buffered data to be written
+            to the underlying device.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            If all of the child streams support writing, then the current child stream
+            will be flushed.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support writing.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -181,38 +209,20 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 Length" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets the length of the stream.
+            Gets the length in bytes of the stream.
             </summary>
-        <value>The length of the stream.</value>
-        <remarks>To be added.</remarks>
-        <exception cref="T:System.ObjectDisposedException">
-            The stream has been disposed.
-            </exception>
-      </Docs>
-    </Member>
-    <Member MemberName="Position">
-      <MemberSignature Language="C#" Value="public override long Position { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance int64 Position" />
-      <MemberType>Property</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Int64</ReturnType>
-      </ReturnValue>
-      <Docs>
-        <summary>
-            Gets or sets the position of the stream.
-            </summary>
-        <value>The position of the stream.</value>
-        <remarks>To be added.</remarks>
+        <value>The length of the stream in bytes.</value>
+        <remarks>
+            The length of a <see cref="T:MimeKit.IO.ChainedStream" /> is the combined lenths of all
+            of its chained streams.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -221,12 +231,42 @@
             </exception>
       </Docs>
     </Member>
+    <Member MemberName="Position">
+      <MemberSignature Language="C#" Value="public override long Position { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int64 Position" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int64</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets the position within the current stream.
+            </summary>
+        <value>The position of the stream.</value>
+        <remarks>
+            It is always possible to get the position of a <see cref="T:MimeKit.IO.ChainedStream" />,
+            but setting the position is only possible if all of its streams are seekable.
+            </remarks>
+        <exception cref="T:System.ObjectDisposedException">
+            The stream has been disposed.
+            </exception>
+        <exception cref="T:System.NotSupportedException">
+            The stream does not support seeking.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
+            </exception>
+      </Docs>
+    </Member>
     <Member MemberName="Read">
       <MemberSignature Language="C#" Value="public override int Read (byte[] buffer, int offset, int count);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int32 Read(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -241,15 +281,35 @@
         <param name="offset">The offset into the buffer to start reading data.</param>
         <param name="count">The number of bytes to read.</param>
         <summary>
-            Reads data into the specified buffer.
+            Reads a sequence of bytes from the stream and advances the position
+            within the stream by the number of bytes read.
             </summary>
-        <returns>The number of bytes read.</returns>
-        <remarks>To be added.</remarks>
+        <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+            bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
+        <remarks>
+            Reads up to the requested number of bytes if reading is supported. If the
+            current child stream does not have enough remaining data to complete the
+            read, the read will progress into the next stream in the chain in order
+            to complete the read.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support reading.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -258,7 +318,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int64 Seek(int64 offset, valuetype System.IO.SeekOrigin origin) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
@@ -268,13 +328,16 @@
         <Parameter Name="origin" Type="System.IO.SeekOrigin" />
       </Parameters>
       <Docs>
-        <param name="offset">The offset from the specified origin.</param>
-        <param name="origin">The origin from which to seek.</param>
+        <param name="offset">The offset into the stream relative to the <paramref name="origin" />.</param>
+        <param name="origin">The origin to seek from.</param>
         <summary>
-            Seeks to the specified offset.
+            Sets the position within the current stream.
             </summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <returns>The new position within the stream.</returns>
+        <remarks>
+            Seeks to the specified position within the stream if all child streams
+            support seeking.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -294,7 +357,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void SetLength(int64 value) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -303,11 +366,13 @@
         <Parameter Name="value" Type="System.Int64" />
       </Parameters>
       <Docs>
-        <param name="value">The new length.</param>
+        <param name="value">The desired length of the stream in bytes.</param>
         <summary>
-            Sets the length.
+            Sets the length of the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Setting the length of a <see cref="T:MimeKit.IO.ChainedStream" /> is not supported.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -321,7 +386,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Write(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -336,14 +401,33 @@
         <param name="offset">The offset of the first byte to write.</param>
         <param name="count">The number of bytes to write.</param>
         <summary>
-            Writes the specified buffer.
+            Writes a sequence of bytes to the stream and advances the current
+            position within this stream by the number of bytes written.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Writes the requested number of bytes if writing is supported. If the
+            current child stream does not have enough remaining space to fit the
+            complete buffer, the data will spill over into the next stream in the
+            chain in order to complete the write.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support writing.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>

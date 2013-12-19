@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi abstract beforefieldinit CryptographyContext extends System.Object implements class System.IDisposable" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.Object</BaseTypeName>
@@ -29,7 +29,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -42,7 +42,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class MimeKit.Cryptography.CryptographyContext Create(string protocol) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.CryptographyContext</ReturnType>
@@ -71,7 +71,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class MimeKit.MimeEntity Decrypt(class System.IO.Stream encryptedData) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -96,7 +96,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Dispose() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -117,7 +117,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance void Dispose(bool disposing) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -139,7 +139,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class MimeKit.MimePart Encrypt(class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -174,7 +174,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string EncryptionProtocol" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -184,7 +184,11 @@
             Gets the encryption protocol.
             </summary>
         <value>The encryption protocol.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <para>The encryption protocol is used by <see cref="T:MimeKit.Cryptography.MultipartEncrypted" />
+            in order to determine what the protocol parameter of the Content-Type
+            header should be.</para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Export">
@@ -192,7 +196,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class MimeKit.MimePart Export(class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; mailboxes) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -223,7 +227,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance valuetype MimeKit.Cryptography.DigestAlgorithm GetDigestAlgorithm(string micalg) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.DigestAlgorithm</ReturnType>
@@ -237,18 +241,20 @@
             Gets the digest algorithm from the micalg parameter value in a multipart/signed part.
             </summary>
         <returns>The digest algorithm.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Maps the micalg parameter value string back to the appropriate <see cref="T:MimeKit.Cryptography.DigestAlgorithm" />.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="micalg" /> is <c>null</c>.
             </exception>
       </Docs>
     </Member>
-    <Member MemberName="GetMicAlgorithmName">
-      <MemberSignature Language="C#" Value="public abstract string GetMicAlgorithmName (MimeKit.Cryptography.DigestAlgorithm micalg);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance string GetMicAlgorithmName(valuetype MimeKit.Cryptography.DigestAlgorithm micalg) cil managed" />
+    <Member MemberName="GetDigestAlgorithmName">
+      <MemberSignature Language="C#" Value="public abstract string GetDigestAlgorithmName (MimeKit.Cryptography.DigestAlgorithm micalg);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance string GetDigestAlgorithmName(valuetype MimeKit.Cryptography.DigestAlgorithm micalg) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -262,7 +268,11 @@
             Gets the string name of the digest algorithm for use with the micalg parameter of a multipart/signed part.
             </summary>
         <returns>The micalg value.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Maps the <see cref="T:MimeKit.Cryptography.DigestAlgorithm" /> to the appropriate string identifier
+            as used by the micalg parameter value of a multipart/signed Content-Type
+            header.
+            </remarks>
         <exception cref="T:System.ArgumentOutOfRangeException">
           <paramref name="micalg" /> is out of range.
             </exception>
@@ -273,7 +283,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Import(class System.IO.Stream stream) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -300,7 +310,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string KeyExchangeProtocol" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -318,7 +328,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void Register(class System.Type type) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -351,7 +361,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class MimeKit.MimePart Sign(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -394,7 +404,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string SignatureProtocol" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -404,7 +414,11 @@
             Gets the signature protocol.
             </summary>
         <value>The signature protocol.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <para>The signature protocol is used by <see cref="T:MimeKit.Cryptography.MultipartSigned" />
+            in order to determine what the protocol parameter of the Content-Type
+            header should be.</para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Supports">
@@ -412,7 +426,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool Supports(string protocol) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -427,7 +441,10 @@
             </summary>
         <returns>
           <c>true</c> if the protocol is supported; otherwise <c>false</c></returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Used in order to make sure that the protocol parameter value specified in either a multipart/signed
+            or multipart/encrypted part is supported by the supplied cryptography context.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="protocol" /> is <c>null</c>.
             </exception>
@@ -438,7 +455,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class MimeKit.Cryptography.DigitalSignatureCollection Verify(class System.IO.Stream content, class System.IO.Stream signatureData) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.DigitalSignatureCollection</ReturnType>

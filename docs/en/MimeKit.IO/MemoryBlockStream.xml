@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit MemoryBlockStream extends System.IO.Stream" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.IO.Stream</BaseTypeName>
@@ -15,7 +15,12 @@
             get access to the internal byte buffer in order to drastically improve
             performance.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            Instead of resizing an internal byte array, the <see cref="T:MimeKit.IO.MemoryBlockStream" />
+            chains blocks of non-contiguous memory. This helps improve performance by avoiding
+            unneeded copying of data from the old array to the newly allocated array as well
+            as the zeroing of the newly allocated array.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -23,14 +28,17 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
         <summary>
             Initializes a new instance of the <see cref="T:MimeKit.IO.MemoryBlockStream" /> class.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Creates a new <see cref="T:MimeKit.IO.MemoryBlockStream" /> with an initial memory block
+            of 2048 bytes.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanRead">
@@ -38,7 +46,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanRead" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -49,7 +57,9 @@
             </summary>
         <value>
           <c>true</c> if the stream supports reading; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.MemoryBlockStream" /> is always readable.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanSeek">
@@ -57,7 +67,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanSeek" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -68,7 +78,9 @@
             </summary>
         <value>
           <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.MemoryBlockStream" /> is always seekable.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanTimeout">
@@ -76,7 +88,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanTimeout" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -87,7 +99,9 @@
             </summary>
         <value>
           <c>true</c> if reading and writing to the stream can timeout; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.MemoryBlockStream" /> does not support timing out.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanWrite">
@@ -95,7 +109,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanWrite" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -105,9 +119,10 @@
             Checks whether or not the stream supports writing.
             </summary>
         <value>
-          <c>true</c> if the stream supports writing; otherwise, <c>false</c>.
-            </value>
-        <remarks>To be added.</remarks>
+          <c>true</c> if the stream supports writing; otherwise, <c>false</c>.</value>
+        <remarks>
+            The <see cref="T:MimeKit.IO.MemoryBlockStream" /> is always writable.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -115,7 +130,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void Dispose(bool disposing) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -124,11 +139,14 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">If set to <c>true</c> disposing.</param>
+        <param name="disposing">If set to <c>true</c>, the stream is being disposed
+            via the <see cref="M:System.IO.Stream.Dispose" /> method.</param>
         <summary>
-            Dispose the specified disposing.
+            Disposes the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Sets the internal disposed state to <c>true</c>.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Flush">
@@ -136,7 +154,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Flush() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -144,7 +162,8 @@
       <Parameters />
       <Docs>
         <summary>
-            Flushes any internal output buffers.
+            Clears all buffers for this stream and causes any buffered data to be written
+            to the underlying device.
             </summary>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ObjectDisposedException">
@@ -160,16 +179,16 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 Length" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets the length of the stream.
+            Gets the length of the stream, in bytes.
             </summary>
-        <value>The length of the stream.</value>
+        <value>The length of the stream, in bytes.</value>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
@@ -181,14 +200,14 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 Position" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets the position of the stream.
+            Gets or sets the position within the current stream.
             </summary>
         <value>The position of the stream.</value>
         <remarks>To be added.</remarks>
@@ -198,6 +217,9 @@
         <exception cref="T:System.NotSupportedException">
             The stream does not support seeking.
             </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
+            </exception>
       </Docs>
     </Member>
     <Member MemberName="Read">
@@ -205,7 +227,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int32 Read(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -220,12 +242,27 @@
         <param name="offset">The offset into the buffer to start reading data.</param>
         <param name="count">The number of bytes to read.</param>
         <summary>
-            Reads data into the specified buffer.
+            Reads a sequence of bytes from the stream and advances the position
+            within the stream by the number of bytes read.
             </summary>
-        <returns>The number of bytes read.</returns>
+        <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+            bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -234,7 +271,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int64 Seek(int64 offset, valuetype System.IO.SeekOrigin origin) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
@@ -244,12 +281,12 @@
         <Parameter Name="origin" Type="System.IO.SeekOrigin" />
       </Parameters>
       <Docs>
-        <param name="offset">The offset from the specified origin.</param>
-        <param name="origin">The origin from which to seek.</param>
+        <param name="offset">The offset into the stream relative to the <paramref name="origin" />.</param>
+        <param name="origin">The origin to seek from.</param>
         <summary>
-            Seeks to the specified offset.
+            Sets the position within the current stream.
             </summary>
-        <returns>To be added.</returns>
+        <returns>The new position within the stream.</returns>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
@@ -267,7 +304,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void SetLength(int64 value) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -276,9 +313,9 @@
         <Parameter Name="value" Type="System.Int64" />
       </Parameters>
       <Docs>
-        <param name="value">The new length.</param>
+        <param name="value">The desired length of the stream in bytes.</param>
         <summary>
-            Sets the length.
+            Sets the length of the stream.
             </summary>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentOutOfRangeException">
@@ -294,7 +331,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance unsigned int8[] ToArray() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Byte[]</ReturnType>
@@ -305,7 +342,9 @@
             Copies the memory stream into a byte array.
             </summary>
         <returns>The array.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Copies all of the stream data into a newly allocated byte array.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Write">
@@ -313,7 +352,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Write(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -328,14 +367,30 @@
         <param name="offset">The offset of the first byte to write.</param>
         <param name="count">The number of bytes to write.</param>
         <summary>
-            Writes the specified buffer.
+            Writes a sequence of bytes to the stream and advances the current
+            position within this stream by the number of bytes written.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Writes the entire buffer to the buffer, adding memory blocks as needed.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support writing.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>

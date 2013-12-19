@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit WindowsSecureMimeContext extends MimeKit.Cryptography.SecureMimeContext" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>MimeKit.Cryptography.SecureMimeContext</BaseTypeName>
@@ -21,14 +21,16 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
         <summary>
             Initializes a new instance of the <see cref="T:MimeKit.Cryptography.WindowsSecureMimeContext" /> class.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Constructs an S/MIME context using the current user's X.509 store location.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -36,7 +38,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype System.Security.Cryptography.X509Certificates.StoreLocation location) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="location" Type="System.Security.Cryptography.X509Certificates.StoreLocation" />
@@ -54,7 +56,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.MimeEntity Decrypt(class System.IO.Stream encryptedData) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -82,7 +84,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.Cryptography.ApplicationPkcs7Mime EncapsulatedSign(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPkcs7Mime</ReturnType>
@@ -128,7 +130,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class Org.BouncyCastle.X509.X509Certificate GetCertificate(class Org.BouncyCastle.X509.Store.IX509Selector selector) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.X509.X509Certificate</ReturnType>
@@ -150,7 +152,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class Org.BouncyCastle.X509.Store.IX509Store GetCertificateRevocationLists() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.X509.Store.IX509Store</ReturnType>
@@ -169,7 +171,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class MimeKit.Cryptography.CmsRecipient GetCmsRecipient(class MimeKit.MailboxAddress mailbox) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.CmsRecipient</ReturnType>
@@ -194,7 +196,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class MimeKit.Cryptography.CmsSigner GetCmsSigner(class MimeKit.MailboxAddress mailbox, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.CmsSigner</ReturnType>
@@ -221,7 +223,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class Org.BouncyCastle.X509.Store.IX509Store GetIntermediateCertificates() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.X509.Store.IX509Store</ReturnType>
@@ -240,7 +242,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class Org.BouncyCastle.Crypto.AsymmetricKeyParameter GetPrivateKey(class Org.BouncyCastle.X509.Store.IX509Selector selector) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Crypto.AsymmetricKeyParameter</ReturnType>
@@ -262,7 +264,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance class Org.BouncyCastle.Utilities.Collections.HashSet GetTrustedAnchors() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Utilities.Collections.HashSet</ReturnType>
@@ -281,7 +283,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Import(class Org.BouncyCastle.X509.X509Certificate certificate) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -305,7 +307,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Import(class Org.BouncyCastle.X509.X509Crl crl) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -329,7 +331,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Import(class System.IO.Stream stream, string password) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -362,7 +364,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.MimePart Sign(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -408,7 +410,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Security.Cryptography.X509Certificates.StoreLocation StoreLocation" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Security.Cryptography.X509Certificates.StoreLocation</ReturnType>
@@ -426,7 +428,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void UpdateSecureMimeCapabilities(class Org.BouncyCastle.X509.X509Certificate certificate, valuetype MimeKit.Cryptography.EncryptionAlgorithm[] algorithms, valuetype System.DateTime timestamp) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>

@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed FormatOptions extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.Object</BaseTypeName>
@@ -13,7 +13,10 @@
     <summary>
             Format options for serializing various MimeKit objects.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            Represents the available options for formatting MIME messages
+            and entities when writing them to a stream.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -21,7 +24,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -34,7 +37,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.FormatOptions Clone() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.FormatOptions</ReturnType>
@@ -45,7 +48,9 @@
             Clones an instance of <see cref="T:MimeKit.FormatOptions" />.
             </summary>
         <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Clones the formatting options.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Default">
@@ -53,7 +58,7 @@
       <MemberSignature Language="ILAsm" Value=".field public static initonly class MimeKit.FormatOptions Default" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.FormatOptions</ReturnType>
@@ -62,7 +67,35 @@
         <summary>
             The default formatting options.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            If a custom <see cref="T:MimeKit.FormatOptions" /> is not passed to methods such as
+            <see cref="M:MimeKit.MimeMessage.WriteTo(MimeKit.FormatOptions,System.IO.Stream)" />, the default options
+            will be used.
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="HiddenHeaders">
+      <MemberSignature Language="C#" Value="public System.Collections.Generic.HashSet&lt;MimeKit.HeaderId&gt; HiddenHeaders { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class System.Collections.Generic.HashSet`1&lt;valuetype MimeKit.HeaderId&gt; HiddenHeaders" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Collections.Generic.HashSet&lt;MimeKit.HeaderId&gt;</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets the message headers that should be hidden.
+            </summary>
+        <value>The message headers.</value>
+        <remarks>
+          <para>Specifies the set of headers that should be removed when
+            writing a <see cref="T:MimeKit.MimeMessage" /> to a stream.</para>
+          <para>This is primarily meant for the purposes of removing Bcc
+            and Resent-Bcc headers when sending via a transport such as
+            SMTP.</para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="MaxLineLength">
@@ -70,7 +103,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 MaxLineLength" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -81,7 +114,9 @@
             use this value to determine where to place line breaks.
             </summary>
         <value>The maximum line length.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Specifies the maximum line length to use when line-wrapping headers.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="NewLineFormat">
@@ -89,7 +124,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype MimeKit.NewLineFormat NewLineFormat" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.NewLineFormat</ReturnType>
@@ -99,7 +134,10 @@
             Gets or sets the new-line format.
             </summary>
         <value>The new-line format.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Specifies the new-line encoding to use when writing the message
+            or entity to a stream.
+            </remarks>
       </Docs>
     </Member>
   </Members>

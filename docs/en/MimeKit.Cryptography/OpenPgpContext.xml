@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi abstract beforefieldinit OpenPgpContext extends MimeKit.Cryptography.CryptographyContext" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>MimeKit.Cryptography.CryptographyContext</BaseTypeName>
@@ -25,7 +25,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig specialname rtspecialname instance void .ctor(string pubring, string secring) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="pubring" Type="System.String" />
@@ -58,7 +58,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.MimeEntity Decrypt(class System.IO.Stream encryptedData) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -95,7 +95,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimeEntity Decrypt(class System.IO.Stream encryptedData, class MimeKit.Cryptography.DigitalSignatureCollection signatures) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimeEntity</ReturnType>
@@ -131,7 +131,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.MimePart Encrypt(class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -174,7 +174,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimePart Encrypt(class System.Collections.Generic.IEnumerable`1&lt;class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey&gt; recipients, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -211,7 +211,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string EncryptionProtocol" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -221,7 +221,11 @@
             Gets the encryption protocol.
             </summary>
         <value>The encryption protocol.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <para>The encryption protocol is used by <see cref="T:MimeKit.Cryptography.MultipartEncrypted" />
+            in order to determine what the protocol parameter of the Content-Type
+            header should be.</para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Export">
@@ -229,7 +233,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimePart Export(class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKeyRingBundle keys) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -254,7 +258,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.MimePart Export(class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; mailboxes) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -282,7 +286,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimePart Export(class System.Collections.Generic.IEnumerable`1&lt;class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey&gt; keys) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -307,7 +311,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig valuetype MimeKit.Cryptography.DigestAlgorithm GetDigestAlgorithm(valuetype Org.BouncyCastle.Bcpg.HashAlgorithmTag hashAlgorithm) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.DigestAlgorithm</ReturnType>
@@ -336,7 +340,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance valuetype MimeKit.Cryptography.DigestAlgorithm GetDigestAlgorithm(string micalg) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.DigestAlgorithm</ReturnType>
@@ -350,9 +354,82 @@
             Gets the digest algorithm from the micalg parameter value in a multipart/signed part.
             </summary>
         <returns>The digest algorithm.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Maps the micalg parameter value string back to the appropriate <see cref="T:MimeKit.Cryptography.DigestAlgorithm" />.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="micalg" /> is <c>null</c>.
+            </exception>
+      </Docs>
+    </Member>
+    <Member MemberName="GetDigestAlgorithmName">
+      <MemberSignature Language="C#" Value="public override string GetDigestAlgorithmName (MimeKit.Cryptography.DigestAlgorithm micalg);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance string GetDigestAlgorithmName(valuetype MimeKit.Cryptography.DigestAlgorithm micalg) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.String</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="micalg" Type="MimeKit.Cryptography.DigestAlgorithm" />
+      </Parameters>
+      <Docs>
+        <param name="micalg">The digest algorithm.</param>
+        <summary>
+            Gets the string name of the digest algorithm for use with the micalg parameter of a multipart/signed part.
+            </summary>
+        <returns>The micalg value.</returns>
+        <remarks>
+          <para>Maps the <see cref="T:MimeKit.Cryptography.DigestAlgorithm" /> to the appropriate string identifier
+            as used by the micalg parameter value of a multipart/signed Content-Type
+            header. For example:</para>
+          <list type="table">
+            <listheader>
+              <term>Algorithm</term>
+              <description>Name</description>
+            </listheader>
+            <item>
+              <term>
+                <see cref="F:MimeKit.Cryptography.DigestAlgorithm.MD5" />
+              </term>
+              <description>pgp-md5</description>
+            </item>
+            <item>
+              <term>
+                <see cref="F:MimeKit.Cryptography.DigestAlgorithm.Sha1" />
+              </term>
+              <description>pgp-sha1</description>
+            </item>
+            <item>
+              <term>
+                <see cref="F:MimeKit.Cryptography.DigestAlgorithm.RipeMD160" />
+              </term>
+              <description>pgp-ripemd160</description>
+            </item>
+            <item>
+              <term>
+                <see cref="F:MimeKit.Cryptography.DigestAlgorithm.MD2" />
+              </term>
+              <description>pgp-md2</description>
+            </item>
+            <item>
+              <term>
+                <see cref="F:MimeKit.Cryptography.DigestAlgorithm.Tiger192" />
+              </term>
+              <description>pgp-tiger192</description>
+            </item>
+            <item>
+              <term>
+                <see cref="F:MimeKit.Cryptography.DigestAlgorithm.Haval5160" />
+              </term>
+              <description>pgp-haval-5-160</description>
+            </item>
+          </list>
+        </remarks>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <paramref name="micalg" /> is out of range.
             </exception>
       </Docs>
     </Member>
@@ -361,7 +438,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig valuetype Org.BouncyCastle.Bcpg.HashAlgorithmTag GetHashAlgorithm(valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.HashAlgorithmTag</ReturnType>
@@ -376,7 +453,9 @@
             specified <see cref="T:MimeKit.Cryptography.DigestAlgorithm" />.
             </summary>
         <returns>The hash algorithm.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Maps a <see cref="T:MimeKit.Cryptography.DigestAlgorithm" /> to the equivalent <see cref="T:Org.BouncyCastle.Bcpg.HashAlgorithmTag" />.
+            </remarks>
         <exception cref="T:System.ArgumentOutOfRangeException">
           <paramref name="digestAlgo" /> is out of range.
             </exception>
@@ -386,37 +465,12 @@
             </exception>
       </Docs>
     </Member>
-    <Member MemberName="GetMicAlgorithmName">
-      <MemberSignature Language="C#" Value="public override string GetMicAlgorithmName (MimeKit.Cryptography.DigestAlgorithm micalg);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance string GetMicAlgorithmName(valuetype MimeKit.Cryptography.DigestAlgorithm micalg) cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.String</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="micalg" Type="MimeKit.Cryptography.DigestAlgorithm" />
-      </Parameters>
-      <Docs>
-        <param name="micalg">The digest algorithm.</param>
-        <summary>
-            Gets the string name of the digest algorithm for use with the micalg parameter of a multipart/signed part.
-            </summary>
-        <returns>The micalg value.</returns>
-        <remarks>To be added.</remarks>
-        <exception cref="T:System.ArgumentOutOfRangeException">
-          <paramref name="micalg" /> is out of range.
-            </exception>
-      </Docs>
-    </Member>
     <Member MemberName="GetPasswordForKey">
       <MemberSignature Language="C#" Value="protected abstract string GetPasswordForKey (Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey key);" />
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance string GetPasswordForKey(class Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey key) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -441,7 +495,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig instance class Org.BouncyCastle.Bcpg.OpenPgp.PgpPrivateKey GetPrivateKey(class Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey key) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.OpenPgp.PgpPrivateKey</ReturnType>
@@ -472,7 +526,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig instance class Org.BouncyCastle.Bcpg.OpenPgp.PgpPrivateKey GetPrivateKey(int64 keyId) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.OpenPgp.PgpPrivateKey</ReturnType>
@@ -503,7 +557,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey GetPublicKey(class MimeKit.MailboxAddress mailbox) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey</ReturnType>
@@ -528,7 +582,7 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig valuetype MimeKit.Cryptography.PublicKeyAlgorithm GetPublicKeyAlgorithm(valuetype Org.BouncyCastle.Bcpg.PublicKeyAlgorithmTag algorithm) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.PublicKeyAlgorithm</ReturnType>
@@ -557,7 +611,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance class System.Collections.Generic.IList`1&lt;class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey&gt; GetPublicKeys(class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; mailboxes) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Collections.Generic.IList&lt;Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey&gt;</ReturnType>
@@ -582,7 +636,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance class Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey GetSigningKey(class MimeKit.MailboxAddress mailbox) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey</ReturnType>
@@ -610,7 +664,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Import(class System.IO.Stream stream) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -639,7 +693,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void ImportSecretKeys(class System.IO.Stream rawData) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -668,7 +722,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string KeyExchangeProtocol" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -686,7 +740,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKeyRingBundle PublicKeyRingBundle" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKeyRingBundle</ReturnType>
@@ -704,14 +758,14 @@
       <MemberSignature Language="ILAsm" Value=".property instance string PublicKeyRingPath" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets the public key ring path.
+            Gets the public keyring path.
             </summary>
         <value>The public key ring path.</value>
         <remarks>To be added.</remarks>
@@ -722,7 +776,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig instance void SavePublicKeyRingBundle() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -743,7 +797,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig instance void SaveSecretKeyRingBundle() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -764,7 +818,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance class Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKeyRingBundle SecretKeyRingBundle" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKeyRingBundle</ReturnType>
@@ -782,14 +836,14 @@
       <MemberSignature Language="ILAsm" Value=".property instance string SecretKeyRingPath" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets the secret key ring path.
+            Gets the secret keyring path.
             </summary>
         <value>The secret key ring path.</value>
         <remarks>To be added.</remarks>
@@ -800,7 +854,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.MimePart Sign(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -852,7 +906,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.Cryptography.ApplicationPgpSignature Sign(class Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.ApplicationPgpSignature</ReturnType>
@@ -901,7 +955,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimePart SignAndEncrypt(class MimeKit.MailboxAddress signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.Collections.Generic.IEnumerable`1&lt;class MimeKit.MailboxAddress&gt; recipients, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -968,7 +1022,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class MimeKit.MimePart SignAndEncrypt(class Org.BouncyCastle.Bcpg.OpenPgp.PgpSecretKey signer, valuetype MimeKit.Cryptography.DigestAlgorithm digestAlgo, class System.Collections.Generic.IEnumerable`1&lt;class Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKey&gt; recipients, class System.IO.Stream content) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.MimePart</ReturnType>
@@ -1021,7 +1075,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string SignatureProtocol" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -1031,7 +1085,11 @@
             Gets the signature protocol.
             </summary>
         <value>The signature protocol.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <para>The signature protocol is used by <see cref="T:MimeKit.Cryptography.MultipartSigned" />
+            in order to determine what the protocol parameter of the Content-Type
+            header should be.</para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Supports">
@@ -1039,7 +1097,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool Supports(string protocol) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -1065,7 +1123,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MimeKit.Cryptography.DigitalSignatureCollection Verify(class System.IO.Stream content, class System.IO.Stream signatureData) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.Cryptography.DigitalSignatureCollection</ReturnType>

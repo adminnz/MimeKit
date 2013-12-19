@@ -1,6 +1,6 @@
 <Overview>
   <Assemblies>
-    <Assembly Name="MimeKit" Version="0.16.0.0">
+    <Assembly Name="MimeKit" Version="0.18.0.0">
       <Attributes>
         <Attribute>
           <AttributeName>System.Reflection.AssemblyCompany("")</AttributeName>
@@ -15,10 +15,10 @@
           <AttributeName>System.Reflection.AssemblyDescription("A complete MIME library with support for S/MIME, PGP and Unix mbox spools.")</AttributeName>
         </Attribute>
         <Attribute>
-          <AttributeName>System.Reflection.AssemblyFileVersion("0.16.0.0")</AttributeName>
+          <AttributeName>System.Reflection.AssemblyFileVersion("0.18.0.0")</AttributeName>
         </Attribute>
         <Attribute>
-          <AttributeName>System.Reflection.AssemblyInformationalVersion("0.16.0")</AttributeName>
+          <AttributeName>System.Reflection.AssemblyInformationalVersion("0.18.0")</AttributeName>
         </Attribute>
         <Attribute>
           <AttributeName>System.Reflection.AssemblyProduct("MimeKit")</AttributeName>
@@ -52,6 +52,7 @@
       <Type Name="ContentObject" Kind="Class" />
       <Type Name="ContentType" Kind="Class" />
       <Type Name="DomainList" Kind="Class" />
+      <Type Name="EncodingConstraint" Kind="Enumeration" />
       <Type Name="FormatOptions" Kind="Class" />
       <Type Name="GroupAddress" Kind="Class" />
       <Type Name="Header" Kind="Class" />
@@ -141,6 +142,7 @@
     </Namespace>
     <Namespace Name="MimeKit.IO.Filters">
       <Type Name="ArmoredFromFilter" Kind="Class" />
+      <Type Name="BestEncodingFilter" Kind="Class" />
       <Type Name="CharsetFilter" Kind="Class" />
       <Type Name="DecoderFilter" Kind="Class" />
       <Type Name="Dos2UnixFilter" Kind="Class" />

@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit BoundStream extends System.IO.Stream" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.IO.Stream</BaseTypeName>
@@ -13,7 +13,12 @@
     <summary>
             A bounded stream, confined to reading and writing data to a limited subset of the overall source stream.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+      <para>Wraps an arbitrary stream, limiting I/O operations to a subset of the source stream.
+            If the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" /> is <c>-1</c>, then the end of the stream is unbound.</para>
+      <para>When a <see cref="T:MimeKit.MimeParser" /> is set to parse a persistent stream, it will construct
+            <see cref="T:MimeKit.ContentObject" />s using bounded streams instead of loading the content into memory.</para>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -21,7 +26,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class System.IO.Stream baseStream, int64 startBoundary, int64 endBoundary, bool leaveOpen) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="baseStream" Type="System.IO.Stream" />
@@ -39,7 +44,10 @@
         <summary>
             Initializes a new instance of the <see cref="T:MimeKit.IO.BoundStream" /> class.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            If the <paramref name="endBoundary" /> is less than <c>0</c>, then the end of the stream
+            is unbounded.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="baseStream" /> is <c>null</c>.
             </exception>
@@ -58,7 +66,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance class System.IO.Stream BaseStream" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.IO.Stream</ReturnType>
@@ -68,7 +76,9 @@
             Gets the underlying stream.
             </summary>
         <value>The underlying stream.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            All I/O is performed on the base stream.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanRead">
@@ -76,7 +86,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanRead" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -87,7 +97,10 @@
             </summary>
         <value>
           <c>true</c> if the stream supports reading; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.BoundStream" /> will only support reading if the
+            <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> supports it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanSeek">
@@ -95,7 +108,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanSeek" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -106,7 +119,10 @@
             </summary>
         <value>
           <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.BoundStream" /> will only support seeking if the
+            <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> supports it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanTimeout">
@@ -114,7 +130,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanTimeout" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -125,7 +141,10 @@
             </summary>
         <value>
           <c>true</c> if I/O operations can timeout; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.BoundStream" /> will only support timing out if the
+            <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> supports it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanWrite">
@@ -133,7 +152,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanWrite" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -144,7 +163,10 @@
             </summary>
         <value>
           <c>true</c> if the stream supports writing; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The <see cref="T:MimeKit.IO.BoundStream" /> will only support writing if the
+            <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> supports it.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -152,7 +174,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void Dispose(bool disposing) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -161,11 +183,15 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">If set to <c>true</c> disposing.</param>
+        <param name="disposing">If set to <c>true</c>, the stream is being disposed
+            via the <see cref="M:System.IO.Stream.Dispose" /> method.</param>
         <summary>
-            Dispose the specified disposing.
+            Disposes the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            If the <see cref="P:MimeKit.IO.BoundStream.LeaveOpen" /> property is <c>false</c>, then
+            the <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> is also disposed.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="EndBoundary">
@@ -173,7 +199,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 EndBoundary" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
@@ -183,7 +209,11 @@
             Gets the end boundary offset of the underlying stream.
             </summary>
         <value>The end boundary offset of the underlying stream.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The end boundary is the byte offset into the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />
+            that marks the end of the substream. If the value is less than 0,
+            then the end of the stream is treated as unbound.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Flush">
@@ -191,7 +221,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Flush() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -199,14 +229,20 @@
       <Parameters />
       <Docs>
         <summary>
-            Flushes any internal output buffers.
+            Clears all buffers for this stream and causes any buffered data to be written
+            to the underlying device.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Flushes the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support writing.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -215,38 +251,23 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 Length" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets the length of the stream.
+            Gets the length in bytes of the stream.
             </summary>
-        <value>The length of the stream.</value>
-        <remarks>To be added.</remarks>
-        <exception cref="T:System.ObjectDisposedException">
-            The stream has been disposed.
-            </exception>
-      </Docs>
-    </Member>
-    <Member MemberName="Position">
-      <MemberSignature Language="C#" Value="public override long Position { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance int64 Position" />
-      <MemberType>Property</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Int64</ReturnType>
-      </ReturnValue>
-      <Docs>
-        <summary>
-            Gets or sets the position of the stream.
-            </summary>
-        <value>The position of the stream.</value>
-        <remarks>To be added.</remarks>
+        <value>The length of the stream in bytes.</value>
+        <remarks>
+            If the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" /> property is greater than or equal to <c>0</c>,
+            then the length will be calculated by subtracting the <see cref="P:MimeKit.IO.BoundStream.StartBoundary" />
+            from the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" />. If the end of the stream is unbound, then the
+            <see cref="P:MimeKit.IO.BoundStream.StartBoundary" /> will be subtracted from the length of the
+            <see cref="P:MimeKit.IO.BoundStream.BaseStream" />.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -255,12 +276,41 @@
             </exception>
       </Docs>
     </Member>
+    <Member MemberName="Position">
+      <MemberSignature Language="C#" Value="public override long Position { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int64 Position" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int64</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets the position within the current stream.
+            </summary>
+        <value>The position of the stream.</value>
+        <remarks>
+            The <see cref="P:MimeKit.IO.BoundStream.Position" /> is relative to the <see cref="P:MimeKit.IO.BoundStream.StartBoundary" />.
+            </remarks>
+        <exception cref="T:System.ObjectDisposedException">
+            The stream has been disposed.
+            </exception>
+        <exception cref="T:System.NotSupportedException">
+            The stream does not support seeking.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
+            </exception>
+      </Docs>
+    </Member>
     <Member MemberName="Read">
       <MemberSignature Language="C#" Value="public override int Read (byte[] buffer, int offset, int count);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int32 Read(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -275,15 +325,33 @@
         <param name="offset">The offset into the buffer to start reading data.</param>
         <param name="count">The number of bytes to read.</param>
         <summary>
-            Reads data into the specified buffer.
+            Reads a sequence of bytes from the stream and advances the position
+            within the stream by the number of bytes read.
             </summary>
-        <returns>The number of bytes read.</returns>
-        <remarks>To be added.</remarks>
+        <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+            bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
+        <remarks>
+            Reads data from the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />, not allowing it to
+            read beyond the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" />.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support reading.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -292,17 +360,19 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 ReadTimeout" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets the read timeout.
+            Gets or sets a value, in miliseconds, that determines how long the stream will attempt to read before timing out.
             </summary>
-        <value>The read timeout.</value>
-        <remarks>To be added.</remarks>
+        <value>A value, in miliseconds, that determines how long the stream will attempt to read before timing out.</value>
+        <remarks>
+            Gets or sets the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />'s read timeout.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Seek">
@@ -310,7 +380,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int64 Seek(int64 offset, valuetype System.IO.SeekOrigin origin) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
@@ -320,13 +390,15 @@
         <Parameter Name="origin" Type="System.IO.SeekOrigin" />
       </Parameters>
       <Docs>
-        <param name="offset">The offset from the specified origin.</param>
-        <param name="origin">The origin from which to seek.</param>
+        <param name="offset">The offset into the stream relative to the <paramref name="origin" />.</param>
+        <param name="origin">The origin to seek from.</param>
         <summary>
-            Seeks to the specified offset.
+            Sets the position within the current stream.
             </summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <returns>The new position within the stream.</returns>
+        <remarks>
+            Seeks within the confines of the <see cref="P:MimeKit.IO.BoundStream.StartBoundary" /> and the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" />.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -346,7 +418,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void SetLength(int64 value) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -355,11 +427,16 @@
         <Parameter Name="value" Type="System.Int64" />
       </Parameters>
       <Docs>
-        <param name="value">The new length.</param>
+        <param name="value">The desired length of the stream in bytes.</param>
         <summary>
-            Sets the length.
+            Sets the length of the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Updates the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" /> to be <see cref="P:MimeKit.IO.BoundStream.StartBoundary" /> plus
+            the specified new length. If the <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> needs to be grown
+            to allow this, then the length of the <see cref="P:MimeKit.IO.BoundStream.BaseStream" /> will also be
+            updated.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -376,7 +453,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 StartBoundary" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
@@ -386,7 +463,10 @@
             Gets the start boundary offset of the underlying stream.
             </summary>
         <value>The start boundary offset of the underlying stream.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            The start boundary is the byte offset into the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />
+            that marks the beginning of the substream.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Write">
@@ -394,7 +474,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Write(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -409,14 +489,31 @@
         <param name="offset">The offset of the first byte to write.</param>
         <param name="count">The number of bytes to write.</param>
         <summary>
-            Writes the specified buffer.
+            Writes a sequence of bytes to the stream and advances the current
+            position within this stream by the number of bytes written.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Writes data to the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />, not allowing it to
+            write beyond the <see cref="P:MimeKit.IO.BoundStream.EndBoundary" />.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support writing.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -425,17 +522,19 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 WriteTimeout" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets the write timeout.
+            Gets or sets a value, in miliseconds, that determines how long the stream will attempt to write before timing out.
             </summary>
-        <value>The write timeout.</value>
-        <remarks>To be added.</remarks>
+        <value>A value, in miliseconds, that determines how long the stream will attempt to write before timing out.</value>
+        <remarks>
+            Gets or sets the <see cref="P:MimeKit.IO.BoundStream.BaseStream" />'s write timeout.
+            </remarks>
       </Docs>
     </Member>
   </Members>

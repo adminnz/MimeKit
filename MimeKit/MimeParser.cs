@@ -27,6 +27,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 
@@ -108,7 +109,7 @@ namespace MimeKit {
 
 		// I/O buffering
 		readonly byte[] input = new byte[ReadAheadSize + BlockSize + PadSize];
-		readonly int inputStart = ReadAheadSize;
+		const int inputStart = ReadAheadSize;
 		int inputIndex = ReadAheadSize;
 		int inputEnd = ReadAheadSize;
 
@@ -128,7 +129,9 @@ namespace MimeKit {
 		MimeParserState state;
 		MimeFormat format;
 		bool persistent;
+		bool eos;
 
+		CancellationToken token = CancellationToken.None;
 		ParserOptions options;
 		Stream stream;
 		long offset;
@@ -358,6 +361,7 @@ namespace MimeKit {
 			headers.Clear ();
 			headerOffset = 0;
 			headerIndex = 0;
+			eos = false;
 
 			bounds.Clear ();
 			if (format == MimeFormat.Mbox) {
@@ -532,7 +536,7 @@ namespace MimeKit {
 		{
 			int left = inputEnd - inputIndex;
 
-			if (left >= atleast)
+			if (left >= atleast || eos)
 				return left;
 
 			int index = inputIndex - save;
@@ -542,7 +546,7 @@ namespace MimeKit {
 
 			left += save;
 
-			// attempt to align the end of the remaining input with BackBufferSize
+			// attempt to align the end of the remaining input with ReadAheadSize
 			if (index >= start) {
 				start -= left < ReadAheadSize ? left : ReadAheadSize;
 				MemMove (inbuf, index, start, left);
@@ -569,9 +573,13 @@ namespace MimeKit {
 			if (persistent && stream.Position != offset)
 				stream.Seek (offset, SeekOrigin.Begin);
 
+			token.ThrowIfCancellationRequested ();
+
 			if ((nread = stream.Read (input, start, end - start)) > 0) {
 				inputEnd += nread;
 				offset += nread;
+			} else {
+				eos = true;
 			}
 
 			return inputEnd - inputIndex;
@@ -1349,13 +1357,34 @@ namespace MimeKit {
 		/// Parses an entity from the stream.
 		/// </summary>
 		/// <returns>The parsed entity.</returns>
-		public MimeEntity ParseEntity ()
+		/// <param name="cancellationToken">A cancellation token.</param>
+		/// <exception cref="System.OperationCanceledException">
+		/// The operation was canceled via the cancellation token.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
+		/// </exception>
+		public MimeEntity ParseEntity (CancellationToken cancellationToken)
 		{
+			token = cancellationToken;
+
 			unsafe {
 				fixed (byte* inbuf = input) {
 					return ParseEntity (inbuf);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Parses an entity from the stream.
+		/// </summary>
+		/// <returns>The parsed entity.</returns>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
+		/// </exception>
+		public MimeEntity ParseEntity ()
+		{
+			return ParseEntity (CancellationToken.None);
 		}
 
 		unsafe MimeMessage ParseMessage (byte* inbuf)
@@ -1427,13 +1456,34 @@ namespace MimeKit {
 		/// Parses a message from the stream.
 		/// </summary>
 		/// <returns>The parsed message.</returns>
-		public MimeMessage ParseMessage ()
+		/// <param name="cancellationToken">A cancellation token.</param>
+		/// <exception cref="System.OperationCanceledException">
+		/// The operation was canceled via the cancellation token.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
+		/// </exception>
+		public MimeMessage ParseMessage (CancellationToken cancellationToken)
 		{
+			token = cancellationToken;
+
 			unsafe {
 				fixed (byte* inbuf = input) {
 					return ParseMessage (inbuf);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Parses a message from the stream.
+		/// </summary>
+		/// <returns>The parsed message.</returns>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
+		/// </exception>
+		public MimeMessage ParseMessage ()
+		{
+			return ParseMessage (CancellationToken.None);
 		}
 	}
 }

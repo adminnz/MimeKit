@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit MimePart extends MimeKit.MimeEntity" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>MimeKit.MimeEntity</BaseTypeName>
@@ -21,7 +21,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -37,7 +37,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class MimeKit.MimeEntityConstructorInfo entity) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="entity" Type="MimeKit.MimeEntityConstructorInfo" />
@@ -56,7 +56,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string mediaType, string mediaSubtype) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="mediaType" Type="System.String" />
@@ -84,7 +84,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string mediaType, string mediaSubtype, object[] args) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="mediaType" Type="System.String" />
@@ -131,7 +131,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance string ComputeContentMd5() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -153,7 +153,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Nullable`1&lt;int32&gt; ContentDuration" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Nullable&lt;System.Int32&gt;</ReturnType>
@@ -174,7 +174,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string ContentMd5" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -192,7 +192,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance class MimeKit.IContentObject ContentObject" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.IContentObject</ReturnType>
@@ -210,7 +210,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype MimeKit.ContentEncoding ContentTransferEncoding" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentEncoding</ReturnType>
@@ -228,7 +228,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string FileName" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -246,12 +246,71 @@
         </remarks>
       </Docs>
     </Member>
+    <Member MemberName="GetBestEncoding">
+      <MemberSignature Language="C#" Value="public MimeKit.ContentEncoding GetBestEncoding (MimeKit.EncodingConstraint constraint);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance valuetype MimeKit.ContentEncoding GetBestEncoding(valuetype MimeKit.EncodingConstraint constraint) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MimeKit.ContentEncoding</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="constraint" Type="MimeKit.EncodingConstraint" />
+      </Parameters>
+      <Docs>
+        <param name="constraint">The encoding constraint.</param>
+        <summary>
+            Calculates the most efficient content encoding given the specified constraint.
+            </summary>
+        <returns>The most efficient content encoding.</returns>
+        <remarks>
+            If no <see cref="T:MimeKit.ContentObject" /> is set, <see cref="F:MimeKit.ContentEncoding.SevenBit" /> will be returned.
+            </remarks>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
+            </exception>
+      </Docs>
+    </Member>
+    <Member MemberName="GetBestEncoding">
+      <MemberSignature Language="C#" Value="public MimeKit.ContentEncoding GetBestEncoding (MimeKit.EncodingConstraint constraint, System.Threading.CancellationToken cancellationToken);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance valuetype MimeKit.ContentEncoding GetBestEncoding(valuetype MimeKit.EncodingConstraint constraint, valuetype System.Threading.CancellationToken cancellationToken) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MimeKit.ContentEncoding</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="constraint" Type="MimeKit.EncodingConstraint" />
+        <Parameter Name="cancellationToken" Type="System.Threading.CancellationToken" />
+      </Parameters>
+      <Docs>
+        <param name="constraint">The encoding constraint.</param>
+        <param name="cancellationToken">A cancellation token.</param>
+        <summary>
+            Calculates the most efficient content encoding given the specified constraint.
+            </summary>
+        <returns>The most efficient content encoding.</returns>
+        <remarks>
+            If no <see cref="T:MimeKit.ContentObject" /> is set, <see cref="F:MimeKit.ContentEncoding.SevenBit" /> will be returned.
+            </remarks>
+        <exception cref="T:System.OperationCanceledException">
+            The operation was canceled via the cancellation token.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
+            </exception>
+      </Docs>
+    </Member>
     <Member MemberName="IsAttachment">
       <MemberSignature Language="C#" Value="public bool IsAttachment { get; set; }" />
       <MemberSignature Language="ILAsm" Value=".property instance bool IsAttachment" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -270,7 +329,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void OnHeadersChanged(valuetype MimeKit.HeaderListChangedAction action, class MimeKit.Header header) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -293,7 +352,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance bool VerifyContentMd5() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -309,11 +368,11 @@
       </Docs>
     </Member>
     <Member MemberName="WriteTo">
-      <MemberSignature Language="C#" Value="public override void WriteTo (MimeKit.FormatOptions options, System.IO.Stream stream);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void WriteTo(class MimeKit.FormatOptions options, class System.IO.Stream stream) cil managed" />
+      <MemberSignature Language="C#" Value="public override void WriteTo (MimeKit.FormatOptions options, System.IO.Stream stream, System.Threading.CancellationToken cancellationToken);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void WriteTo(class MimeKit.FormatOptions options, class System.IO.Stream stream, valuetype System.Threading.CancellationToken cancellationToken) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -321,12 +380,14 @@
       <Parameters>
         <Parameter Name="options" Type="MimeKit.FormatOptions" />
         <Parameter Name="stream" Type="System.IO.Stream" />
+        <Parameter Name="cancellationToken" Type="System.Threading.CancellationToken" />
       </Parameters>
       <Docs>
         <param name="options">The formatting options.</param>
-        <param name="stream">The stream.</param>
+        <param name="stream">The output stream.</param>
+        <param name="cancellationToken">A cancellation token.</param>
         <summary>
-            Writes the <see cref="T:MimeKit.MimePart" /> to the specified stream.
+            Writes the <see cref="T:MimeKit.MimePart" /> to the specified output stream.
             </summary>
         <remarks>To be added.</remarks>
         <exception cref="T:System.ArgumentNullException">
@@ -336,6 +397,12 @@
           <para>
             <paramref name="stream" /> is <c>null</c>.</para>
         </exception>
+        <exception cref="T:System.OperationCanceledException">
+            The operation was canceled via the cancellation token.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
+            </exception>
       </Docs>
     </Member>
   </Members>

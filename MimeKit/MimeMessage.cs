@@ -28,9 +28,11 @@ using System;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Threading;
 using System.Collections.Generic;
 using System.Net.Mail;
 
+using MimeKit.Cryptography;
 using MimeKit.Utils;
 using MimeKit.IO;
 

@@ -34,6 +34,9 @@ namespace MimeKit.IO {
 	/// <summary>
 	/// A stream which filters data as it is read or written.
 	/// </summary>
+	/// <remarks>
+	/// Passes data through each <see cref="IMimeFilter"/> as the data is read or written.
+	/// </remarks>
 	public class FilteredStream : Stream
 	{
 		const int ReadBufferSize = 4096;
@@ -49,13 +52,15 @@ namespace MimeKit.IO {
 		int filteredIndex;
 		byte[] filtered;
 		byte[] readbuf;
-		long position;
 		bool disposed;
 		bool flushed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.IO.FilteredStream"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Creates a filtered stream using the specified source stream.
+		/// </remarks>
 		/// <param name='source'>The underlying stream to filter.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="source"/> is <c>null</c>.
@@ -65,13 +70,18 @@ namespace MimeKit.IO {
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			position = source.Position;
 			Source = source;
 		}
 
 		/// <summary>
 		/// Gets the underlying source stream.
 		/// </summary>
+		/// <remarks>
+		/// In general, it is not a good idea to manipulate the underlying
+		/// source stream because most <see cref="IMimeFilter"/>s store
+		/// important state about previous bytes read from or written to
+		/// the source stream.
+		/// </remarks>
 		/// <value>The underlying source stream.</value>
 		public Stream Source {
 			get; private set;
@@ -80,6 +90,11 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Adds the specified filter.
 		/// </summary>
+		/// <remarks>
+		/// Adds the <paramref name="filter"/> to the end of the list of filters
+		/// that data will pass through as data is read from or written to the
+		/// underlying source stream.
+		/// </remarks>
 		/// <param name='filter'>The filter.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="filter"/> is <c>null</c>.
@@ -95,6 +110,10 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Contains the specified filter.
 		/// </summary>
+		/// <remarks>
+		/// Checks for the specified filter, by reference, in the list of
+		/// filters that have been added.
+		/// </remarks>
 		/// <param name='filter'>The filter.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="filter"/> is <c>null</c>.
@@ -110,6 +129,9 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Remove the specified filter.
 		/// </summary>
+		/// <remarks>
+		/// Removes the specified filter from the list if it exists.
+		/// </remarks>
 		/// <param name='filter'>The filter.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="filter"/> is <c>null</c>.
@@ -145,6 +167,10 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Checks whether or not the stream supports reading.
 		/// </summary>
+		/// <remarks>
+		/// The <see cref="FilteredStream"/> will only support reading if the
+		/// <see cref="Source"/> supports it.
+		/// </remarks>
 		/// <value><c>true</c> if the stream supports reading; otherwise, <c>false</c>.</value>
 		public override bool CanRead {
 			get { return Source.CanRead; }
@@ -153,6 +179,10 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Checks whether or not the stream supports writing.
 		/// </summary>
+		/// <remarks>
+		/// The <see cref="FilteredStream"/> will only support writing if the
+		/// <see cref="Source"/> supports it.
+		/// </remarks>
 		/// <value><c>true</c> if the stream supports writing; otherwise, <c>false</c>.</value>
 		public override bool CanWrite {
 			get { return Source.CanWrite; }
@@ -161,6 +191,9 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Checks whether or not the stream supports seeking.
 		/// </summary>
+		/// <remarks>
+		/// Seeking is not supported by the <see cref="FilteredStream"/>.
+		/// </remarks>
 		/// <value><c>true</c> if the stream supports seeking; otherwise, <c>false</c>.</value>
 		public override bool CanSeek {
 			get { return false; }
@@ -169,38 +202,51 @@ namespace MimeKit.IO {
 		/// <summary>
 		/// Checks whether or not I/O operations can timeout.
 		/// </summary>
+		/// <remarks>
+		/// The <see cref="FilteredStream"/> will only support timing out if the
+		/// <see cref="Source"/> supports it.
+		/// </remarks>
 		/// <value><c>true</c> if I/O operations can timeout; otherwise, <c>false</c>.</value>
 		public override bool CanTimeout {
 			get { return Source.CanTimeout; }
 		}
 
 		/// <summary>
-		/// Gets the length of the stream.
+		/// Gets the length in bytes of the stream.
 		/// </summary>
-		/// <value>The length of the stream.</value>
+		/// <remarks>
+		/// Getting the length of a <see cref="FilteredStream"/> is not supported.
+		/// </remarks>
+		/// <value>The length of the stream in bytes.</value>
 		/// <exception cref="System.NotSupportedException">
-		/// The stream does not support setting the length.
+		/// The stream does not support seeking.
 		/// </exception>
 		public override long Length {
 			get { throw new NotSupportedException ("Cannot get the length of the stream"); }
 		}
 
 		/// <summary>
-		/// Gets or sets the position of the stream.
+		/// Gets or sets the position within the current stream.
 		/// </summary>
+		/// <remarks>
+		/// Getting and setting the position of a <see cref="FilteredStream"/> is not supported.
+		/// </remarks>
 		/// <value>The position of the stream.</value>
 		/// <exception cref="System.NotSupportedException">
 		/// The stream does not support seeking.
 		/// </exception>
 		public override long Position {
-			get { return position; }
+			get { throw new NotSupportedException ("The stream does not support seeking"); }
 			set { throw new NotSupportedException ("The stream does not support seeking"); }
 		}
 
 		/// <summary>
-		/// Gets or sets the read timeout.
+		/// Gets or sets a value, in miliseconds, that determines how long the stream will attempt to read before timing out.
 		/// </summary>
-		/// <value>The read timeout.</value>
+		/// <remarks>
+		/// Gets or sets the read timeout on the <see cref="Source"/> stream.
+		/// </remarks>
+		/// <value>A value, in miliseconds, that determines how long the stream will attempt to read before timing out.</value>
 		public override int ReadTimeout
 		{
 			get { return Source.ReadTimeout; }
@@ -208,9 +254,12 @@ namespace MimeKit.IO {
 		}
 
 		/// <summary>
-		/// Gets or sets the write timeout.
+		/// Gets or sets a value, in miliseconds, that determines how long the stream will attempt to write before timing out.
 		/// </summary>
-		/// <value>The write timeout.</value>
+		/// <remarks>
+		/// Gets or sets the write timeout on the <see cref="Source"/> stream.
+		/// </remarks>
+		/// <value>A value, in miliseconds, that determines how long the stream will attempt to write before timing out.</value>
 		public override int WriteTimeout
 		{
 			get { return Source.WriteTimeout; }
@@ -230,17 +279,35 @@ namespace MimeKit.IO {
 		}
 
 		/// <summary>
-		/// Reads data into the specified buffer.
+		/// Reads a sequence of bytes from the stream and advances the position
+		/// within the stream by the number of bytes read.
 		/// </summary>
-		/// <returns>The number of bytes read.</returns>
-		/// <param name='buffer'>The buffer to read data into.</param>
-		/// <param name='offset'>The offset into the buffer to start reading data.</param>
-		/// <param name='count'>The number of bytes to read.</param>
+		/// <remarks>
+		/// Reads up to the requested number of bytes, passing the data read from the <see cref="Source"/> stream
+		/// through each of the filters before finally copying the result into the provided buffer.
+		/// </remarks>
+		/// <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+		/// bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
+		/// <param name="buffer">The buffer to read data into.</param>
+		/// <param name="offset">The offset into the buffer to start reading data.</param>
+		/// <param name="count">The number of bytes to read.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="buffer"/> is <c>null</c>.
+		/// </exception>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <para><paramref name="offset"/> is less than zero or greater than the length of <paramref name="buffer"/>.</para>
+		/// <para>-or-</para>
+		/// <para>The <paramref name="buffer"/> is not large enough to contain <paramref name="count"/> bytes strting
+		/// at the specified <paramref name="offset"/>.</para>
+		/// </exception>
 		/// <exception cref="System.ObjectDisposedException">
 		/// The stream has been disposed.
 		/// </exception>
 		/// <exception cref="System.NotSupportedException">
 		/// The stream does not support reading.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
 		/// </exception>
 		public override int Read (byte[] buffer, int offset, int count)
 		{
@@ -275,23 +342,39 @@ namespace MimeKit.IO {
 				Array.Copy (filtered, filteredIndex, buffer, offset, nread);
 				filteredLength -= nread;
 				filteredIndex += nread;
-				position += nread;
 			}
 
 			return nread;
 		}
 
 		/// <summary>
-		/// Writes the specified buffer.
+		/// Writes a sequence of bytes to the stream and advances the current
+		/// position within this stream by the number of bytes written.
 		/// </summary>
+		/// <remarks>
+		/// Filters the provided buffer through each of the filters before finally writing
+		/// the result to the underlying <see cref="Source"/> stream.
+		/// </remarks>
 		/// <param name='buffer'>The buffer to write.</param>
 		/// <param name='offset'>The offset of the first byte to write.</param>
 		/// <param name='count'>The number of bytes to write.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="buffer"/> is <c>null</c>.
+		/// </exception>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <para><paramref name="offset"/> is less than zero or greater than the length of <paramref name="buffer"/>.</para>
+		/// <para>-or-</para>
+		/// <para>The <paramref name="buffer"/> is not large enough to contain <paramref name="count"/> bytes strting
+		/// at the specified <paramref name="offset"/>.</para>
+		/// </exception>
 		/// <exception cref="System.ObjectDisposedException">
 		/// The stream has been disposed.
 		/// </exception>
 		/// <exception cref="System.NotSupportedException">
 		/// The stream does not support writing.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
 		/// </exception>
 		public override void Write (byte[] buffer, int offset, int count)
 		{
@@ -311,14 +394,17 @@ namespace MimeKit.IO {
 				filtered = filter.Filter (filtered, filteredIndex, filteredLength, out filteredIndex, out filteredLength);
 
 			Source.Write (filtered, filteredIndex, filteredLength);
-			position += count;
 		}
 
 		/// <summary>
-		/// Seeks to the specified offset.
+		/// Sets the position within the current stream.
 		/// </summary>
-		/// <param name='offset'>The offset from the specified origin.</param>
-		/// <param name='origin'>The origin from which to seek.</param>
+		/// <remarks>
+		/// Seeking is not supported by the <see cref="FilteredStream"/>.
+		/// </remarks>
+		/// <returns>The new position within the stream.</returns>
+		/// <param name="offset">The offset into the stream relative to the <paramref name="origin"/>.</param>
+		/// <param name="origin">The origin to seek from.</param>
 		/// <exception cref="System.NotSupportedException">
 		/// The stream does not support seeking.
 		/// </exception>
@@ -328,13 +414,21 @@ namespace MimeKit.IO {
 		}
 
 		/// <summary>
-		/// Flushes any internal output buffers.
+		/// Clears all buffers for this stream and causes any buffered data to be written
+		/// to the underlying device.
 		/// </summary>
+		/// <remarks>
+		/// Flushes the state of all filters, writing any output to the underlying <see cref="Source"/>
+		/// stream and then calling <see cref="System.IO.Stream.Flush"/> on the <see cref="Source"/>.
+		/// </remarks>
 		/// <exception cref="System.ObjectDisposedException">
 		/// The stream has been disposed.
 		/// </exception>
 		/// <exception cref="System.NotSupportedException">
 		/// The stream does not support writing.
+		/// </exception>
+		/// <exception cref="System.IO.IOException">
+		/// An I/O error occurred.
 		/// </exception>
 		public override void Flush ()
 		{
@@ -365,9 +459,12 @@ namespace MimeKit.IO {
 		}
 
 		/// <summary>
-		/// Sets the length.
+		/// Sets the length of the stream.
 		/// </summary>
-		/// <param name='value'>The new length.</param>
+		/// <remarks>
+		/// Setting the length of a <see cref="FilteredStream"/> is not supported.
+		/// </remarks>
+		/// <param name='value'>The desired length of the stream in bytes.</param>
 		/// <exception cref="System.ObjectDisposedException">
 		/// The stream has been disposed.
 		/// </exception>
@@ -382,9 +479,13 @@ namespace MimeKit.IO {
 		}
 
 		/// <summary>
-		/// Dispose the specified disposing.
+		/// Disposes the stream.
 		/// </summary>
-		/// <param name="disposing">If set to <c>true</c> disposing.</param>
+		/// <remarks>
+		/// Sets the internal disposed state to <c>true</c>.
+		/// </remarks>
+		/// <param name="disposing">If set to <c>true</c>, the stream is being disposed
+		/// via the <see cref="System.IO.Stream.Dispose()"/> method.</param>
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing) {

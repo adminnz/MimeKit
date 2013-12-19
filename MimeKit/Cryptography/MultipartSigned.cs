@@ -26,7 +26,6 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
 
 using Org.BouncyCastle.Bcpg.OpenPgp;
 
@@ -74,10 +73,18 @@ namespace MimeKit.Cryptography {
 			} else {
 				var part = (MimePart) entity;
 
-				if (part.ContentTransferEncoding == ContentEncoding.Binary)
-					part.ContentTransferEncoding = ContentEncoding.Base64;
-				else if (part.ContentTransferEncoding != ContentEncoding.Base64)
+				switch (part.ContentTransferEncoding) {
+				case ContentEncoding.SevenBit:
+					// need to make sure that "From "-lines are properly armored
+					part.ContentTransferEncoding = part.GetBestEncoding (EncodingConstraint.SevenBit);
+					break;
+				case ContentEncoding.EightBit:
 					part.ContentTransferEncoding = ContentEncoding.QuotedPrintable;
+					break;
+				case ContentEncoding.Binary:
+					part.ContentTransferEncoding = ContentEncoding.Base64;
+					break;
+				}
 			}
 		}
 
@@ -145,7 +152,7 @@ namespace MimeKit.Cryptography {
 
 				// sign the cleartext content
 				var signature = ctx.Sign (signer, digestAlgo, memory);
-				var micalg = ctx.GetMicAlgorithmName (digestAlgo);
+				var micalg = ctx.GetDigestAlgorithmName (digestAlgo);
 				var signed = new MultipartSigned ();
 
 				// set the protocol and micalg Content-Type parameters
@@ -224,7 +231,7 @@ namespace MimeKit.Cryptography {
 				memory.Position = 0;
 
 				// sign the cleartext content
-				var micalg = ctx.GetMicAlgorithmName (digestAlgo);
+				var micalg = ctx.GetDigestAlgorithmName (digestAlgo);
 				var signature = ctx.Sign (signer, digestAlgo, memory);
 				var signed = new MultipartSigned ();
 
@@ -326,7 +333,7 @@ namespace MimeKit.Cryptography {
 				memory.Position = 0;
 
 				// sign the cleartext content
-				var micalg = ctx.GetMicAlgorithmName (signer.DigestAlgorithm);
+				var micalg = ctx.GetDigestAlgorithmName (signer.DigestAlgorithm);
 				var signature = ctx.Sign (signer, memory);
 				var signed = new MultipartSigned ();
 

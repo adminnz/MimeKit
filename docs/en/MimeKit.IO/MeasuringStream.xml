@@ -3,7 +3,7 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit MeasuringStream extends System.IO.Stream" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.16.0.0</AssemblyVersion>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.IO.Stream</BaseTypeName>
@@ -13,7 +13,12 @@
     <summary>
             A stream useful for measuring the amount of data written.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+            A <see cref="T:MimeKit.IO.MeasuringStream" /> keeps track of the number of bytes
+            that have been written to it. This is useful, for example, when you
+            need to know how large a <see cref="T:MimeKit.MimeMessage" /> is without
+            actually writing it to disk or into a memory buffer.
+            </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -21,7 +26,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -36,7 +41,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanRead" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -47,7 +52,9 @@
             </summary>
         <value>
           <c>true</c> if the stream supports reading; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            A <see cref="T:MimeKit.IO.MeasuringStream" /> is not readable.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanSeek">
@@ -55,7 +62,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanSeek" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -66,7 +73,9 @@
             </summary>
         <value>
           <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            A <see cref="T:MimeKit.IO.MeasuringStream" /> is always seekable.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanTimeout">
@@ -74,7 +83,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanTimeout" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -85,7 +94,9 @@
             </summary>
         <value>
           <c>true</c> if reading and writing to the stream can timeout; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Writing to a <see cref="T:MimeKit.IO.MeasuringStream" /> cannot timeout.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="CanWrite">
@@ -93,7 +104,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanWrite" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -104,7 +115,9 @@
             </summary>
         <value>
           <c>true</c> if the stream supports writing; otherwise, <c>false</c>.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            A <see cref="T:MimeKit.IO.MeasuringStream" /> is always writable.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -112,7 +125,7 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig virtual instance void Dispose(bool disposing) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -121,11 +134,14 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">If set to <c>true</c> disposing.</param>
+        <param name="disposing">If set to <c>true</c>, the stream is being disposed
+            via the <see cref="M:System.IO.Stream.Dispose" /> method.</param>
         <summary>
-            Dispose the specified disposing.
+            Disposes the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Sets the internal disposed state to <c>true</c>.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Flush">
@@ -133,7 +149,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Flush() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -141,9 +157,13 @@
       <Parameters />
       <Docs>
         <summary>
-            Flushes any internal output buffers.
+            Clears all buffers for this stream and causes any buffered data to be written
+            to the underlying device.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Since a <see cref="T:MimeKit.IO.MeasuringStream" /> does not actually do anything other than
+            count bytes, this method is a no-op.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -157,17 +177,20 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 Length" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets the length of the stream.
+            Gets the length in bytes of the stream.
             </summary>
-        <value>The length of the stream.</value>
-        <remarks>To be added.</remarks>
+        <value>The length of the stream in bytes.</value>
+        <remarks>
+            The length of a <see cref="T:MimeKit.IO.MeasuringStream" /> indicates the
+            number of bytes that have been written to it.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -178,22 +201,29 @@
       <MemberSignature Language="ILAsm" Value=".property instance int64 Position" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets the position of the stream.
+            Gets or sets the position within the current stream.
             </summary>
         <value>The position of the stream.</value>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Since it is possible to seek within a <see cref="T:MimeKit.IO.MeasuringStream" />,
+            it is possible that the position will not always be identical to the
+            length of the stream, but typically it will be.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support seeking.
+            </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>
@@ -202,7 +232,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int32 Read(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -217,12 +247,19 @@
         <param name="offset">The offset into the buffer to start reading data.</param>
         <param name="count">The number of bytes to read.</param>
         <summary>
-            Reads data into the specified buffer.
+            Reads a sequence of bytes from the stream and advances the position
+            within the stream by the number of bytes read.
             </summary>
-        <returns>The number of bytes read.</returns>
-        <remarks>To be added.</remarks>
+        <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+            bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
+        <remarks>
+            Reading from a <see cref="T:MimeKit.IO.MeasuringStream" /> is not supported.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
+            </exception>
+        <exception cref="T:System.NotSupportedException">
+            The stream does not support reading.
             </exception>
       </Docs>
     </Member>
@@ -231,7 +268,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance int64 Seek(int64 offset, valuetype System.IO.SeekOrigin origin) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int64</ReturnType>
@@ -241,13 +278,15 @@
         <Parameter Name="origin" Type="System.IO.SeekOrigin" />
       </Parameters>
       <Docs>
-        <param name="offset">The offset from the specified origin.</param>
-        <param name="origin">The origin from which to seek.</param>
+        <param name="offset">The offset into the stream relative to the <paramref name="origin" />.</param>
+        <param name="origin">The origin to seek from.</param>
         <summary>
-            Seeks to the specified offset.
+            Sets the position within the current stream.
             </summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <returns>The new position within the stream.</returns>
+        <remarks>
+            Updates the <see cref="P:MimeKit.IO.MeasuringStream.Position" /> within the stream.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
@@ -264,7 +303,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void SetLength(int64 value) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -273,11 +312,15 @@
         <Parameter Name="value" Type="System.Int64" />
       </Parameters>
       <Docs>
-        <param name="value">The new length.</param>
+        <param name="value">The desired length of the stream in bytes.</param>
         <summary>
-            Sets the length.
+            Sets the length of the stream.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Sets the <see cref="P:MimeKit.IO.MeasuringStream.Length" /> to the specified value and updates
+            <see cref="P:MimeKit.IO.MeasuringStream.Position" /> to the specified value if (and only if)
+            the current position is greater than the new length value.
+            </remarks>
         <exception cref="T:System.ArgumentOutOfRangeException">
           <paramref name="value" /> is out of range.
             </exception>
@@ -291,7 +334,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Write(unsigned int8[] buffer, int32 offset, int32 count) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.16.0.0</AssemblyVersion>
+        <AssemblyVersion>0.18.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -306,14 +349,33 @@
         <param name="offset">The offset of the first byte to write.</param>
         <param name="count">The number of bytes to write.</param>
         <summary>
-            Writes the specified buffer.
+            Writes a sequence of bytes to the stream and advances the current
+            position within this stream by the number of bytes written.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Increments the <see cref="P:MimeKit.IO.MeasuringStream.Position" /> property by the number of bytes written.
+            If the updated position is greater than the current length of the stream, then
+            the <see cref="P:MimeKit.IO.MeasuringStream.Length" /> property will be updated to be identical to the
+            position.
+            </remarks>
         <exception cref="T:System.ObjectDisposedException">
             The stream has been disposed.
             </exception>
         <exception cref="T:System.NotSupportedException">
             The stream does not support writing.
+            </exception>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="buffer" /> is <c>null</c>.
+            </exception>
+        <exception cref="T:System.ArgumentOutOfRangeException">
+          <para>
+            <paramref name="offset" /> is less than zero or greater than the length of <paramref name="buffer" />.</para>
+          <para>-or-</para>
+          <para>The <paramref name="buffer" /> is not large enough to contain <paramref name="count" /> bytes strting
+            at the specified <paramref name="offset" />.</para>
+        </exception>
+        <exception cref="T:System.IO.IOException">
+            An I/O error occurred.
             </exception>
       </Docs>
     </Member>

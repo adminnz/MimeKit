@@ -743,7 +743,7 @@ namespace MimeKit {
 						parts.Add (pair);
 					} else {
 						parts = new List<NameValuePair> ();
-						rfc2184.Add (pair.Name, parts);
+						rfc2184[pair.Name] = parts;
 						@params.Add (pair);
 						parts.Add (pair);
 					}
@@ -772,6 +772,9 @@ namespace MimeKit {
 				int length = param.ValueLength;
 				Decoder decoder = null;
 				string value;
+
+				if (paramList.Contains (param.Name))
+					continue;
 
 				if (param.Id.HasValue) {
 					parts = rfc2184[param.Name];
@@ -807,7 +810,7 @@ namespace MimeKit {
 					value = string.Empty;
 				}
 
-				paramList.Add (new Parameter (param.Name, value));
+				paramList.Add (param.Name, value);
 			}
 
 			return true;

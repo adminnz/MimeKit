@@ -34,7 +34,6 @@ using NUnit.Framework;
 using MimeKit;
 using MimeKit.Cryptography;
 
-<<<<<<< HEAD
 namespace UnitTests
 {
     [TestFixture]
@@ -974,5 +973,4 @@ namespace UnitTests {
 		}
 	}
 	#endif
->>>>>>> upstream/master
 }

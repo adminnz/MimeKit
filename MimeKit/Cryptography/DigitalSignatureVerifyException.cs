@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 //
 
 using System;
+using System.Runtime.Serialization;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
@@ -33,8 +34,28 @@ namespace MimeKit.Cryptography {
 	/// <remarks>
 	/// For more information about the error condition, check the <see cref="System.Exception.InnerException"/> property.
 	/// </remarks>
+#if !PORTABLE
+	[Serializable]
+#endif
 	public class DigitalSignatureVerifyException : Exception
 	{
+#if !PORTABLE
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.DigitalSignatureVerifyException"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="DigitalSignatureVerifyException"/>.
+		/// </remarks>
+		/// <param name="info">The serialization info.</param>
+		/// <param name="context">The stream context.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="info"/> is <c>null</c>.
+		/// </exception>
+		protected DigitalSignatureVerifyException (SerializationInfo info, StreamingContext context) : base (info, context)
+		{
+		}
+#endif
+
 		internal DigitalSignatureVerifyException (string message, Exception innerException) : base (message, innerException)
 		{
 		}

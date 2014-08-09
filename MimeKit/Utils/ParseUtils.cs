@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 // THE SOFTWARE.
 //
 
-using System;
 using System.Text;
 
 namespace MimeKit.Utils {
@@ -151,30 +150,6 @@ namespace MimeKit.Utils {
 			return index > start;
 		}
 
-		static bool Skip8bitAtom (byte[] text, ref int index, int endIndex)
-		{
-			int start = index;
-
-			while (index < endIndex && (text[index].IsAtom () || text[index] >= 127))
-				index++;
-
-			return index > start;
-		}
-
-		public static bool Skip8bitWord (byte[] text, ref int index, int endIndex, bool throwOnError)
-		{
-			if (text[index] == (byte) '"')
-				return SkipQuoted (text, ref index, endIndex, throwOnError);
-
-			if (text[index].IsAtom () || text[index] >= 127)
-				return Skip8bitAtom (text, ref index, endIndex);
-
-			if (throwOnError)
-				throw new ParseException (string.Format ("Invalid word token at offset {0}", index), index, index);
-
-			return false;
-		}
-
 		public static bool SkipWord (byte[] text, ref int index, int endIndex, bool throwOnError)
 		{
 			if (text[index] == (byte) '"')
@@ -183,15 +158,12 @@ namespace MimeKit.Utils {
 			if (text[index].IsAtom ())
 				return SkipAtom (text, ref index, endIndex);
 
-			if (throwOnError)
-				throw new ParseException (string.Format ("Invalid word token at offset {0}", index), index, index);
-
 			return false;
 		}
 
 		static bool TryParseDotAtom (byte[] text, ref int index, int endIndex, bool throwOnError, string tokenType, out string dotatom)
 		{
-			StringBuilder token = new StringBuilder ();
+			var token = new StringBuilder ();
 			int startIndex = index;
 			int comment;
 
@@ -205,9 +177,17 @@ namespace MimeKit.Utils {
 					return false;
 				}
 
-				while (index < endIndex && text[index].IsAtom ()) {
-					token.Append ((char) text[index]);
+				int start = index;
+				while (index < endIndex && text[index].IsAtom ())
 					index++;
+
+				try {
+					token.Append (Encoding.UTF8.GetString (text, start, index - start));
+				} catch (ParseException ex) {
+					if (throwOnError)
+						throw new ParseException ("Internationalized domains may only contain UTF-8 characters.", start, start, ex);
+
+					return false;
 				}
 
 				comment = index;
@@ -240,7 +220,7 @@ namespace MimeKit.Utils {
 
 		static bool TryParseDomainLiteral (byte[] text, ref int index, int endIndex, bool throwOnError, out string domain)
 		{
-			StringBuilder token = new StringBuilder ("[");
+			var token = new StringBuilder ("[");
 			int startIndex = index++;
 
 			domain = null;

@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,9 @@ namespace MimeKit.Cryptography {
 	/// <summary>
 	/// A <see cref="OpenPgpContext"/> that uses the GnuPG keyrings.
 	/// </summary>
+	/// <remarks>
+	/// A <see cref="OpenPgpContext"/> that uses the GnuPG keyrings.
+	/// </remarks>
 	public abstract class GnuPGContext : OpenPgpContext
 	{
 		static readonly string PublicKeyRing;
@@ -43,7 +46,7 @@ namespace MimeKit.Cryptography {
 			if (gnupg == null) {
 				if (Path.DirectorySeparatorChar == '\\') {
 					var appData = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-					gnupg = Path.Combine (appData, "Roaming", "gnupg");
+					gnupg = Path.Combine (appData, "gnupg");
 				} else {
 					var home = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
 					gnupg = Path.Combine (home, ".gnupg");
@@ -57,6 +60,9 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.GnuPGContext"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="GnuPGContext"/>.
+		/// </remarks>
 		protected GnuPGContext () : base (PublicKeyRing, SecretKeyRing)
 		{
 		}

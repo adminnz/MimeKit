@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2012 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,10 @@
 using System;
 using System.Text;
 
+#if PORTABLE
+using Encoding = Portable.Text.Encoding;
+#endif
+
 using MimeKit.Utils;
 
 namespace MimeKit {
@@ -38,7 +42,7 @@ namespace MimeKit {
 	/// suggest to the receiving client the mime-type of the content and,
 	/// depending on that mime-type, presentation options such as charset.
 	/// </remarks>
-	public sealed class ContentType
+	public class ContentType
 	{
 		ParameterList parameters;
 		string type, subtype;
@@ -70,7 +74,7 @@ namespace MimeKit {
 				throw new ArgumentException ("The type is not allowed to be empty.", "mediaType");
 
 			for (int i = 0; i < mediaType.Length; i++) {
-				if (mediaType[i] >= 127 || !IsAtom ((byte) mediaType[i]))
+				if (mediaType[i] >= 127 || !IsAsciiAtom ((byte) mediaType[i]))
 					throw new ArgumentException ("Illegal characters in type.", "mediaType");
 			}
 
@@ -95,9 +99,9 @@ namespace MimeKit {
 			return c.IsToken ();
 		}
 
-		static bool IsAtom (byte c)
+		static bool IsAsciiAtom (byte c)
 		{
-			return c.IsAtom ();
+			return c.IsAsciiAtom ();
 		}
 
 		/// <summary>
@@ -125,7 +129,7 @@ namespace MimeKit {
 					throw new ArgumentException ("MediaType is not allowed to be empty.", "value");
 
 				for (int i = 0; i < value.Length; i++) {
-					if (value[i] > 127 || !IsAtom ((byte) value[i]))
+					if (value[i] > 127 || !IsAsciiAtom ((byte) value[i]))
 						throw new ArgumentException ("Illegal characters in media type.", "value");
 				}
 
@@ -233,6 +237,17 @@ namespace MimeKit {
 		}
 
 		/// <summary>
+		/// Gets the simple mime-type.
+		/// </summary>
+		/// <remarks>
+		/// Gets the simple mime-type.
+		/// </remarks>
+		/// <value>The mime-type.</value>
+		public string MimeType {
+			get { return string.Format ("{0}/{1}", MediaType, MediaSubtype); }
+		}
+
+		/// <summary>
 		/// Gets or sets the name parameter.
 		/// </summary>
 		/// <remarks>
@@ -260,6 +275,8 @@ namespace MimeKit {
 		/// If the specified <paramref name="mediaType"/> or <paramref name="mediaSubtype"/>
 		/// are <c>"*"</c>, they match anything.
 		/// </remarks>
+		/// <returns><c>true</c> if the <see cref="ContentType"/> matches the
+		/// provided media type and subtype.</returns>
 		/// <param name="mediaType">The media type.</param>
 		/// <param name="mediaSubtype">The media subtype.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -363,7 +380,7 @@ namespace MimeKit {
 		{
 			int startIndex = index;
 
-			while (index < endIndex && text[index].IsAtom () && text[index] != (byte) '/')
+			while (index < endIndex && text[index].IsAsciiAtom () && text[index] != (byte) '/')
 				index++;
 
 			return index > startIndex;
@@ -450,6 +467,10 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given input buffer into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the given index
+		/// and spanning across the specified number of bytes.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="options">The parser options.</param>
 		/// <param name="buffer">The input buffer.</param>
@@ -473,10 +494,10 @@ namespace MimeKit {
 			if (buffer == null)
 				throw new ArgumentNullException ("buffer");
 
-			if (startIndex < 0 || startIndex >= buffer.Length)
+			if (startIndex < 0 || startIndex > buffer.Length)
 				throw new ArgumentOutOfRangeException ("startIndex");
 
-			if (length < 0 || startIndex + length >= buffer.Length)
+			if (length < 0 || length > (buffer.Length - startIndex))
 				throw new ArgumentOutOfRangeException ("length");
 
 			int index = startIndex;
@@ -487,6 +508,10 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given input buffer into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the given index
+		/// and spanning across the specified number of bytes.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="buffer">The input buffer.</param>
 		/// <param name="startIndex">The starting index of the input buffer.</param>
@@ -507,6 +532,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given input buffer into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the specified index.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="options">The parser options.</param>
 		/// <param name="buffer">The input buffer.</param>
@@ -539,6 +567,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given input buffer into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the specified index.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="buffer">The input buffer.</param>
 		/// <param name="startIndex">The starting index of the input buffer.</param>
@@ -557,6 +588,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given input buffer into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified buffer.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="options">The parser options.</param>
 		/// <param name="buffer">The input buffer.</param>
@@ -582,6 +616,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given input buffer into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified buffer.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="buffer">The input buffer.</param>
 		/// <param name="type">The parsed content type.</param>
@@ -596,6 +633,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Tries to parse the given text into a new <see cref="MimeKit.ContentType"/> instance.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified text.
+		/// </remarks>
 		/// <returns><c>true</c>, if the content type was successfully parsed, <c>false</c> otherwise.</returns>
 		/// <param name="text">The text to parse.</param>
 		/// <param name="type">The parsed content type.</param>
@@ -616,6 +656,10 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified input buffer into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the given index
+		/// and spanning across the specified number of bytes.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="options">The parser options.</param>
 		/// <param name="buffer">The input buffer.</param>
@@ -644,7 +688,7 @@ namespace MimeKit {
 			if (startIndex < 0 || startIndex > buffer.Length)
 				throw new ArgumentOutOfRangeException ("startIndex");
 
-			if (length < 0 || startIndex + length > buffer.Length)
+			if (length < 0 || length > (buffer.Length - startIndex))
 				throw new ArgumentOutOfRangeException ("length");
 
 			int index = startIndex;
@@ -658,6 +702,10 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified input buffer into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the given index
+		/// and spanning across the specified number of bytes.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="buffer">The input buffer.</param>
 		/// <param name="startIndex">The start index of the buffer.</param>
@@ -680,6 +728,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified input buffer into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the specified index.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="options">The parser options.</param>
 		/// <param name="buffer">The input buffer.</param>
@@ -717,6 +768,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified input buffer into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the supplied buffer starting at the specified index.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="buffer">The input buffer.</param>
 		/// <param name="startIndex">The start index of the buffer.</param>
@@ -737,6 +791,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified input buffer into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified buffer.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="options">The parser options.</param>
 		/// <param name="buffer">The input buffer.</param>
@@ -767,6 +824,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified input buffer into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified buffer.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="buffer">The input buffer.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -783,6 +843,43 @@ namespace MimeKit {
 		/// <summary>
 		/// Parse the specified text into a new instance of the <see cref="MimeKit.ContentType"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified text.
+		/// </remarks>
+		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
+		/// <param name="options">The parser options.</param>
+		/// <param name="text">The text.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="options"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="text"/> is <c>null</c>.</para>
+		/// </exception>
+		/// <exception cref="MimeKit.ParseException">
+		/// The <paramref name="text"/> could not be parsed.
+		/// </exception>
+		public static ContentType Parse (ParserOptions options, string text)
+		{
+			if (options == null)
+				throw new ArgumentNullException ("options");
+
+			if (text == null)
+				throw new ArgumentNullException ("text");
+
+			var buffer = Encoding.UTF8.GetBytes (text);
+			ContentType type;
+			int index = 0;
+
+			TryParse (options, buffer, ref index, buffer.Length, true, out type);
+
+			return type;
+		}
+
+		/// <summary>
+		/// Parse the specified text into a new instance of the <see cref="MimeKit.ContentType"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Parses a Content-Type value from the specified text.
+		/// </remarks>
 		/// <returns>The parsed <see cref="MimeKit.ContentType"/>.</returns>
 		/// <param name="text">The text.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -793,16 +890,7 @@ namespace MimeKit {
 		/// </exception>
 		public static ContentType Parse (string text)
 		{
-			if (text == null)
-				throw new ArgumentNullException ("text");
-
-			var buffer = Encoding.UTF8.GetBytes (text);
-			ContentType type;
-			int index = 0;
-
-			TryParse (ParserOptions.Default, buffer, ref index, buffer.Length, true, out type);
-
-			return type;
+			return Parse (ParserOptions.Default, text);
 		}
 	}
 }

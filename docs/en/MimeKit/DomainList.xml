@@ -1,9 +1,9 @@
 <Type Name="DomainList" FullName="MimeKit.DomainList">
-  <TypeSignature Language="C#" Value="public sealed class DomainList : System.Collections.Generic.ICollection&lt;string&gt;, System.Collections.Generic.IEnumerable&lt;string&gt;, System.Collections.Generic.IList&lt;string&gt;" />
-  <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed beforefieldinit DomainList extends System.Object implements class System.Collections.Generic.ICollection`1&lt;string&gt;, class System.Collections.Generic.IEnumerable`1&lt;string&gt;, class System.Collections.Generic.IList`1&lt;string&gt;, class System.Collections.IEnumerable" />
+  <TypeSignature Language="C#" Value="public class DomainList : System.Collections.Generic.ICollection&lt;string&gt;, System.Collections.Generic.IEnumerable&lt;string&gt;, System.Collections.Generic.IList&lt;string&gt;" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit DomainList extends System.Object implements class System.Collections.Generic.ICollection`1&lt;string&gt;, class System.Collections.Generic.IEnumerable`1&lt;string&gt;, class System.Collections.Generic.IList`1&lt;string&gt;, class System.Collections.IEnumerable" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.18.0.0</AssemblyVersion>
+    <AssemblyVersion>0.92.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.Object</BaseTypeName>
@@ -33,7 +33,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
       <Docs>
@@ -50,7 +50,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class System.Collections.Generic.IEnumerable`1&lt;string&gt; domains) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="domains" Type="System.Collections.Generic.IEnumerable&lt;System.String&gt;" />
@@ -63,6 +63,9 @@
         <remarks>
             Creates a new <see cref="T:MimeKit.DomainList" /> based on the domains provided.
             </remarks>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="domains" /> is <c>null</c>.
+            </exception>
       </Docs>
     </Member>
     <Member MemberName="Add">
@@ -70,7 +73,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Add(string domain) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -96,7 +99,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Clear() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -116,7 +119,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool Contains(string domain) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -133,7 +136,7 @@
           <value>true</value> if the specified domain is contained;
             otherwise <value>false</value>.</returns>
         <remarks>
-            Checks if the specified domain is contained with in the <see cref="T:MimeKit.DomainList" />.
+            Determines whether or not the domain list contains the specified domain.
             </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="domain" /> is <c>null</c>.
@@ -145,7 +148,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void CopyTo(string[] array, int32 arrayIndex) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -177,7 +180,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 Count" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -197,7 +200,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class System.Collections.Generic.IEnumerator`1&lt;string&gt; GetEnumerator() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Collections.Generic.IEnumerator&lt;System.String&gt;</ReturnType>
@@ -208,7 +211,9 @@
             Gets an enumerator for the list of domains.
             </summary>
         <returns>The enumerator.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+            Gets an enumerator for the list of domains.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="IndexOf">
@@ -216,7 +221,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance int32 IndexOf(string domain) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Int32</ReturnType>
@@ -243,7 +248,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Insert(int32 index, string domain) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -259,7 +264,7 @@
             Insert the domain at the specified index.
             </summary>
         <remarks>
-            Inerts the domain at the specified index in the list.
+            Inserts the domain at the specified index in the list.
             </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="domain" /> is <c>null</c>.
@@ -274,7 +279,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool IsReadOnly" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -295,7 +300,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance string Item(int32)" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -306,10 +311,12 @@
       <Docs>
         <param name="index">The index.</param>
         <summary>
-            Gets or sets the <see cref="T:MimeKit.DomainList" /> at the specified index.
+            Gets or sets the domain at the specified index.
             </summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <value>The domain at the specified index.</value>
+        <remarks>
+            Gets or sets the domain at the specified index.
+            </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="value" /> is <c>null</c>.
             </exception>
@@ -323,7 +330,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool Remove(string domain) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
@@ -337,10 +344,9 @@
             Removes the specified domain.
             </summary>
         <returns>
-          <value>true</value> if the specified domain was removed;
-            otherwise <value>false</value>.</returns>
+          <value>true</value> if the domain was removed; otherwise <value>false</value>.</returns>
         <remarks>
-            Removes the first instance of the specified domain from the list.
+            Removes the first instance of the specified domain from the list if it exists.
             </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="domain" /> is <c>null</c>.
@@ -352,7 +358,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void RemoveAt(int32 index) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -366,7 +372,7 @@
             Removes the domain at the specified index.
             </summary>
         <remarks>
-            Removed the domain at the specified index.
+            Removes the domain at the specified index.
             </remarks>
         <exception cref="T:System.ArgumentOutOfRangeException">
           <paramref name="index" /> is out of range.
@@ -378,16 +384,20 @@
       <MemberSignature Language="ILAsm" Value=".method hidebysig newslot virtual instance class System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Collections.IEnumerator</ReturnType>
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <summary>
+            Gets an enumerator for the list of domains.
+            </summary>
+        <returns>The enumerator.</returns>
+        <remarks>
+            Gets an enumerator for the list of domains.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="ToString">
@@ -395,7 +405,7 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance string ToString() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.String</ReturnType>
@@ -403,12 +413,45 @@
       <Parameters />
       <Docs>
         <summary>
-            Serializes the <see cref="T:MimeKit.DomainList" /> to a string.
+            Returns a string representation of the list of domains.
             </summary>
-        <returns>A <see cref="T:System.String" /> that represents the current <see cref="T:MimeKit.DomainList" />.</returns>
+        <returns>A string representing the <see cref="T:MimeKit.DomainList" />.</returns>
         <remarks>
-            Returns a newly allocated string containing the list of domains separated by commas.
+          <para>Each non-empty domain string will be prepended by an '@'.</para>
+          <para>If there are multiple domains in the list, they will be separated by a comma.</para>
+        </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="TryParse">
+      <MemberSignature Language="C#" Value="public static bool TryParse (string text, out MimeKit.DomainList route);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig bool TryParse(string text, class MimeKit.DomainList route) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="text" Type="System.String" />
+        <Parameter Name="route" Type="MimeKit.DomainList&amp;" RefType="out" />
+      </Parameters>
+      <Docs>
+        <param name="text">The text to parse.</param>
+        <param name="route">The parsed DomainList.</param>
+        <summary>
+            Tries to parse a list of domains.
+            </summary>
+        <returns>
+          <c>true</c> if a <see cref="T:MimeKit.DomainList" /> was successfully parsed;
+            <c>false</c> otherwise.</returns>
+        <remarks>
+            Attempts to parse a <see cref="T:MimeKit.DomainList" /> from the supplied text. The index
+            will only be updated if a <see cref="T:MimeKit.DomainList" /> was successfully parsed.
             </remarks>
+        <exception cref="T:System.ArgumentNullException">
+          <paramref name="text" /> is <c>null</c>.
+            </exception>
       </Docs>
     </Member>
   </Members>

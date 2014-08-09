@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,51 @@
 //
 
 using System;
+using System.Runtime.Serialization;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
 	/// An exception that is thrown when a public key could not be found for a specified mailbox.
 	/// </summary>
+	/// <remarks>
+	/// An exception that is thrown when a public key could not be found for a specified mailbox.
+	/// </remarks>
+#if !PORTABLE
+	[Serializable]
+#endif
 	public class PublicKeyNotFoundException : Exception
 	{
+#if !PORTABLE
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.PublicKeyNotFoundException"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="PublicKeyNotFoundException"/>.
+		/// </remarks>
+		/// <param name="info">The serialization info.</param>
+		/// <param name="context">The stream context.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="info"/> is <c>null</c>.
+		/// </exception>
+		protected PublicKeyNotFoundException (SerializationInfo info, StreamingContext context) : base (info, context)
+		{
+			if (info == null)
+				throw new ArgumentNullException ("info");
+
+			var text = info.GetString ("Mailbox");
+			MailboxAddress mailbox;
+
+			if (MailboxAddress.TryParse (text, out mailbox))
+				Mailbox = mailbox;
+		}
+#endif
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.PublicKeyNotFoundException"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="PublicKeyNotFoundException"/>.
+		/// </remarks>
 		/// <param name="mailbox">The mailbox that could not be resolved to a valid private key.</param>
 		/// <param name="message">A message explaining the error.</param>
 		public PublicKeyNotFoundException (MailboxAddress mailbox, string message) : base (message)
@@ -42,9 +77,37 @@ namespace MimeKit.Cryptography {
 			Mailbox = mailbox;
 		}
 
+#if !PORTABLE
+		/// <summary>
+		/// When overridden in a derived class, sets the <see cref="System.Runtime.Serialization.SerializationInfo"/>
+		/// with information about the exception.
+		/// </summary>
+		/// <remarks>
+		/// Sets the <see cref="System.Runtime.Serialization.SerializationInfo"/>
+		/// with information about the exception.
+		/// </remarks>
+		/// <param name="info">The serialization info.</param>
+		/// <param name="context">The streaming context.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="info"/> is <c>null</c>.
+		/// </exception>
+		public override void GetObjectData (SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+				throw new ArgumentNullException ("info");
+
+			info.AddValue ("Mailbox", Mailbox.ToString (true));
+
+			base.GetObjectData (info, context);
+		}
+#endif
+
 		/// <summary>
 		/// Gets the key id that could not be found.
 		/// </summary>
+		/// <remarks>
+		/// Gets the key id that could not be found.
+		/// </remarks>
 		/// <value>The key id.</value>
 		public MailboxAddress Mailbox {
 			get; private set;

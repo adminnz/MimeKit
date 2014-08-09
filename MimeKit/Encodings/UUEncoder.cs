@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2012 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,9 @@ namespace MimeKit.Encodings {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Encodings.UUEncoder"/> class.
 		/// </summary>
+		/// <remarks>
+		/// Creates a new Unix-to-Unix encoder.
+		/// </remarks>
 		public UUEncoder ()
 		{
 			Reset ();
@@ -58,12 +61,15 @@ namespace MimeKit.Encodings {
 		/// <summary>
 		/// Clone the <see cref="UUEncoder"/> with its current state.
 		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="UUEncoder"/> with exactly the same state as the current encoder.
+		/// </remarks>
 		/// <returns>A new <see cref="UUEncoder"/> with identical state.</returns>
 		public IMimeEncoder Clone ()
 		{
 			var encoder = new UUEncoder ();
 
-			Array.Copy (uubuf, encoder.uubuf, uubuf.Length);
+			Buffer.BlockCopy (uubuf, 0, encoder.uubuf, 0, uubuf.Length);
 			encoder.nsaved = nsaved;
 			encoder.saved = saved;
 			encoder.uulen = uulen;
@@ -74,17 +80,22 @@ namespace MimeKit.Encodings {
 		/// <summary>
 		/// Gets the encoding.
 		/// </summary>
+		/// <remarks>
+		/// Gets the encoding that the encoder supports.
+		/// </remarks>
 		/// <value>The encoding.</value>
-		public ContentEncoding Encoding
-		{
+		public ContentEncoding Encoding {
 			get { return ContentEncoding.UUEncode; }
 		}
 
 		/// <summary>
 		/// Estimates the length of the output.
 		/// </summary>
+		/// <remarks>
+		/// Estimates the number of bytes needed to encode the specified number of input bytes.
+		/// </remarks>
 		/// <returns>The estimated output length.</returns>
-		/// <param name='inputLength'>The input length.</param>
+		/// <param name="inputLength">The input length.</param>
 		public int EstimateOutputLength (int inputLength)
 		{
 			return (((inputLength + 2) / MaxInputPerLine) * MaxOutputPerLine) + MaxOutputPerLine + 2;
@@ -98,7 +109,7 @@ namespace MimeKit.Encodings {
 			if (startIndex < 0 || startIndex > input.Length)
 				throw new ArgumentOutOfRangeException ("startIndex");
 
-			if (length < 0 || startIndex + length > input.Length)
+			if (length < 0 || length > (input.Length - startIndex))
 				throw new ArgumentOutOfRangeException ("length");
 
 			if (output == null)
@@ -117,13 +128,13 @@ namespace MimeKit.Encodings {
 		{
 			if (length == 0)
 				return 0;
-			
+
 			byte* inend = input + length;
 			byte* outptr = output;
 			byte* inptr = input;
 			byte* bufptr;
 			byte b0, b1, b2;
-			
+
 			if ((length + uulen) < 45) {
 				// not enough input to write a full uuencoded line
 				bufptr = uuptr + ((uulen / 3) * 4);
@@ -132,11 +143,13 @@ namespace MimeKit.Encodings {
 				
 				if (uulen > 0) {
 					// copy the previous call's uubuf to output
-					Array.Copy (uubuf, 0, outbuf, (int) (bufptr - outptr), ((uulen / 3) * 4));
-					bufptr += ((uulen / 3) * 4);
+					int n = (uulen / 3) * 4;
+
+					Buffer.BlockCopy (uubuf, 0, outbuf, (int) (bufptr - output), n);
+					bufptr += n;
 				}
 			}
-			
+
 			if (nsaved == 2) {
 				b0 = (byte) ((saved >> 8) & 0xFF);
 				b1 = (byte) (saved & 0xFF);
@@ -173,7 +186,7 @@ namespace MimeKit.Encodings {
 					}
 				}
 			}
-			
+
 			while (inptr < inend) {
 				while (uulen < 45 && (inptr + 3) <= inend) {
 					b0 = *inptr++;
@@ -215,11 +228,17 @@ namespace MimeKit.Encodings {
 		/// <summary>
 		/// Encodes the specified input into the output buffer.
 		/// </summary>
+		/// <remarks>
+		/// <para>Encodes the specified input into the output buffer.</para>
+		/// <para>The output buffer should be large enough to hold all of the
+		/// encoded input. For estimating the size needed for the output buffer,
+		/// see <see cref="EstimateOutputLength"/>.</para>
+		/// </remarks>
 		/// <returns>The number of bytes written to the output buffer.</returns>
-		/// <param name='input'>The input buffer.</param>
-		/// <param name='startIndex'>The starting index of the input buffer.</param>
-		/// <param name='length'>The length of the input buffer.</param>
-		/// <param name='output'>The output buffer.</param>
+		/// <param name="input">The input buffer.</param>
+		/// <param name="startIndex">The starting index of the input buffer.</param>
+		/// <param name="length">The length of the input buffer.</param>
+		/// <param name="output">The output buffer.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <para><paramref name="input"/> is <c>null</c>.</para>
 		/// <para>-or-</para>
@@ -282,17 +301,17 @@ namespace MimeKit.Encodings {
 			}
 			
 			if (uulen > 0) {
-				int copylen = ((uulen / 3) * 4);
+				int n = (uulen / 3) * 4;
 				
 				*outptr++ = Encode ((uulen - uufill) & 0xFF);
-				Array.Copy (uubuf, 0, outbuf, (int) (outptr - output), copylen);
-				outptr += copylen;
+				Buffer.BlockCopy (uubuf, 0, outbuf, (int) (outptr - output), n);
+				outptr += n;
 
 				*outptr++ = (byte) '\n';
 				uulen = 0;
 			}
 			
-			*outptr++ = Encode (uulen & 0xff);
+			*outptr++ = Encode (uulen & 0xFF);
 			*outptr++ = (byte) '\n';
 
 			Reset ();
@@ -303,11 +322,17 @@ namespace MimeKit.Encodings {
 		/// <summary>
 		/// Encodes the specified input into the output buffer, flushing any internal buffer state as well.
 		/// </summary>
+		/// <remarks>
+		/// <para>Encodes the specified input into the output buffer, flusing any internal state as well.</para>
+		/// <para>The output buffer should be large enough to hold all of the
+		/// encoded input. For estimating the size needed for the output buffer,
+		/// see <see cref="EstimateOutputLength"/>.</para>
+		/// </remarks>
 		/// <returns>The number of bytes written to the output buffer.</returns>
-		/// <param name='input'>The input buffer.</param>
-		/// <param name='startIndex'>The starting index of the input buffer.</param>
-		/// <param name='length'>The length of the input buffer.</param>
-		/// <param name='output'>The output buffer.</param>
+		/// <param name="input">The input buffer.</param>
+		/// <param name="startIndex">The starting index of the input buffer.</param>
+		/// <param name="length">The length of the input buffer.</param>
+		/// <param name="output">The output buffer.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <para><paramref name="input"/> is <c>null</c>.</para>
 		/// <para>-or-</para>
@@ -336,6 +361,9 @@ namespace MimeKit.Encodings {
 		/// <summary>
 		/// Resets the encoder.
 		/// </summary>
+		/// <remarks>
+		/// Resets the state of the encoder.
+		/// </remarks>
 		public void Reset ()
 		{
 			nsaved = 0;

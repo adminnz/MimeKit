@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace MimeKit.Cryptography {
 	/// <para>To verify the signature, use the <see cref="MultipartSigned.Verify()"/>
 	/// method on the parent multipart/signed part.</para>
 	/// </remarks>
-	public sealed class ApplicationPkcs7Signature : MimePart
+	public class ApplicationPkcs7Signature : MimePart
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.ApplicationPkcs7Signature"/> class.
@@ -67,11 +67,9 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		public ApplicationPkcs7Signature (Stream stream) : base ("application", "pkcs7-signature")
 		{
-			ContentObject = new ContentObject (stream, ContentEncoding.Default);
-			ContentDisposition = new ContentDisposition ("attachment");
 			ContentTransferEncoding = ContentEncoding.Base64;
-			ContentDisposition.FileName = "smime.p7s";
-			ContentType.Name = "smime.p7s";
+			ContentObject = new ContentObject (stream);
+			FileName = "smime.p7s";
 		}
 	}
 }

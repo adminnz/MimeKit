@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 // THE SOFTWARE.
 //
 
-using System;
 using System.IO;
 using System.Threading;
 
@@ -32,23 +31,39 @@ namespace MimeKit {
 	/// <summary>
 	/// An interface for content stream encapsulation as used by <see cref="MimeKit.MimePart"/>.
 	/// </summary>
+    /// <remarks>
+    /// Implemented by <see cref="ContentObject"/>.
+    /// </remarks>
 	public interface IContentObject
 	{
 		/// <summary>
 		/// Gets the content encoding.
 		/// </summary>
+        /// <remarks>
+        /// If the <see cref="Stream"/> is not encoded, this value will be
+        /// <see cref="ContentEncoding.Default"/>. Otherwise, it will be
+        /// set to the raw content encoding of the stream.
+        /// </remarks>
 		/// <value>The encoding.</value>
 		ContentEncoding Encoding { get; }
 
 		/// <summary>
-		/// Gets the content stream.
+		/// Opens the decoded content stream.
 		/// </summary>
-		/// <value>The stream.</value>
-		Stream Stream { get; }
+		/// <remarks>
+		/// Provides a means of reading the decoded content without having to first write it to another
+		/// stream using <see cref="DecodeTo(System.IO.Stream,System.Threading.CancellationToken)"/>.
+		/// </remarks>
+		/// <returns>The decoded content stream.</returns>
+		Stream Open ();
 
 		/// <summary>
 		/// Decodes the content stream into another stream.
 		/// </summary>
+        /// <remarks>
+        /// If the content stream is encoded, this method will decode it into the
+        /// output stream using a suitable decoder.
+        /// </remarks>
 		/// <param name="stream">The output stream.</param>
 		/// <param name="cancellationToken">A cancellation token.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -60,23 +75,14 @@ namespace MimeKit {
 		/// <exception cref="System.IO.IOException">
 		/// An I/O error occurred.
 		/// </exception>
-		void DecodeTo (Stream stream, CancellationToken cancellationToken);
-
-		/// <summary>
-		/// Decodes the content stream into another stream.
-		/// </summary>
-		/// <param name="stream">The output stream.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="stream"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="System.IO.IOException">
-		/// An I/O error occurred.
-		/// </exception>
-		void DecodeTo (Stream stream);
+		void DecodeTo (Stream stream, CancellationToken cancellationToken = default (CancellationToken));
 
 		/// <summary>
 		/// Copies the content stream to the specified output stream.
 		/// </summary>
+        /// <remarks>
+        /// Copies the data from <see cref="Stream"/> into <paramref name="stream"/>.
+        /// </remarks>
 		/// <param name="stream">The output stream.</param>
 		/// <param name="cancellationToken">A cancellation token.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -88,18 +94,6 @@ namespace MimeKit {
 		/// <exception cref="System.IO.IOException">
 		/// An I/O error occurred.
 		/// </exception>
-		void WriteTo (Stream stream, CancellationToken cancellationToken);
-
-		/// <summary>
-		/// Copies the content stream to the specified output stream.
-		/// </summary>
-		/// <param name="stream">The output stream.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="stream"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="System.IO.IOException">
-		/// An I/O error occurred.
-		/// </exception>
-		void WriteTo (Stream stream);
+		void WriteTo (Stream stream, CancellationToken cancellationToken = default (CancellationToken));
 	}
 }

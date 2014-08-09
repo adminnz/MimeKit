@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,17 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
+using MimeKit.IO;
+
 namespace MimeKit.Cryptography {
 	/// <summary>
 	/// An S/MIME part with a Content-Type of application/pkcs7-mime.
 	/// </summary>
-	public sealed class ApplicationPkcs7Mime : MimePart
+	/// <remarks>
+	/// An application/pkcs7-mime is an S/MIME part and may contain encrypted,
+	/// signed or compressed data (or any combination of the above).
+	/// </remarks>
+	public class ApplicationPkcs7Mime : MimePart
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.Cryptography.ApplicationPkcs7Mime"/> class.
@@ -70,9 +76,9 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		public ApplicationPkcs7Mime (SecureMimeType type, Stream stream) : base ("application", "pkcs7-mime")
 		{
-			ContentObject = new ContentObject (stream, ContentEncoding.Default);
 			ContentDisposition = new ContentDisposition ("attachment");
 			ContentTransferEncoding = ContentEncoding.Base64;
+			ContentObject = new ContentObject (stream);
 
 			switch (type) {
 			case SecureMimeType.CompressedData:
@@ -103,6 +109,9 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets the value of the "smime-type" parameter.
 		/// </summary>
+		/// <remarks>
+		/// Gets the value of the "smime-type" parameter.
+		/// </remarks>
 		/// <value>The value of the "smime-type" parameter.</value>
 		public SecureMimeType SecureMimeType {
 			get {
@@ -122,8 +131,11 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Decompress using the specified <see cref="SecureMimeContext"/>.
+		/// Decompresses the content.
 		/// </summary>
+		/// <remarks>
+		/// Decompresses the content using the specified <see cref="SecureMimeContext"/>.
+		/// </remarks>
 		/// <returns>The decompressed <see cref="MimeKit.MimeEntity"/>.</returns>
 		/// <param name="ctx">The S/MIME context to use for decompressing.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -143,7 +155,7 @@ namespace MimeKit.Cryptography {
 			if (SecureMimeType != SecureMimeType.CompressedData)
 				throw new InvalidOperationException ();
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				ContentObject.DecodeTo (memory);
 				memory.Position = 0;
 
@@ -152,8 +164,11 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Decompress using the specified <see cref="SecureMimeContext"/>.
+		/// Decompresses the content.
 		/// </summary>
+		/// <remarks>
+		/// Decompresses the content using the default <see cref="SecureMimeContext"/>.
+		/// </remarks>
 		/// <returns>The decompressed <see cref="MimeKit.MimeEntity"/>.</returns>
 		/// <exception cref="System.InvalidOperationException">
 		/// The "smime-type" parameter on the Content-Type header is not "compressed-data".
@@ -172,8 +187,11 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Decrypt using the specified <see cref="CryptographyContext"/>.
+		/// Decrypts the content.
 		/// </summary>
+		/// <remarks>
+		/// Decrypts the content using the specified <see cref="SecureMimeContext"/>.
+		/// </remarks>
 		/// <returns>The decrypted <see cref="MimeKit.MimeEntity"/>.</returns>
 		/// <param name="ctx">The S/MIME context to use for decrypting.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -193,7 +211,7 @@ namespace MimeKit.Cryptography {
 			if (SecureMimeType != SecureMimeType.EnvelopedData)
 				throw new InvalidOperationException ();
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				ContentObject.DecodeTo (memory);
 				memory.Position = 0;
 
@@ -202,8 +220,11 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Decrypt the content.
+		/// Decrypts the content.
 		/// </summary>
+		/// <remarks>
+		/// Decrypts the content using the default <see cref="SecureMimeContext"/>.
+		/// </remarks>
 		/// <returns>The decrypted <see cref="MimeKit.MimeEntity"/>.</returns>
 		/// <exception cref="System.InvalidOperationException">
 		/// The "smime-type" parameter on the Content-Type header is not "certs-only".
@@ -219,8 +240,11 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Import the certificates contained in the content.
+		/// Imports the certificates contained in the content.
 		/// </summary>
+		/// <remarks>
+		/// Imports the certificates contained in the content.
+		/// </remarks>
 		/// <param name="ctx">The S/MIME context to import certificates into.</param>
 		/// <exception cref="System.InvalidOperationException">
 		/// The "smime-type" parameter on the Content-Type header is not "certs-only".
@@ -233,7 +257,7 @@ namespace MimeKit.Cryptography {
 			if (SecureMimeType != SecureMimeType.CertsOnly)
 				throw new InvalidOperationException ();
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				ContentObject.DecodeTo (memory);
 				memory.Position = 0;
 
@@ -242,11 +266,17 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Verify the signed-data and return the unencapsulated <see cref="MimeKit.MimeEntity"/>.
+		/// Verifies the signed-data and returns the unencapsulated <see cref="MimeKit.MimeEntity"/>.
 		/// </summary>
+		/// <remarks>
+		/// Verifies the signed-data and returns the unencapsulated <see cref="MimeKit.MimeEntity"/>.
+		/// </remarks>
 		/// <returns>The list of digital signatures.</returns>
 		/// <param name="ctx">The S/MIME context to use for verifying the signature.</param>
 		/// <param name="entity">The unencapsulated entity.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="ctx"/> is <c>null</c>.
+		/// </exception>
 		/// <exception cref="System.InvalidOperationException">
 		/// The "smime-type" parameter on the Content-Type header is not "signed-data".
 		/// </exception>
@@ -255,10 +285,13 @@ namespace MimeKit.Cryptography {
 		/// </exception>
 		public DigitalSignatureCollection Verify (SecureMimeContext ctx, out MimeEntity entity)
 		{
+			if (ctx == null)
+				throw new ArgumentNullException ("ctx");
+
 			if (SecureMimeType != SecureMimeType.SignedData)
 				throw new InvalidOperationException ();
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				ContentObject.DecodeTo (memory);
 				memory.Position = 0;
 
@@ -267,8 +300,11 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Verify the signed-data and return the unencapsulated <see cref="MimeKit.MimeEntity"/>.
+		/// Verifies the signed-data and returns the unencapsulated <see cref="MimeKit.MimeEntity"/>.
 		/// </summary>
+		/// <remarks>
+		/// Verifies the signed-data and returns the unencapsulated <see cref="MimeKit.MimeEntity"/>.
+		/// </remarks>
 		/// <returns>The list of digital signatures.</returns>
 		/// <param name="entity">The unencapsulated entity.</param>
 		/// <exception cref="System.InvalidOperationException">
@@ -285,12 +321,14 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Compress the specified entity.
+		/// Compresses the specified entity.
 		/// </summary>
 		/// <remarks>
-		/// It should be noted that this feature is not supported by most mail clients,
-		/// even among those that support S/MIME.
+		/// <para>Compresses the specified entity using the specified <see cref="SecureMimeContext"/>.</para>
+		/// <para>It should be noted that this feature is not supported by most mail clients,
+		/// even among those that support S/MIME.</para>
 		/// </remarks>
+		/// <returns>The compressed entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for compressing.</param>
 		/// <param name="entity">The entity.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -309,7 +347,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException ("entity");
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				var options = FormatOptions.Default.Clone ();
 				options.NewLineFormat = NewLineFormat.Dos;
 
@@ -321,12 +359,14 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Compress the specified entity.
+		/// Compresses the specified entity.
 		/// </summary>
 		/// <remarks>
-		/// It should be noted that this feature is not supported by most mail clients,
-		/// even among those that support S/MIME.
+		/// <para>Compresses the specified entity using the default <see cref="SecureMimeContext"/>.</para>
+		/// <para>It should be noted that this feature is not supported by most mail clients,
+		/// even among those that support S/MIME.</para>
 		/// </remarks>
+		/// <returns>The compressed entity.</returns>
 		/// <param name="entity">The entity.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="entity"/> is <c>null</c>.
@@ -345,8 +385,12 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Encrypt the specified entity.
+		/// Encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Encrypts the entity to the specified recipients using the supplied <see cref="SecureMimeContext"/>.
+		/// </remarks>
+		/// <returns>The encrypted entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for encrypting.</param>
 		/// <param name="recipients">The recipients.</param>
 		/// <param name="entity">The entity.</param>
@@ -371,7 +415,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException ("entity");
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				var options = FormatOptions.Default.Clone ();
 				options.NewLineFormat = NewLineFormat.Dos;
 
@@ -383,8 +427,12 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Encrypt the specified entity.
+		/// Encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Encrypts the entity to the specified recipients using the default <see cref="SecureMimeContext"/>.
+		/// </remarks>
+		/// <returns>The encrypted entity.</returns>
 		/// <param name="recipients">The recipients.</param>
 		/// <param name="entity">The entity.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -409,8 +457,12 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Encrypt the specified entity.
+		/// Encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Encrypts the entity to the specified recipients using the supplied <see cref="SecureMimeContext"/>.
+		/// </remarks>
+		/// <returns>The encrypted entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for encrypting.</param>
 		/// <param name="recipients">The recipients.</param>
 		/// <param name="entity">The entity.</param>
@@ -441,7 +493,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException ("entity");
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				var options = FormatOptions.Default.Clone ();
 				options.NewLineFormat = NewLineFormat.Dos;
 
@@ -453,8 +505,12 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Encrypt the specified entity.
+		/// Encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Encrypts the entity to the specified recipients using the default <see cref="SecureMimeContext"/>.
+		/// </remarks>
+		/// <returns>The encrypted entity.</returns>
 		/// <param name="recipients">The recipients.</param>
 		/// <param name="entity">The entity.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -485,14 +541,16 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign the specified entity.
+		/// Cryptographically signs the specified entity.
 		/// </summary>
 		/// <remarks>
-		/// For better interoperability with other mail clients, you should use
+		/// <para>Signs the entity using the supplied signer and <see cref="SecureMimeContext"/>.</para>
+		/// <para>For better interoperability with other mail clients, you should use
 		/// <see cref="MultipartSigned.Create(SecureMimeContext, CmsSigner, MimeEntity)"/>
 		/// instead as the multipart/signed format is supported among a much larger
-		/// subset of mail client software.
+		/// subset of mail client software.</para>
 		/// </remarks>
+		/// <returns>The signed entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for signing.</param>
 		/// <param name="signer">The signer.</param>
 		/// <param name="entity">The entity.</param>
@@ -517,7 +575,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException ("entity");
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				var options = FormatOptions.Default.Clone ();
 				options.NewLineFormat = NewLineFormat.Dos;
 
@@ -529,14 +587,16 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign the specified entity.
+		/// Cryptographically signs the specified entity.
 		/// </summary>
 		/// <remarks>
-		/// For better interoperability with other mail clients, you should use
+		/// <para>Signs the entity using the supplied signer.</para>
+		/// <para>For better interoperability with other mail clients, you should use
 		/// <see cref="MultipartSigned.Create(SecureMimeContext, CmsSigner, MimeEntity)"/>
 		/// instead as the multipart/signed format is supported among a much larger
-		/// subset of mail client software.
+		/// subset of mail client software.</para>
 		/// </remarks>
+		/// <returns>The signed entity.</returns>
 		/// <param name="signer">The signer.</param>
 		/// <param name="entity">The entity.</param>
 		/// <exception cref="System.ArgumentNullException">
@@ -561,14 +621,16 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign the specified entity.
+		/// Cryptographically signs the specified entity.
 		/// </summary>
 		/// <remarks>
-		/// For better interoperability with other mail clients, you should use
-		/// <see cref="MultipartSigned.Create(CryptographyContext, MailboxAddress, DigestAlgorithm, MimeEntity)"/>
+		/// <para>Signs the entity using the supplied signer, digest algorithm and <see cref="SecureMimeContext"/>.</para>
+		/// <para>For better interoperability with other mail clients, you should use
+		/// <see cref="MultipartSigned.Create(SecureMimeContext, CmsSigner, MimeEntity)"/>
 		/// instead as the multipart/signed format is supported among a much larger
-		/// subset of mail client software.
+		/// subset of mail client software.</para>
 		/// </remarks>
+		/// <returns>The signed entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for signing.</param>
 		/// <param name="signer">The signer.</param>
 		/// <param name="digestAlgo">The digest algorithm to use for signing.</param>
@@ -597,7 +659,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException ("entity");
 
-			using (var memory = new MemoryStream ()) {
+			using (var memory = new MemoryBlockStream ()) {
 				var options = FormatOptions.Default.Clone ();
 				options.NewLineFormat = NewLineFormat.Dos;
 
@@ -609,14 +671,16 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign the specified entity.
+		/// Cryptographically signs the specified entity.
 		/// </summary>
 		/// <remarks>
-		/// For better interoperability with other mail clients, you should use
-		/// <see cref="MultipartSigned.Create(CryptographyContext, MailboxAddress, DigestAlgorithm, MimeEntity)"/>
+		/// <para>Signs the entity using the supplied signer and digest algorithm.</para>
+		/// <para>For better interoperability with other mail clients, you should use
+		/// <see cref="MultipartSigned.Create(SecureMimeContext, CmsSigner, MimeEntity)"/>
 		/// instead as the multipart/signed format is supported among a much larger
-		/// subset of mail client software.
+		/// subset of mail client software.</para>
 		/// </remarks>
+		/// <returns>The signed entity.</returns>
 		/// <param name="signer">The signer.</param>
 		/// <param name="digestAlgo">The digest algorithm to use for signing.</param>
 		/// <param name="entity">The entity.</param>
@@ -645,8 +709,13 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign and Encrypt the specified entity.
+		/// Cryptographically signs and encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Cryptographically signs entity using the supplied signer and then
+		/// encrypts the result to the specified recipients.
+		/// </remarks>
+		/// <returns>The signed and encrypted entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for signing and encrypting.</param>
 		/// <param name="signer">The signer.</param>
 		/// <param name="recipients">The recipients.</param>
@@ -681,8 +750,13 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign and Encrypt the specified entity.
+		/// Cryptographically signs and encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Cryptographically signs entity using the supplied signer and then
+		/// encrypts the result to the specified recipients.
+		/// </remarks>
+		/// <returns>The signed and encrypted entity.</returns>
 		/// <param name="signer">The signer.</param>
 		/// <param name="recipients">The recipients.</param>
 		/// <param name="entity">The entity.</param>
@@ -713,8 +787,13 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign and Encrypt the specified entity.
+		/// Cryptographically signs and encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Cryptographically signs entity using the supplied signer and then
+		/// encrypts the result to the specified recipients.
+		/// </remarks>
+		/// <returns>The signed and encrypted entity.</returns>
 		/// <param name="ctx">The S/MIME context to use for signing and encrypting.</param>
 		/// <param name="signer">The signer.</param>
 		/// <param name="digestAlgo">The digest algorithm to use for signing.</param>
@@ -755,8 +834,13 @@ namespace MimeKit.Cryptography {
 		}
 
 		/// <summary>
-		/// Sign and Encrypt the specified entity.
+		/// Cryptographically signs and encrypts the specified entity.
 		/// </summary>
+		/// <remarks>
+		/// Cryptographically signs entity using the supplied signer and then
+		/// encrypts the result to the specified recipients.
+		/// </remarks>
+		/// <returns>The signed and encrypted entity.</returns>
 		/// <param name="signer">The signer.</param>
 		/// <param name="digestAlgo">The digest algorithm to use for signing.</param>
 		/// <param name="recipients">The recipients.</param>

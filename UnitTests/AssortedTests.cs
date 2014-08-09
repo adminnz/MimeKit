@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,10 +44,9 @@ namespace UnitTests {
 			var multiline = "This is a part in a (multipart) message generated with the MimeKit library.\n\n" + 
 			                "All of the parts of this message are identical, however they've been encoded " +
 			                "for transport using different methods.\n";
-			var expected = "This is a part in a (multipart) message generated with the MimeKit\n" +
-			               "library.\n\n" +
-			               "All of the parts of this message are identical, however they've been\n" +
-			               "encoded for transport using different methods.\n";
+			var expected = "This is a part in a (multipart) message generated with the MimeKit library.\n\n" +
+			               "All of the parts of this message are identical, however they've been encoded\n" +
+			               "for transport using different methods.\n";
 
 			if (FormatOptions.Default.NewLineFormat != NewLineFormat.Unix)
 				expected = expected.Replace ("\n", "\r\n");
@@ -64,9 +63,9 @@ namespace UnitTests {
 			var multiline = "This is a part in a (multipart) message generated with the MimeKit library. " + 
 			                "All of the parts of this message are identical, however they've been encoded " +
 			                "for transport using different methods.";
-			var expected = "This is a part in a (multipart) message generated with the MimeKit\n" +
-			               "library. All of the parts of this message are identical, however\n" +
-			               "they've been encoded for transport using different methods.\n";
+			var expected = "This is a part in a (multipart) message generated with the MimeKit library.\n" +
+			               "All of the parts of this message are identical, however they've been encoded\n" +
+			               "for transport using different methods.\n";
 
 			if (FormatOptions.Default.NewLineFormat != NewLineFormat.Unix)
 				expected = expected.Replace ("\n", "\r\n");
@@ -83,13 +82,13 @@ namespace UnitTests {
 			var msgid = MimeUtils.EnumerateReferences (obsolete).FirstOrDefault ();
 
 			Assert.IsNotNull (msgid, "The parsed msgid token should not be null");
-			Assert.AreEqual ("<some.message.id.1@some.domain>", msgid, "The parsed msgid does not match");
+			Assert.AreEqual ("some.message.id.1@some.domain", msgid, "The parsed msgid does not match");
 
 			obsolete = "<some.message.id.2@some.domain> as sent on Mon, 17 Jan 1994 11:14:55 -0500";
 			msgid = MimeUtils.EnumerateReferences (obsolete).FirstOrDefault ();
 
 			Assert.IsNotNull (msgid, "The parsed msgid token should not be null");
-			Assert.AreEqual ("<some.message.id.2@some.domain>", msgid, "The parsed msgid does not match");
+			Assert.AreEqual ("some.message.id.2@some.domain", msgid, "The parsed msgid does not match");
 		}
 
 		[Test]
@@ -99,11 +98,11 @@ namespace UnitTests {
 			var input = "=?iso-8859-1?q?hola?=";
 			string actual;
 
-			options.EnableRfc2047Workarounds = false;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Strict;
 			actual = Rfc2047.DecodePhrase (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual);
 
-			options.EnableRfc2047Workarounds = true;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Loose;
 			actual = Rfc2047.DecodePhrase (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual, "Unexpected result when workarounds enabled.");
 		}
@@ -115,11 +114,11 @@ namespace UnitTests {
 			var input = "=?iso-8859-1?B?aG9sYQ==?=";
 			string actual;
 
-			options.EnableRfc2047Workarounds = false;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Strict;
 			actual = Rfc2047.DecodePhrase (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual);
 
-			options.EnableRfc2047Workarounds = true;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Loose;
 			actual = Rfc2047.DecodePhrase (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual, "Unexpected result when workarounds enabled.");
 		}
@@ -131,11 +130,11 @@ namespace UnitTests {
 			var input = "=?iso-8859-1?q?hola?=";
 			string actual;
 
-			options.EnableRfc2047Workarounds = false;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Strict;
 			actual = Rfc2047.DecodeText (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual);
 
-			options.EnableRfc2047Workarounds = true;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Loose;
 			actual = Rfc2047.DecodeText (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual, "Unexpected result when workarounds enabled.");
 		}
@@ -147,13 +146,64 @@ namespace UnitTests {
 			var input = "=?iso-8859-1?B?aG9sYQ==?=";
 			string actual;
 
-			options.EnableRfc2047Workarounds = false;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Strict;
 			actual = Rfc2047.DecodeText (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual);
 
-			options.EnableRfc2047Workarounds = true;
+			options.Rfc2047ComplianceMode = RfcComplianceMode.Loose;
 			actual = Rfc2047.DecodeText (options, Encoding.ASCII.GetBytes (input));
 			Assert.AreEqual ("hola", actual, "Unexpected result when workarounds enabled.");
+		}
+
+		[Test]
+		public void TestRfc2047DecodeInvalidMultibyteBreak ()
+		{
+			const string japanese = "狂ったこの世で狂うなら気は確かだ。";
+			var utf8 = Encoding.UTF8.GetBytes (japanese);
+			var builder = new StringBuilder ();
+
+			for (int wordBreak = (utf8.Length / 2) - 5; wordBreak < (utf8.Length / 2) + 5; wordBreak++) {
+				builder.Append ("=?utf-8?b?").Append (Convert.ToBase64String (utf8, 0, wordBreak)).Append ("?= ");
+				builder.Append ("=?utf-8?b?").Append (Convert.ToBase64String (utf8, wordBreak, utf8.Length - wordBreak)).Append ("?=");
+
+				var decoded = Rfc2047.DecodeText (Encoding.ASCII.GetBytes (builder.ToString ()));
+
+				Assert.AreEqual (japanese, decoded, "Decoded text did not match the original.");
+
+				builder.Clear ();
+			}
+		}
+
+		[Test]
+		public void TestRfc2047DecodeInvalidPayloadBreak ()
+		{
+			const string japanese = "狂ったこの世で狂うなら気は確かだ。";
+			var utf8 = Encoding.UTF8.GetBytes (japanese);
+			var base64 = Convert.ToBase64String (utf8);
+			var builder = new StringBuilder ();
+
+			builder.Append ("=?utf-8?b?").Append (base64.Substring (0, base64.Length - 6)).Append ("?= ");
+			builder.Append ("=?utf-8?b?").Append (base64.Substring (base64.Length - 6)).Append ("?=");
+
+			var decoded = Rfc2047.DecodeText (Encoding.ASCII.GetBytes (builder.ToString ()));
+
+			Assert.AreEqual (japanese, decoded, "Decoded text did not match the original.");
+		}
+
+		[Test]
+		public void TestDecodeInvalidCharset ()
+		{
+			const string xunknown = "=?x-unknown?B?aG9sYQ==?=";
+			const string cp1260 = "=?cp1260?B?aG9sYQ==?=";
+			string actual;
+
+			// Note: we won't be able to get a codepage for x-unknown.
+			actual = Rfc2047.DecodeText (Encoding.ASCII.GetBytes (xunknown));
+			Assert.AreEqual ("hola", actual, "Unexpected decoding of x-unknown.");
+
+			// Note: cp-1260 doesn't exist, but will make CharsetUtils parse the codepage as 1260.
+			actual = Rfc2047.DecodeText (Encoding.ASCII.GetBytes (cp1260));
+			Assert.AreEqual ("hola", actual, "Unexpected decoding of cp1260.");
 		}
 	}
 }

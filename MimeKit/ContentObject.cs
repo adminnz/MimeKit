@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,8 +39,10 @@ namespace MimeKit {
 	/// A <see cref="ContentObject"/> represents the content of a <see cref="MimePart"/>.
 	/// The content has both a stream and an encoding (typically <see cref="ContentEncoding.Default"/>).
 	/// </remarks>
-	public sealed class ContentObject : IContentObject
+	public class ContentObject : IContentObject
 	{
+		readonly Stream content;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.ContentObject"/> class.
 		/// </summary>
@@ -59,16 +61,19 @@ namespace MimeKit {
 		/// <para>-or-</para>
 		/// <para><paramref name="stream"/> does not support seeking.</para>
 		/// </exception>
-		public ContentObject (Stream stream, ContentEncoding encoding)
+		public ContentObject (Stream stream, ContentEncoding encoding = ContentEncoding.Default)
 		{
 			if (stream == null)
 				throw new ArgumentNullException ("stream");
 
-			if (!stream.CanRead || !stream.CanSeek)
-				throw new ArgumentException ("stream");
+			if (!stream.CanRead)
+				throw new ArgumentException ("The stream does not support reading.", "stream");
+
+			if (!stream.CanSeek)
+				throw new ArgumentException ("The stream does not support seeking.", "stream");
 
 			Encoding = encoding;
-			Stream = stream;
+			content = stream;
 		}
 
 		#region IContentObject implementation
@@ -87,18 +92,28 @@ namespace MimeKit {
 		}
 
 		/// <summary>
-		/// Gets or sets the content stream.
+		/// Opens the decoded content stream.
 		/// </summary>
-		/// <value>The content stream.</value>
-		public Stream Stream {
-			get; private set;
+		/// <remarks>
+		/// Provides a means of reading the decoded content without having to first write it to another
+		/// stream using <see cref="DecodeTo(System.IO.Stream,System.Threading.CancellationToken)"/>.
+		/// </remarks>
+		/// <returns>The decoded content stream.</returns>
+		public Stream Open ()
+		{
+			content.Seek (0, SeekOrigin.Begin);
+
+			var filtered = new FilteredStream (content);
+			filtered.Add (DecoderFilter.Create (Encoding));
+
+			return filtered;
 		}
 
 		/// <summary>
 		/// Copies the content stream to the specified output stream.
 		/// </summary>
 		/// <remarks>
-		/// This is equivalent to simply using <see cref="Stream.CopyTo(Stream)"/> to
+		/// This is equivalent to simply using <see cref="System.IO.Stream.CopyTo(System.IO.Stream)"/> to
 		/// copy the content stream to the output stream except that this method is
 		/// cancellable.
 		/// </remarks>
@@ -113,58 +128,47 @@ namespace MimeKit {
 		/// <exception cref="System.IO.IOException">
 		/// An I/O error occurred.
 		/// </exception>
-		public void WriteTo (Stream stream, CancellationToken cancellationToken)
+		public void WriteTo (Stream stream, CancellationToken cancellationToken = default (CancellationToken))
 		{
 			if (stream == null)
 				throw new ArgumentNullException ("stream");
 
-			cancellationToken.ThrowIfCancellationRequested ();
-
-			byte[] buf = new byte[4096];
+			var readable = content as ICancellableStream;
+			var writable = stream as ICancellableStream;
+			var buf = new byte[4096];
 			int nread;
 
-			Stream.Seek (0, SeekOrigin.Begin);
+			content.Seek (0, SeekOrigin.Begin);
 
 			try {
 				do {
-					cancellationToken.ThrowIfCancellationRequested ();
-					if ((nread = Stream.Read (buf, 0, buf.Length)) <= 0)
-						break;
+					if (readable != null) {
+						if ((nread = readable.Read (buf, 0, buf.Length, cancellationToken)) <= 0)
+							break;
+					} else {
+						cancellationToken.ThrowIfCancellationRequested ();
+						if ((nread = content.Read (buf, 0, buf.Length)) <= 0)
+							break;
+					}
 
-					cancellationToken.ThrowIfCancellationRequested ();
-					stream.Write (buf, 0, nread);
+					if (writable != null) {
+						writable.Write (buf, 0, nread, cancellationToken);
+					} else {
+						cancellationToken.ThrowIfCancellationRequested ();
+						stream.Write (buf, 0, nread);
+					}
 				} while (true);
 
-				Stream.Seek (0, SeekOrigin.Begin);
+				content.Seek (0, SeekOrigin.Begin);
 			} catch (OperationCanceledException) {
 				// try and reset the stream
-
 				try {
-					Stream.Seek (0, SeekOrigin.Begin);
+					content.Seek (0, SeekOrigin.Begin);
 				} catch (IOException) {
 				}
 
 				throw;
 			}
-		}
-
-		/// <summary>
-		/// Copies the content stream to the specified output stream.
-		/// </summary>
-		/// <remarks>
-		/// This is functionally equivalent to using <see cref="Stream.CopyTo(Stream)"/>
-		/// to copy the raw content stream to the output stream.
-		/// </remarks>
-		/// <param name="stream">The output stream.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="stream"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="System.IO.IOException">
-		/// An I/O error occurred.
-		/// </exception>
-		public void WriteTo (Stream stream)
-		{
-			WriteTo (stream, CancellationToken.None);
 		}
 
 		/// <summary>
@@ -184,7 +188,7 @@ namespace MimeKit {
 		/// <exception cref="System.IO.IOException">
 		/// An I/O error occurred.
 		/// </exception>
-		public void DecodeTo (Stream stream, CancellationToken cancellationToken)
+		public void DecodeTo (Stream stream, CancellationToken cancellationToken = default (CancellationToken))
 		{
 			if (stream == null)
 				throw new ArgumentNullException ("stream");
@@ -192,26 +196,8 @@ namespace MimeKit {
 			using (var filtered = new FilteredStream (stream)) {
 				filtered.Add (DecoderFilter.Create (Encoding));
 				WriteTo (filtered, cancellationToken);
-				filtered.Flush ();
+				filtered.Flush (cancellationToken);
 			}
-		}
-
-		/// <summary>
-		/// Decodes the content stream into another stream.
-		/// </summary>
-		/// <remarks>
-		/// Uses the <see cref="Encoding"/> to decode the content stream to the output stream.
-		/// </remarks>
-		/// <param name="stream">The output stream.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="stream"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="System.IO.IOException">
-		/// An I/O error occurred.
-		/// </exception>
-		public void DecodeTo (Stream stream)
-		{
-			DecodeTo (stream, CancellationToken.None);
 		}
 
 		#endregion

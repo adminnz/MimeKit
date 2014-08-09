@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,19 @@ namespace MimeKit.Cryptography {
 	/// <summary>
 	/// An OpenPGP digital signature.
 	/// </summary>
+	/// <remarks>
+	/// An OpenPGP digital signature.
+	/// </remarks>
 	public class OpenPgpDigitalSignature : IDigitalSignature
 	{
 		DigitalSignatureVerifyException vex;
 		bool? valid;
+
+		internal OpenPgpDigitalSignature (PgpPublicKey pubkey, PgpOnePassSignature signature)
+		{
+			SignerCertificate = pubkey != null ? new OpenPgpDigitalCertificate (pubkey) : null;
+			OnePassSignature = signature;
+		}
 
 		internal OpenPgpDigitalSignature (PgpPublicKey pubkey, PgpSignature signature)
 		{
@@ -47,8 +56,12 @@ namespace MimeKit.Cryptography {
 		{
 		}
 
-		internal PgpSignature Signature {
+		internal PgpOnePassSignature OnePassSignature {
 			get; private set;
+		}
+
+		internal PgpSignature Signature {
+			get; set;
 		}
 
 		#region IDigitalSignature implementation
@@ -56,6 +69,9 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets certificate used by the signer.
 		/// </summary>
+		/// <remarks>
+		/// Gets certificate used by the signer.
+		/// </remarks>
 		/// <value>The signer's certificate.</value>
 		public IDigitalCertificate SignerCertificate {
 			get; private set;
@@ -64,6 +80,9 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets the public key algorithm used for the signature.
 		/// </summary>
+		/// <remarks>
+		/// Gets the public key algorithm used for the signature.
+		/// </remarks>
 		/// <value>The public key algorithm.</value>
 		public PublicKeyAlgorithm PublicKeyAlgorithm {
 			get; internal set;
@@ -72,6 +91,9 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets the digest algorithm used for the signature.
 		/// </summary>
+		/// <remarks>
+		/// Gets the digest algorithm used for the signature.
+		/// </remarks>
 		/// <value>The digest algorithm.</value>
 		public DigestAlgorithm DigestAlgorithm {
 			get; internal set;
@@ -80,14 +102,20 @@ namespace MimeKit.Cryptography {
 		/// <summary>
 		/// Gets the creation date of the digital signature.
 		/// </summary>
+		/// <remarks>
+		/// Gets the creation date of the digital signature.
+		/// </remarks>
 		/// <value>The creation date.</value>
 		public DateTime CreationDate {
 			get; internal set;
 		}
 
 		/// <summary>
-		/// Verify the digital signature.
+		/// Verifies the digital signature.
 		/// </summary>
+		/// <remarks>
+		/// Verifies the digital signature.
+		/// </remarks>
 		/// <returns><c>true</c> if the signature is valid; otherwise <c>false</c>.</returns>
 		/// <exception cref="DigitalSignatureVerifyException">
 		/// An error verifying the signature has occurred.
@@ -107,7 +135,10 @@ namespace MimeKit.Cryptography {
 			}
 
 			try {
-				valid = Signature.Verify ();
+				if (OnePassSignature != null)
+					valid = OnePassSignature.Verify (Signature);
+				else
+					valid = Signature.Verify ();
 				return valid.Value;
 			} catch (Exception ex) {
 				var message = string.Format ("Failed to verify digital signature: {0}", ex.Message);

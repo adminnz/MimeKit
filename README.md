@@ -37,6 +37,7 @@ MimeKit is a C# library which may be used for the creation and parsing of messag
 * [5322](http://www.ietf.org/rfc/rfc5322.txt): Internet Message Format (Obsoletes rfc2822) 
 * [5750](http://www.ietf.org/rfc/rfc5750.txt): S/MIME Version 3.2 Certificate Handling (Obsoletes rfc3850)
 * [5751](http://www.ietf.org/rfc/rfc5751.txt): S/MIME Version 3.2 Message Specification (Obsoletes rfc3851)
+* [6532](http://www.ietf.org/rfc/rfc6532.txt): Internationalized Email Headers
 
 #### Other RFCs of interest:
 
@@ -46,11 +47,16 @@ MimeKit is a C# library which may be used for the creation and parsing of messag
 * [2110](http://www.ietf.org/rfc/rfc2110.txt): MIME E-mail Encapsulation of Aggregate Documents, such as HTML (MHTML)
 * [2111](http://www.ietf.org/rfc/rfc2111.txt): Content-ID and Message-ID Uniform Resource Locators
 * [2112](http://www.ietf.org/rfc/rfc2112.txt): The MIME Multipart/Related Content-type (Obsoletes rfc1872)
+* [2298](http://www.ietf.org/rfc/rfc2298.txt): An Extensible Message Format for Message Disposition Notifications
 * [2387](http://www.ietf.org/rfc/rfc2387.txt): The MIME Multipart/Related Content-type (Obsoletes rfc2112)
+* [2388](http://www.ietf.org/rfc/rfc2388.txt): Returning Values from Forms: multipart/form-data
+* [2557](http://www.ietf.org/rfc/rfc2557.txt): MIME Encapsulation of Aggregate Documents, such as HTML (MHTML) (Obsoletes rfc2110)
+* [3798](http://www.ietf.org/rfc/rfc3798.txt): Message Disposition Notification (Obsoletes rfc2298)
+* [7103](http://www.ietf.org/rfc/rfc7103.txt): Advice for Safe Handling of Malformed Messages
 
 ## License Information
 
-MimeKit is Copyright (C) 2012, 2013 Jeffrey Stedfast and is licensed under the MIT license:
+MimeKit is Copyright (C) 2012-2014 Xamarin Inc. and is licensed under the MIT license:
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -72,8 +78,8 @@ MimeKit is Copyright (C) 2012, 2013 Jeffrey Stedfast and is licensed under the M
 
 ## History
 
-As a developer and user of Electronic Mail clients, I had come to realize that the vast majority of E-Mail client
-(and server) software had less-than-satisfactory MIME implementations. More often than not these E-Mail clients
+As a developer and user of Electronic Mail clients, I had come to realize that the vast majority of email client
+(and server) software had less-than-satisfactory MIME implementations. More often than not these email clients
 created broken MIME messages and/or would incorrectly try to parse a MIME message thus subtracting from the full
 benefits that MIME was meant to provide. MimeKit is meant to address this issue by following the MIME specification
 as closely as possible while also providing programmers with an extremely easy to use high-level API.
@@ -85,12 +91,39 @@ Now that I typically find myself working in C# rather than lower level languages
 begin writing a new parser in C# which would not depend on GMime. This would also allow me to have more
 flexibility in that I'd be able use Generics and create a more .NET-compliant API.
 
+## Performance
+
+While mainstream beliefs may suggest that C# can never be as fast as C, it turns out that with a bit of creative
+parser design and a few clever optimizations 
+<sup>[[1](http://jeffreystedfast.blogspot.com/2013/09/optimization-tips-tricks-used-by.html)]
+[[2](http://jeffreystedfast.blogspot.com/2013/10/optimization-tips-tricks-used-by.html)]</sup>, MimeKit's performance
+is actually [on par with GMime](http://jeffreystedfast.blogspot.com/2014/03/gmime-gets-speed-boost.html).
+
+Since GMime is pretty well-known as a high-performance native MIME parser and MimeKit more-or-less matches GMime's
+performance, it stands to reason that MimeKit is likely unsurpassed in performance in the .NET MIME parser space.
+
+For a comparison, as I [blogged here](http://jeffreystedfast.blogspot.com/2013/10/optimization-tips-tricks-used-by.html)
+(I have since optimized MimeKit by at least another 30%), MimeKit is more than 25x faster than OpenPOP.NET, 75x faster
+than SharpMimeTools, and 65x faster than regex-based parsers. Even the commercial MIME parser offerings such as LimiLabs'
+Mail.dll and NewtonIdeas' Mime4Net cannot even come close to matching MimeKit's performance (they are both orders of
+magnitude slower than MimeKit).
+
+## Installing via NuGet
+
+The easiest way to install MimeKit is via [NuGet](https://www.nuget.org/packages/MimeKit/).
+
+In Visual Studio's [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console),
+simply enter the following command:
+
+    Install-Package MimeKit
+
 ## Building
 
 First, you'll need to clone MimeKit and Bouncy Castle from my GitHub repository:
 
     git clone https://github.com/jstedfast/MimeKit.git
     git clone https://github.com/jstedfast/bc-csharp.git
+    git clone https://github.com/jstedfast/Portable.Text.Encoding.git
 
 Currently, MimeKit depends on the visual-studio-2010 branch of bc-csharp for the Visual Studio 2010 project
 files that I've added (to replace the Visual Studio 2003 project files). To switch to that branch,
@@ -98,13 +131,11 @@ files that I've added (to replace the Visual Studio 2003 project files). To swit
     cd bc-csharp
     git checkout -b visual-studio-2010 origin/visual-studio-2010
 
-In the top-level MimeKit source directory, there are three solution files: MimeKit.sln, MimeKit.Net40.sln and MimeKit.Mobile.sln.
+In the top-level MimeKit source directory, there are several solution files:
 
-* MimeKit.Mobile.sln just includes the Xamarin.iOS and Xamarin.Android projects.
-* MimeKit.Net40.sln just includes the .NET Framework 4.0 C# project (MimeKit/MimeKit.csproj) and the UnitTests
-project (UnitTests/UnitTests.csproj).
-* MimeKit.sln includes everything that is in the MimeKit.Net40.sln solution as well as the projects for Xamarin.Android,
-Xamarin.iOS, and Xamarin.Mac.
+* MimeKit.sln includes projects for .NET 4.5, .NET 4.0, PCL (Profile7 and Profile111), Xamarin.Android, Xamarin.iOS, and Xamarin.Mac as well as the unit tests.
+* MimeKit.Mobile.sln just includes the Xamarin.Android and Xamarin.iOS projects.
+* MimeKit.Net40.sln just includes the .NET 4.0 project.
 
 If you don't have the Xamarin products, you'll probably want to open the MimeKit.Net40.sln instead of MimeKit.sln.
 
@@ -155,56 +186,29 @@ Once you have parsed a MimeMessage, you'll most likely want to traverse the tree
 The MimeMessage.Body is the top-level MIME entity of the message. Generally, it will either be a
 TextPart or a Multipart.
 
-As an example, if you wanted to render the MimeMessage to some sort of UI control, you might
-use code similar to this:
+As an example, if you wanted to rip out all of the attachments of a message, your code might look
+something like this:
 
 ```csharp
-void RenderMessage (MimeMessage message)
-{
-    RenderMimeEntity (message.Body);
-}
+var attachments = new List<MimePart> ();
+var multiparts = new List<Multipart> ();
+var iter = new MimeIterator (message);
 
-void RenderMimeEntity (MimeEntity entity)
-{
-    if (entity is MessagePart) {
-        // This entity is an attached message/rfc822 mime part.
-        var messagePart = (MessagePart) entity;
+// collect our list of attachments and their parent multiparts
+while (iter.MoveNext ()) {
+    var multipart = iter.Parent as Multipart;
+    var part = iter.Current as MimePart;
 
-        // If you'd like to render this inline instead of treating
-        // it as an attachment, you would just continue to recurse:
-        RenderMessage (messagePart.Message);
-    } else if (entity is Multipart) {
-        // This entity is a multipart container.
-        var multipart = (Multipart) entity;
-
-        foreach (var subpart in multipart)
-            RenderMimeEntity (subpart);
-    } else {
-        // Everything that isn't either a MessagePart or a Multipart is a MimePart
-        var part = (MimePart) entity;
-
-        // Don't render anything that is explicitly marked as an attachment.
-        if (part.IsAttachment)
-            return;
-
-        if (part is TextPart) {
-            // This is a mime part with textual content.
-            var text = (TextPart) part;
-    
-            if (text.ContentType.Matches ("text", "html"))
-                RenderHtml (text.Text);
-            else
-                RenderText (text.Text);
-        } else if (entity.ContentType.Matches ("image", "*")) {
-            using (var content = new MemoryStream ()) {
-                // If the content is base64 encoded (which it probably is), decode it.
-                part.ContentObject.DecodeTo (memory);
-
-                RenderImage (memory);
-            }
-        }
+    if (parent != null && part != null && part.IsAttachment) {
+        // keep track of each attachment's parent multipart
+        multiparts.Add (multipart);
+        attachments.Add (part);
     }
 }
+
+// now remove each attachment from its parent multipart...
+for (int i = 0; i < attachments.Count; i++)
+    multiparts[i].Remove (attachments[i]);
 ```
 
 ### Getting the Decoded Content of a MIME Part
@@ -225,26 +229,17 @@ using (var stream = File.Create (fileName)) {
 }
 ```
 
-You can also get access to the original encoded content and its encoding by poking at the Stream and
-Encoding properties of the ContentObject. This might be useful if you want to pass the content off
-to a UI control that can do its own loading from a stream.
+You can also get access to the original encoded content and its encoding by "opening" the ContentObject.
+This might be useful if you want to pass the content off to a UI control that can do its own loading
+from a stream.
 
 ```csharp
-var filtered = new FilteredStream (part.ContentObject.Stream);
-
-// Note: if the MimePart was parsed by a MimeParser (or loaded using MimeMessage.Load
-// or MimeEntity.Load), the ContentObject.Encoding will match the part.Encoding.
-
-// Create an IMimeFilter that can decode the ContentEncoding.
-var decoder = DecoderFilter.Create (part.ContentObject.Encoding);
-
-// Add the filter to our filtered stream.
-filtered.Add (decoder);
-
-// At this point, you can now read from the 'filtered' stream as if it were the
-// original, raw content. Assuming you have an image UI control that could load
-// from a stream, you could do something like this:
-imageControl.Load (filtered);
+using (var stream = part.ContentObject.Open ()) {
+    // At this point, you can now read from the stream as if it were the original,
+    // raw content. Assuming you have an image UI control that could load from a
+    // stream, you could do something like this:
+    imageControl.Load (stream);
+}
 ```
 
 There are a number of useful filters that can be applied to a FilteredStream, so if you find this type of
@@ -314,6 +309,7 @@ Will you be my +1?
 var attachment = new MimePart ("image", "gif") {
     ContentObject = new ContentObject (File.OpenRead (path), ContentEncoding.Default),
     ContentDisposition = new ContentDisposition (ContentDisposition.Attachment),
+    ContentTransferEncoding = ContentEncoding.Base64,
     FileName = Path.GetFileName (path)
 };
 
@@ -354,12 +350,140 @@ multipart.Add (attachment);
 message.Body = multipart;
 ```
 
-### Digitally Signing Messages with S/MIME or PGP/MIME
+### Creating a Message Using a BodyBuilder (not Arnold Schwarzenegger)
 
-Both S/MIME and PGP/MIME use a multipart/signed to contain the signed content and the detached signature data.
+If you are used to System.Net.Mail's API for creating messages, you will probably find using a BodyBuilder
+much more friendly than manually creating the tree of MIME parts. Here's how you could create a message body
+using a BodyBuilder:
 
-To create a multipart/signed MIME part, let's pretend we're going to digitally sign our multipart/mixed example
-from the previous sample using S/MIME.
+```csharp
+var message = new MimeMessage ();
+message.From.Add (new MailboxAddress ("Joey", "joey@friends.com"));
+message.To.Add (new MailboxAddress ("Alice", "alice@wonderland.com"));
+message.Subject = "How you doin?";
+
+var builder = new BodyBuilder ();
+
+// Set the plain-text version of the message text
+builder.TextBody = @"Hey Alice,
+
+What are you up to this weekend? Monica is throwing one of her parties on
+Saturday and I was hoping you could make it.
+
+Will you be my +1?
+
+-- Joey
+";
+
+// Set the html version of the message text
+builder.HtmlBody = @"<p>Hey Alice,<br>
+<p>What are you up to this weekend? Monica is throwing one of her parties on
+Saturday and I was hoping you could make it.<br>
+<p>Will you be my +1?<br>
+<p>-- Joey<br>
+<center><img src=""sexy-pose.jpg""></center>";
+
+// Since sexy-pose.jpg is referenced from the html text, we'll need to add it
+// to builder.LinkedResources
+builder.LinkedResources.Add ("C:\\Users\\Joey\\Documents\\SexySelfies\\sexy-pose.jpg");
+
+// We may also want to attach a calendar event for Monica's party...
+builder.Attachments.Add ("C:\\Users\Joey\\Documents\\party.ics");
+
+// Now we just need to set the message body and we're done
+message.Body = builder.ToMessageBody ();
+```
+
+### Preparing to use MimeKit's S/MIME support
+
+Before you can begin using MimeKit's S/MIME support, you will need to decide which
+database to use for certificate storage.
+
+If you are targetting any of the Xamarin platforms (or Linux), you won't need to do
+anything (although you certianly can if you want to) because, by default, I've
+configured MimeKit to use the Mono.Data.Sqlite binding to SQLite.
+
+If you are, however, on any of the Windows platforms, you'll need to pick a System.Data
+provider such as [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite).
+Once you've made your choice and installed it (via NuGet or however), you'll need to
+implement your own `SecureMimeContext` class. Luckily, it's very simple to do. Assuming
+you've chosen System.Data.SQLite, here's how you'd implement your own `SecureMimeContext`
+class:
+
+```csharp
+using System.Data.SQLite;
+using MimeKit.Cryptography;
+
+using MyAppNamespace {
+    class MySecureMimeContext : DefaultSecureMimeContext
+    {
+        public MySecureMimeContext () : base (OpenDatabase ("C:\\wherever\\certdb.sqlite"))
+        {
+        }
+
+        static IX509CertificateDatabase OpenDatabase (string fileName)
+        {
+            var builder = new SQLiteConnectionStringBuilder ();
+            builder.DateTimeFormat = SQLiteDateFormats.Ticks;
+            builder.DataSource = fileName;
+
+            if (!File.Exists (fileName))
+                SQLiteConnection.CreateFile (fileName);
+
+            var sqlite = new SQLiteConnection (builder.ConnectionString);
+            sqlite.Open ();
+
+            return new SqliteCertificateDatabase (sqlite, "password");
+        }
+    }
+}
+```
+
+Now that you've implemented your own SecureMimeContext, you'll want to register it with MimeKit:
+
+```csharp
+CryptographyContext.Register (typeof (MySecureMimeContext));
+```
+
+Now you are ready to encrypt, decrypt, sign and verify S/MIME messages!
+
+### Preparing to use MimeKit's PGP/MIME support
+
+Like with S/MIME support, you also need to register your own `OpenPgpContext`. Unlike S/MIME, however,
+you don't need to choose a database if you subclass `GnuPGContext` because it uses GnuPG's PGP keyrings
+to load and store public and private keys. If you choose to subclass `GnuPGContext`, the only thing you
+you need to do is implement a password callback method:
+
+```csharp
+using MimeKit.Cryptography;
+
+namespace MyAppNamespace {
+    class MyGnuPGContext : GnuPGContext
+    {
+        public MyGnuPgContext () : base ()
+        {
+        }
+        
+        protected override string GetPasswordForKey (PgpSecretKey key)
+        {
+            // prompt the user (or a secure password cache) for the password for the specified secret key.
+            return "password";
+        }
+    }
+}
+```
+
+Once again, to register your OpenPgpContext, you can use the following code snippet:
+
+```csharp
+CryptographyContext.Register (typeof (MyGnuPGContext));
+```
+
+Now you are ready to encrypt, decrypt, sign and verify PGP/MIME messages!
+
+### Encrypting Messages with S/MIME
+
+S/MIME uses an application/pkcs7-mime MIME part to encapsulate encrypted content (as well as other things).
 
 ```csharp
 var joey = new MailboxAddress ("Joey", "joey@friends.com");
@@ -374,8 +498,96 @@ message.Subject = "How you doin?";
 // image attachments, for example)
 var body = CreateMessageBody ();
 
-// now to digitally sign our message body using the default S/MIME cryptography context
-using (var ctx = new DefaultSecureMimeContext ()) {
+// now to encrypt our message body using our custom S/MIME cryptography context
+using (var ctx = new MySecureMimeContext ()) {
+    // Note: this assumes that "Alice" has an S/MIME certificate with an X.509
+    // Subject Email identifier that matches her email address. If she doesn't,
+    // try using a SecureMailboxAddress which allows you to specify the
+    // fingerprint of her certificate to use for lookups.
+    message.Body = ApplicationPkcs7Mime.Encrypt (ctx, message.To.Mailboxes, body);
+}
+```
+
+### Decrypting S/MIME Messages
+
+As mentioned earlier, S/MIME uses an application/pkcs7-mime part with an "smime-type" parameter with a value of
+"enveloped-data" to encapsulate the encrypted content.
+
+The first thing you must do is find the ApplicationPkcs7Mime part (see the section on traversing MIME parts).
+
+```csharp
+if (entity is ApplicationPkcs7Mime) {
+    var pkcs7 = (ApplicationPkcs7Mime) entity;
+
+    if (pkcs7.SecureMimeType == SecureMimeType.EnvelopedData)
+        return pkcs7.Decrypt ();
+}
+```
+
+### Encrypting Messages with PGP/MIME
+
+Unlike S/MIME, PGP/MIME uses multipart/encrypted to encapsulate its encrypted data.
+
+```csharp
+var joey = new MailboxAddress ("Joey", "joey@friends.com");
+var alice = new MailboxAddress ("Alice", "alice@wonderland.com");
+
+var message = new MimeMessage ();
+message.From.Add (joey);
+message.To.Add (alice);
+message.Subject = "How you doin?";
+
+// create our message body (perhaps a multipart/mixed with the message text and some
+// image attachments, for example)
+var body = CreateMessageBody ();
+
+// now to encrypt our message body using our custom PGP/MIME cryptography context
+using (var ctx = new MyGnuPGContext ()) {
+    // Note: this assumes that "Alice" has a public PGP key that matches her email
+    // address. If she doesn't, try using a SecureMailboxAddress which allows you
+    // to specify the fingerprint of her public PGP key to use for lookups.
+    message.Body = MultipartEncrypted.Create (ctx, message.To.Mailboxes, body);
+}
+```
+
+### Decrypting PGP/MIME Messages
+
+As mentioned earlier, PGP/MIME uses a multipart/encrypted part to encapsulate the encrypted content.
+
+A multipart/encrtpted contains exactly 2 parts: the first MimeEntity is the version information while the second
+MimeEntity is the actual encrypted content and will typically be an application/octet-stream.
+
+The first thing you must do is find the MultipartEncrypted part (see the section on traversing MIME parts).
+
+```csharp
+if (entity is MultipartEncrypted) {
+    var encrypted = (MultipartEncrypted) entity;
+
+    return encrypted.Decrypt ();
+}
+```
+
+### Digitally Signing Messages with S/MIME or PGP/MIME
+
+Both S/MIME and PGP/MIME use a multipart/signed to contain the signed content and the detached signature data.
+
+Here's how you might digitally sign a message using S/MIME:
+
+```csharp
+var joey = new MailboxAddress ("Joey", "joey@friends.com");
+var alice = new MailboxAddress ("Alice", "alice@wonderland.com");
+
+var message = new MimeMessage ();
+message.From.Add (joey);
+message.To.Add (alice);
+message.Subject = "How you doin?";
+
+// create our message body (perhaps a multipart/mixed with the message text and some
+// image attachments, for example)
+var body = CreateMessageBody ();
+
+// now to digitally sign our message body using our custom S/MIME cryptography context
+using (var ctx = new MySecureMimeContext ()) {
     // Note: this assumes that "Joey" has an S/MIME signing certificate and private key
     // with an X.509 Subject Email identifier that matches Joey's email address.
     message.Body = MultipartSigned.Create (ctx, joey, DigestAlgorithm.Sha1, body);
@@ -386,8 +598,8 @@ For S/MIME, if you have a way for the user to configure which S/MIME certificate
 as their signing certificate, you could also do something more like this:
 
 ```csharp
-// now to digitally sign our message body using the default S/MIME cryptography context
-using (var ctx = new DefaultSecureMimeContext ()) {
+// now to digitally sign our message body using our custom S/MIME cryptography context
+using (var ctx = new MySecureMimeContext ()) {
     var certificate = GetJoeysX509Certificate ();
     var signer = new CmsSigner (certificate);
     signer.DigestAlgorithm = DigestAlgorithm.Sha1;
@@ -458,8 +670,8 @@ if (entity is MultipartSigned) {
 ```
 
 It should be noted, however, that while most S/MIME clients will use the preferred multipart/signed
-approach, it is possible that you may encounter an "application/pkcs7-mime" part with an
-"smime-type" parameter set to "signed-data". Luckily, MimeKit can handle this format as well:
+approach, it is possible that you may encounter an application/pkcs7-mime part with an "smime-type"
+parameter set to "signed-data". Luckily, MimeKit can handle this format as well:
 
 ```csharp
 if (entity is ApplicationPkcs7Mime) {
@@ -469,8 +681,8 @@ if (entity is ApplicationPkcs7Mime) {
         // extract the original content and get a list of signatures
         MimeEntity extracted;
 
-        // Note: if you are rendering the message, you'll want to render
-        // the extracted mime part rather than the application/pkcs7-mime part.
+        // Note: if you are rendering the message, you'll want to render the
+        // extracted mime part rather than the application/pkcs7-mime part.
         foreach (var signature in pkcs7.Verify (out extracted)) {
             try {
                 bool valid = signature.Verify ();

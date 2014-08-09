@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,13 @@ namespace MimeKit {
 	/// <summary>
 	/// A New-Line format.
 	/// </summary>
-	/// <remarks></remarks>
+	/// <remarks>
+    /// There are two commonly used line-endings used by modern Operating Systems.
+    /// Unix-based systems such as Linux and Mac OS use a single character (<c>'\n'</c> aka LF)
+    /// to represent the end of line where-as Windows (or DOS) uses a sequence of two
+    /// characters (<c>"\r\n"</c> aka CRLF). Most text-based network protocols such as SMTP,
+    /// POP3, and IMAP use the CRLF sequence as well.
+    /// </remarks>
 	public enum NewLineFormat {
 		/// <summary>
 		/// The Unix New-Line format (<c>"\n"</c>).
@@ -53,24 +59,29 @@ namespace MimeKit {
 	/// Represents the available options for formatting MIME messages
 	/// and entities when writing them to a stream.
 	/// </remarks>
-	public sealed class FormatOptions
+	public class FormatOptions
 	{
-		static readonly byte[][] NewLineFormats = new byte[][] {
-			new byte[] { 0x0A }, new byte[] { 0x0D, 0x0A }
+		static readonly byte[][] NewLineFormats = {
+			new byte[] { (byte) '\n' }, new byte[] { (byte) '\r', (byte) '\n' }
 		};
+
+		const int DefaultMaxLineLength = 78;
+
+		NewLineFormat newLineFormat;
+		bool international;
 
 		/// <summary>
 		/// The default formatting options.
 		/// </summary>
 		/// <remarks>
 		/// If a custom <see cref="FormatOptions"/> is not passed to methods such as
-		/// <see cref="MimeMessage.WriteTo(FormatOptions,System.IO.Stream)"/>, the default options
-		/// will be used.
+		/// <see cref="MimeMessage.WriteTo(FormatOptions,System.IO.Stream,System.Threading.CancellationToken)"/>,
+		/// the default options will be used.
 		/// </remarks>
 		public static readonly FormatOptions Default;
 
 		/// <summary>
-		/// Gets or sets the maximum line length used by the encoders. The encoders
+		/// Gets the maximum line length used by the encoders. The encoders
 		/// use this value to determine where to place line breaks.
 		/// </summary>
 		/// <remarks>
@@ -78,7 +89,7 @@ namespace MimeKit {
 		/// </remarks>
 		/// <value>The maximum line length.</value>
 		public int MaxLineLength {
-			get; private set;
+			get { return DefaultMaxLineLength; }
 		}
 
 		/// <summary>
@@ -89,8 +100,17 @@ namespace MimeKit {
 		/// or entity to a stream.
 		/// </remarks>
 		/// <value>The new-line format.</value>
+		/// <exception cref="System.InvalidOperationException">
+		/// <see cref="Default"/> cannot be changed.
+		/// </exception>
 		public NewLineFormat NewLineFormat {
-			get; set;
+			get { return newLineFormat; }
+			set {
+				if (this == Default)
+					throw new InvalidOperationException ();
+
+				newLineFormat = value;
+			}
 		}
 
 		internal IMimeFilter CreateNewLineFilter ()
@@ -104,12 +124,7 @@ namespace MimeKit {
 		}
 
 		internal string NewLine {
-			get {
-				if (NewLineFormat == NewLineFormat.Unix)
-					return "\n";
-
-				return "\r\n";
-			}
+			get { return NewLineFormat == NewLineFormat.Unix ? "\n" : "\r\n"; }
 		}
 
 		internal byte[] NewLineBytes {
@@ -135,18 +150,51 @@ namespace MimeKit {
 			get; private set;
 		}
 
+		/// <summary>
+		/// Gets or sets whether the new "Internationalized Email" formatting standards should be used.
+		/// </summary>
+		/// <remarks>
+		/// <para>The new "Internationalized Email" format is defined by rfc6530 and rfc6532.</para>
+		/// <para>This feature should only be used when formatting messages meant to be sent via
+		/// SMTP using the SMTPUTF8 extension (rfc6531) or when appending messages to an IMAP folder
+		/// via UTF8 APPEND (rfc6855).</para>
+		/// </remarks>
+		/// <value><c>true</c> if the new internationalized formatting should be used; otherwise, <c>false</c>.</value>
+		/// <exception cref="System.InvalidOperationException">
+		/// <see cref="Default"/> cannot be changed.
+		/// </exception>
+		public bool International {
+			get { return international; }
+			set {
+				if (this == Default)
+					throw new InvalidOperationException ();
+
+				international = value;
+			}
+		}
+
 		static FormatOptions ()
 		{
 			Default = new FormatOptions ();
-			Default.MaxLineLength = 72;
-			Default.WriteHeaders = true;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MimeKit.FormatOptions"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new set of formatting options for use with methods such as
+		/// <see cref="MimeMessage.WriteTo(System.IO.Stream,System.Threading.CancellationToken)"/>.
+		/// </remarks>
+		public FormatOptions ()
+		{
+			HiddenHeaders = new HashSet<HeaderId> ();
+			//maxLineLength = DefaultMaxLineLength;
+			WriteHeaders = true;
 
 			if (Environment.NewLine.Length == 1)
-				Default.NewLineFormat = NewLineFormat.Unix;
+				newLineFormat = NewLineFormat.Unix;
 			else
-				Default.NewLineFormat = NewLineFormat.Dos;
-
-			Default.HiddenHeaders = new HashSet<HeaderId> ();
+				newLineFormat = NewLineFormat.Dos;
 		}
 
 		/// <summary>
@@ -155,12 +203,14 @@ namespace MimeKit {
 		/// <remarks>
 		/// Clones the formatting options.
 		/// </remarks>
+		/// <returns>An exact copy of the <see cref="FormatOptions"/>.</returns>
 		public FormatOptions Clone ()
 		{
 			var options = new FormatOptions ();
-			options.MaxLineLength = MaxLineLength;
-			options.NewLineFormat = NewLineFormat;
+			//options.maxLineLength = maxLineLength;
+			options.newLineFormat = newLineFormat;
 			options.HiddenHeaders = new HashSet<HeaderId> (HiddenHeaders);
+			options.international = international;
 			options.WriteHeaders = true;
 			return options;
 		}

@@ -1,9 +1,9 @@
 <Type Name="ContentObject" FullName="MimeKit.ContentObject">
-  <TypeSignature Language="C#" Value="public sealed class ContentObject : MimeKit.IContentObject" />
-  <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed beforefieldinit ContentObject extends System.Object implements class MimeKit.IContentObject" />
+  <TypeSignature Language="C#" Value="public class ContentObject : MimeKit.IContentObject" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit ContentObject extends System.Object implements class MimeKit.IContentObject" />
   <AssemblyInfo>
     <AssemblyName>MimeKit</AssemblyName>
-    <AssemblyVersion>0.18.0.0</AssemblyVersion>
+    <AssemblyVersion>0.92.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
     <BaseTypeName>System.Object</BaseTypeName>
@@ -24,11 +24,11 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public ContentObject (System.IO.Stream stream, MimeKit.ContentEncoding encoding);" />
+      <MemberSignature Language="C#" Value="public ContentObject (System.IO.Stream stream, MimeKit.ContentEncoding encoding = MimeKit.ContentEncoding.Default);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class System.IO.Stream stream, valuetype MimeKit.ContentEncoding encoding) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="stream" Type="System.IO.Stream" />
@@ -58,40 +58,11 @@
       </Docs>
     </Member>
     <Member MemberName="DecodeTo">
-      <MemberSignature Language="C#" Value="public void DecodeTo (System.IO.Stream stream);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void DecodeTo(class System.IO.Stream stream) cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="stream" Type="System.IO.Stream" />
-      </Parameters>
-      <Docs>
-        <param name="stream">The output stream.</param>
-        <summary>
-            Decodes the content stream into another stream.
-            </summary>
-        <remarks>
-            Uses the <see cref="P:MimeKit.ContentObject.Encoding" /> to decode the content stream to the output stream.
-            </remarks>
-        <exception cref="T:System.ArgumentNullException">
-          <paramref name="stream" /> is <c>null</c>.
-            </exception>
-        <exception cref="T:System.IO.IOException">
-            An I/O error occurred.
-            </exception>
-      </Docs>
-    </Member>
-    <Member MemberName="DecodeTo">
-      <MemberSignature Language="C#" Value="public void DecodeTo (System.IO.Stream stream, System.Threading.CancellationToken cancellationToken);" />
+      <MemberSignature Language="C#" Value="public void DecodeTo (System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = null);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void DecodeTo(class System.IO.Stream stream, valuetype System.Threading.CancellationToken cancellationToken) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
@@ -125,7 +96,7 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype MimeKit.ContentEncoding Encoding" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MimeKit.ContentEncoding</ReturnType>
@@ -142,60 +113,34 @@
             </remarks>
       </Docs>
     </Member>
-    <Member MemberName="Stream">
-      <MemberSignature Language="C#" Value="public System.IO.Stream Stream { get; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance class System.IO.Stream Stream" />
-      <MemberType>Property</MemberType>
+    <Member MemberName="Open">
+      <MemberSignature Language="C#" Value="public System.IO.Stream Open ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class System.IO.Stream Open() cil managed" />
+      <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.IO.Stream</ReturnType>
       </ReturnValue>
+      <Parameters />
       <Docs>
         <summary>
-            Gets or sets the content stream.
+            Opens the decoded content stream.
             </summary>
-        <value>The content stream.</value>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
-    <Member MemberName="WriteTo">
-      <MemberSignature Language="C#" Value="public void WriteTo (System.IO.Stream stream);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void WriteTo(class System.IO.Stream stream) cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="stream" Type="System.IO.Stream" />
-      </Parameters>
-      <Docs>
-        <param name="stream">The output stream.</param>
-        <summary>
-            Copies the content stream to the specified output stream.
-            </summary>
+        <returns>The decoded content stream.</returns>
         <remarks>
-            This is functionally equivalent to using <see cref="M:System.IO.Stream.CopyTo(System.IO.Stream)" />
-            to copy the raw content stream to the output stream.
+            Provides a means of reading the decoded content without having to first write it to another
+            stream using <see cref="M:MimeKit.ContentObject.DecodeTo(System.IO.Stream,System.Threading.CancellationToken)" />.
             </remarks>
-        <exception cref="T:System.ArgumentNullException">
-          <paramref name="stream" /> is <c>null</c>.
-            </exception>
-        <exception cref="T:System.IO.IOException">
-            An I/O error occurred.
-            </exception>
       </Docs>
     </Member>
     <Member MemberName="WriteTo">
-      <MemberSignature Language="C#" Value="public void WriteTo (System.IO.Stream stream, System.Threading.CancellationToken cancellationToken);" />
+      <MemberSignature Language="C#" Value="public void WriteTo (System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = null);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void WriteTo(class System.IO.Stream stream, valuetype System.Threading.CancellationToken cancellationToken) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.18.0.0</AssemblyVersion>
+        <AssemblyVersion>0.92.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>

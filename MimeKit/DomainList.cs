@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace MimeKit {
 	/// <remarks>
 	/// Represents a list of domains, such as those that an email was routed through.
 	/// </remarks>
-	public sealed class DomainList : IList<string>
+	public class DomainList : IList<string>
 	{
 		readonly List<string> domains;
 
@@ -49,8 +49,14 @@ namespace MimeKit {
 		/// Creates a new <see cref="DomainList"/> based on the domains provided.
 		/// </remarks>
 		/// <param name="domains">A domain list.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name="domains"/> is <c>null</c>.
+        /// </exception>
 		public DomainList (IEnumerable<string> domains)
 		{
+            if (domains == null)
+                throw new ArgumentNullException ("domains");
+
 			this.domains = new List<string> (domains);
 		}
 
@@ -90,7 +96,7 @@ namespace MimeKit {
 		/// Insert the domain at the specified index.
 		/// </summary>
 		/// <remarks>
-		/// Inerts the domain at the specified index in the list.
+		/// Inserts the domain at the specified index in the list.
 		/// </remarks>
 		/// <param name="index">The index to insert the domain.</param>
 		/// <param name="domain">The domain to insert.</param>
@@ -113,7 +119,7 @@ namespace MimeKit {
 		/// Removes the domain at the specified index.
 		/// </summary>
 		/// <remarks>
-		/// Removed the domain at the specified index.
+		/// Removes the domain at the specified index.
 		/// </remarks>
 		/// <param name="index">The index.</param>
 		/// <exception cref="System.ArgumentOutOfRangeException">
@@ -126,8 +132,12 @@ namespace MimeKit {
 		}
 
 		/// <summary>
-		/// Gets or sets the <see cref="MimeKit.DomainList"/> at the specified index.
+		/// Gets or sets the domain at the specified index.
 		/// </summary>
+		/// <remarks>
+		/// Gets or sets the domain at the specified index.
+		/// </remarks>
+		/// <value>The domain at the specified index.</value>
 		/// <param name="index">The index.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="value"/> is <c>null</c>.
@@ -188,7 +198,7 @@ namespace MimeKit {
 		/// Checks if the <see cref="DomainList"/> contains the specified domain.
 		/// </summary>
 		/// <remarks>
-		/// Checks if the specified domain is contained with in the <see cref="DomainList"/>.
+		/// Determines whether or not the domain list contains the specified domain.
 		/// </remarks>
 		/// <returns><value>true</value> if the specified domain is contained;
 		/// otherwise <value>false</value>.</returns>
@@ -228,10 +238,9 @@ namespace MimeKit {
 		/// Removes the specified domain.
 		/// </summary>
 		/// <remarks>
-		/// Removes the first instance of the specified domain from the list.
+		/// Removes the first instance of the specified domain from the list if it exists.
 		/// </remarks>
-		/// <returns><value>true</value> if the specified domain was removed;
-		/// otherwise <value>false</value>.</returns>
+		/// <returns><value>true</value> if the domain was removed; otherwise <value>false</value>.</returns>
 		/// <param name="domain">The domain.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="domain"/> is <c>null</c>.
@@ -278,6 +287,9 @@ namespace MimeKit {
 		/// <summary>
 		/// Gets an enumerator for the list of domains.
 		/// </summary>
+		/// <remarks>
+		/// Gets an enumerator for the list of domains.
+		/// </remarks>
 		/// <returns>The enumerator.</returns>
 		public IEnumerator<string> GetEnumerator ()
 		{
@@ -288,6 +300,13 @@ namespace MimeKit {
 
 		#region IEnumerable implementation
 
+		/// <summary>
+		/// Gets an enumerator for the list of domains.
+		/// </summary>
+		/// <remarks>
+		/// Gets an enumerator for the list of domains.
+		/// </remarks>
+		/// <returns>The enumerator.</returns>
 		IEnumerator IEnumerable.GetEnumerator ()
 		{
 			return domains.GetEnumerator ();
@@ -296,15 +315,16 @@ namespace MimeKit {
 		#endregion
 
 		/// <summary>
-		/// Serializes the <see cref="MimeKit.DomainList"/> to a string.
+		/// Returns a string representation of the list of domains.
 		/// </summary>
 		/// <remarks>
-		/// Returns a newly allocated string containing the list of domains separated by commas.
+		/// <para>Each non-empty domain string will be prepended by an '@'.</para>
+		/// <para>If there are multiple domains in the list, they will be separated by a comma.</para>
 		/// </remarks>
-		/// <returns>A <see cref="System.String"/> that represents the current <see cref="MimeKit.DomainList"/>.</returns>
+		/// <returns>A string representing the <see cref="DomainList"/>.</returns>
 		public override string ToString ()
 		{
-			StringBuilder builder = new StringBuilder ();
+			var builder = new StringBuilder ();
 
 			for (int i = 0; i < domains.Count; i++) {
 				if (string.IsNullOrWhiteSpace (domains[i]) && builder.Length == 0)
@@ -331,7 +351,7 @@ namespace MimeKit {
 		}
 
 		/// <summary>
-		/// Parses a list of domains.
+		/// Tries to parse a list of domains.
 		/// </summary>
 		/// <remarks>
 		/// Attempts to parse a <see cref="DomainList"/> from the text buffer starting at the
@@ -348,7 +368,7 @@ namespace MimeKit {
 		/// <param name="route">The parsed DomainList.</param>
 		internal static bool TryParse (byte[] text, ref int index, int endIndex, bool throwOnError, out DomainList route)
 		{
-			List<string> domains = new List<string> ();
+			var domains = new List<string> ();
 			int startIndex = index;
 			string domain;
 
@@ -388,6 +408,32 @@ namespace MimeKit {
 			route = new DomainList (domains);
 
 			return true;
+		}
+
+		/// <summary>
+		/// Tries to parse a list of domains.
+		/// </summary>
+		/// <remarks>
+		/// Attempts to parse a <see cref="DomainList"/> from the supplied text. The index
+		/// will only be updated if a <see cref="DomainList"/> was successfully parsed.
+		/// </remarks>
+		/// <returns><c>true</c> if a <see cref="DomainList"/> was successfully parsed;
+		/// <c>false</c> otherwise.</returns>
+		/// <param name="text">The text to parse.</param>
+		/// <param name="route">The parsed DomainList.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="text"/> is <c>null</c>.
+		/// </exception>
+		public static bool TryParse (string text, out DomainList route)
+		{
+			int index = 0;
+
+			if (text == null)
+				throw new ArgumentNullException ("text");
+
+			var buffer = Encoding.UTF8.GetBytes (text);
+
+			return TryParse (buffer, ref index, buffer.Length, false, out route);
 		}
 	}
 }

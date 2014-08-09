@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2012 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,20 @@
 using System;
 using System.Text;
 
+#if PORTABLE
+using Encoding = Portable.Text.Encoding;
+using Encoder = Portable.Text.Encoder;
+using Decoder = Portable.Text.Decoder;
+#endif
+
 namespace MimeKit.IO.Filters {
 	/// <summary>
 	/// A charset filter for incrementally converting text streams from
 	/// one charset encoding to another.
 	/// </summary>
+	/// <remarks>
+	/// Incrementally converts text from one charset encoding to another.
+	/// </remarks>
 	public class CharsetFilter : MimeFilterBase
 	{
 		readonly char[] chars = new char[1024];
@@ -41,12 +50,12 @@ namespace MimeKit.IO.Filters {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.IO.Filters.CharsetFilter"/> class.
 		/// </summary>
-		/// <param name='sourceEncodingName'>
-		/// Source encoding name.
-		/// </param>
-		/// <param name='targetEncodingName'>
-		/// Target encoding name.
-		/// </param>
+		/// <remarks>
+		/// Creates a new <see cref="CharsetFilter"/> to convert text from the specified
+		/// source encoding into the target charset encoding.
+		/// </remarks>
+		/// <param name="sourceEncodingName">Source encoding name.</param>
+		/// <param name="targetEncodingName">Target encoding name.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <para><paramref name="sourceEncodingName"/> is <c>null</c>.</para>
 		/// <para>-or-</para>
@@ -65,12 +74,12 @@ namespace MimeKit.IO.Filters {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.IO.Filters.CharsetFilter"/> class.
 		/// </summary>
-		/// <param name='sourceCodePage'>
-		/// Source code page.
-		/// </param>
-		/// <param name='targetCodePage'>
-		/// Target code page.
-		/// </param>
+		/// <remarks>
+		/// Creates a new <see cref="CharsetFilter"/> to convert text from the specified
+		/// source encoding into the target charset encoding.
+		/// </remarks>
+		/// <param name="sourceCodePage">Source code page.</param>
+		/// <param name="targetCodePage">Target code page.</param>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <para><paramref name="sourceCodePage"/> is less than zero or greater than 65535.</para>
 		/// <para>-or-</para>
@@ -89,12 +98,12 @@ namespace MimeKit.IO.Filters {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MimeKit.IO.Filters.CharsetFilter"/> class.
 		/// </summary>
-		/// <param name='sourceEncoding'>
-		/// Source encoding.
-		/// </param>
-		/// <param name='targetEncoding'>
-		/// Target encoding.
-		/// </param>
+		/// <remarks>
+		/// Creates a new <see cref="CharsetFilter"/> to convert text from the specified
+		/// source encoding into the target charset encoding.
+		/// </remarks>
+		/// <param name="sourceEncoding">Source encoding.</param>
+		/// <param name="targetEncoding">Target encoding.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <para><paramref name="sourceEncoding"/> is <c>null</c>.</para>
 		/// <para>-or-</para>
@@ -111,16 +120,17 @@ namespace MimeKit.IO.Filters {
 			SourceEncoding = sourceEncoding;
 			TargetEncoding = targetEncoding;
 
-			decoder = SourceEncoding.GetDecoder ();
-			encoder = TargetEncoding.GetEncoder ();
+			decoder = (Decoder) SourceEncoding.GetDecoder ();
+			encoder = (Encoder) TargetEncoding.GetEncoder ();
 		}
 
 		/// <summary>
 		/// Gets the source encoding.
 		/// </summary>
-		/// <value>
-		/// The source encoding.
-		/// </value>
+		/// <remarks>
+		/// Gets the source encoding.
+		/// </remarks>
+		/// <value>The source encoding.</value>
 		public Encoding SourceEncoding {
 			get; private set;
 		}
@@ -128,9 +138,10 @@ namespace MimeKit.IO.Filters {
 		/// <summary>
 		/// Gets the target encoding.
 		/// </summary>
-		/// <value>
-		/// The target encoding.
-		/// </value>
+		/// <remarks>
+		/// Gets the target encoding.
+		/// </remarks>
+		/// <value>The target encoding.</value>
 		public Encoding TargetEncoding {
 			get; private set;
 		}
@@ -138,6 +149,10 @@ namespace MimeKit.IO.Filters {
 		/// <summary>
 		/// Filter the specified input.
 		/// </summary>
+		/// <remarks>
+		/// Filters the specified input buffer starting at the given index,
+		/// spanning across the specified number of bytes.
+		/// </remarks>
 		/// <returns>The filtered output.</returns>
 		/// <param name="input">The input buffer.</param>
 		/// <param name="startIndex">The starting index of the input buffer.</param>
@@ -147,10 +162,10 @@ namespace MimeKit.IO.Filters {
 		/// <param name="flush">If set to <c>true</c>, all internally buffered data should be flushed to the output buffer.</param>
 		protected override byte[] Filter (byte[] input, int startIndex, int length, out int outputIndex, out int outputLength, bool flush)
 		{
-			bool decodeCompleted = false;
-			bool encodeCompleted = false;
 			int inputIndex = startIndex;
 			int inputLeft = length;
+			bool decoded = false;
+			bool encoded = false;
 			int nwritten, nread;
 			int outputOffset = 0;
 			int outputLeft;
@@ -161,10 +176,10 @@ namespace MimeKit.IO.Filters {
 				charsLeft = chars.Length;
 				charIndex = 0;
 
-				if (!decodeCompleted) {
-					decoder.Convert (input, inputIndex, inputLeft, chars, charIndex, charsLeft, flush, out nread, out nwritten, out decodeCompleted);
+				if (!decoded) {
+					decoder.Convert (input, inputIndex, inputLeft, chars, charIndex, charsLeft, flush, out nread, out nwritten, out decoded);
 					if (nwritten > 0)
-						encodeCompleted = false;
+						encoded = false;
 					charIndex += nwritten;
 					inputIndex += nread;
 					inputLeft -= nread;
@@ -174,26 +189,29 @@ namespace MimeKit.IO.Filters {
 				charIndex = 0;
 				
 				// encode *all* input chars into the output buffer
-				while (!encodeCompleted) {
+				while (!encoded) {
 					EnsureOutputSize (outputOffset + TargetEncoding.GetMaxByteCount (charsLeft) + 4, true);
-					outputLeft = output.Length - outputOffset;
+					outputLeft = OutputBuffer.Length - outputOffset;
 					
-					encoder.Convert (chars, charIndex, charsLeft, output, outputOffset, outputLeft, flush, out nread, out nwritten, out encodeCompleted);
+					encoder.Convert (chars, charIndex, charsLeft, OutputBuffer, outputOffset, outputLeft, flush, out nread, out nwritten, out encoded);
 					outputOffset += nwritten;
 					charIndex += nread;
 					charsLeft -= nread;
 				}
-			} while (!decodeCompleted);
+			} while (!decoded);
 
 			outputLength = outputOffset;
 			outputIndex = 0;
 				
-			return output;
+			return OutputBuffer;
 		}
 
 		/// <summary>
 		/// Resets the filter.
 		/// </summary>
+		/// <remarks>
+		/// Resets the filter.
+		/// </remarks>
 		public override void Reset ()
 		{
 			decoder.Reset ();

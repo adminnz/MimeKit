@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2012 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,9 @@ namespace MimeKit {
 	/// <summary>
 	/// Header list changed action.
 	/// </summary>
+    /// <remarks>
+    /// Specifies the way that a <see cref="HeaderList"/> was changed.
+    /// </remarks>
 	public enum HeaderListChangedAction {
 		/// <summary>
 		/// A header was added.

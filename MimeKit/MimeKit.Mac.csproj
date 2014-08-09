@@ -10,14 +10,15 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MimeKit</RootNamespace>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
-    <AssemblyName>MimeKit.Mac</AssemblyName>
+    <AssemblyName>MimeKit</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\lib\mac</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IntermediateOutputPath>obj\Debug\lib\mac</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE;ENABLE_CRYPTO;ENABLE_SNM</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <EnableCodeSigning>false</EnableCodeSigning>
@@ -29,18 +30,25 @@
     <GenerateDocumentation>True</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\lib\mac</OutputPath>
+    <IntermediateOutputPath>obj\Release\lib\mac</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\lib\mac\MimeKit.Mac.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\lib\mac\MimeKit.xml</DocumentationFile>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>ENABLE_CRYPTO;ENABLE_SNM</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>mimekit.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -65,6 +73,7 @@
     <Compile Include="Cryptography\CmsRecipientCollection.cs" />
     <Compile Include="Cryptography\CmsSigner.cs" />
     <Compile Include="Cryptography\CryptographyContext.cs" />
+    <Compile Include="Cryptography\DbExtensions.cs" />
     <Compile Include="Cryptography\DefaultSecureMimeContext.cs" />
     <Compile Include="Cryptography\DigestAlgorithm.cs" />
     <Compile Include="Cryptography\DigitalSignatureCollection.cs" />
@@ -73,6 +82,7 @@
     <Compile Include="Cryptography\GnuPGContext.cs" />
     <Compile Include="Cryptography\IDigitalCertificate.cs" />
     <Compile Include="Cryptography\IDigitalSignature.cs" />
+    <Compile Include="Cryptography\IX509CertificateDatabase.cs" />
     <Compile Include="Cryptography\MacSecureMimeContext.cs" />
     <Compile Include="Cryptography\MultipartEncrypted.cs" />
     <Compile Include="Cryptography\MultipartSigned.cs" />
@@ -87,7 +97,11 @@
     <Compile Include="Cryptography\SecureMimeDigitalCertificate.cs" />
     <Compile Include="Cryptography\SecureMimeDigitalSignature.cs" />
     <Compile Include="Cryptography\SecureMimeType.cs" />
+    <Compile Include="Cryptography\SqlCertificateDatabase.cs" />
+    <Compile Include="Cryptography\SqliteCertificateDatabase.cs" />
     <Compile Include="Cryptography\SubjectIdentifierType.cs" />
+    <Compile Include="Cryptography\TemporarySecureMimeContext.cs" />
+    <Compile Include="Cryptography\X509CertificateChain.cs" />
     <Compile Include="Cryptography\X509CertificateDatabase.cs" />
     <Compile Include="Cryptography\X509CertificateExtensions.cs" />
     <Compile Include="Cryptography\X509CertificateRecord.cs" />
@@ -107,9 +121,12 @@
     <Compile Include="Encodings\QuotedPrintableEncoder.cs" />
     <Compile Include="Encodings\UUDecoder.cs" />
     <Compile Include="Encodings\UUEncoder.cs" />
+    <Compile Include="Encodings\YDecoder.cs" />
+    <Compile Include="Encodings\YEncoder.cs" />
     <Compile Include="IO\BoundStream.cs" />
     <Compile Include="IO\ChainedStream.cs" />
     <Compile Include="IO\FilteredStream.cs" />
+    <Compile Include="IO\ICancellableStream.cs" />
     <Compile Include="IO\MeasuringStream.cs" />
     <Compile Include="IO\MemoryBlockStream.cs" />
     <Compile Include="IO\Filters\ArmoredFromFilter.cs" />
@@ -144,14 +161,33 @@
     <Compile Include="MacInterop\SecKeychainAttribute.cs" />
     <Compile Include="MacInterop\SecKeychainAttributeList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tnef\RtfCompressedToRtf.cs" />
+    <Compile Include="Tnef\RtfCompressionMode.cs" />
+    <Compile Include="Tnef\TnefAttributeLevel.cs" />
+    <Compile Include="Tnef\TnefAttributeTag.cs" />
+    <Compile Include="Tnef\TnefComplianceMode.cs" />
+    <Compile Include="Tnef\TnefComplianceStatus.cs" />
+    <Compile Include="Tnef\TnefException.cs" />
+    <Compile Include="Tnef\TnefNameId.cs" />
+    <Compile Include="Tnef\TnefNameIdKind.cs" />
+    <Compile Include="Tnef\TnefPart.cs" />
+    <Compile Include="Tnef\TnefPropertyId.cs" />
+    <Compile Include="Tnef\TnefPropertyReader.cs" />
+    <Compile Include="Tnef\TnefPropertyTag.cs" />
+    <Compile Include="Tnef\TnefPropertyType.cs" />
+    <Compile Include="Tnef\TnefReader.cs" />
+    <Compile Include="Tnef\TnefReaderStream.cs" />
     <Compile Include="Utils\ByteExtensions.cs" />
     <Compile Include="Utils\CharsetUtils.cs" />
+    <Compile Include="Utils\Crc32.cs" />
     <Compile Include="Utils\DateUtils.cs" />
     <Compile Include="Utils\MimeUtils.cs" />
     <Compile Include="Utils\PackedByteArray.cs" />
     <Compile Include="Utils\ParseUtils.cs" />
     <Compile Include="Utils\Rfc2047.cs" />
     <Compile Include="Utils\StringBuilderExtensions.cs" />
+    <Compile Include="AttachmentCollection.cs" />
+    <Compile Include="BodyBuilder.cs" />
     <Compile Include="ContentDisposition.cs" />
     <Compile Include="ContentEncoding.cs" />
     <Compile Include="ContentObject.cs" />
@@ -174,14 +210,18 @@
     <Compile Include="MimeEntity.cs" />
     <Compile Include="MimeEntityConstructorInfo.cs" />
     <Compile Include="MimeFormat.cs" />
+    <Compile Include="MimeIterator.cs" />
     <Compile Include="MimeMessage.cs" />
     <Compile Include="MimeParser.cs" />
     <Compile Include="MimePart.cs" />
+    <Compile Include="MimeTypes.cs" />
     <Compile Include="Multipart.cs" />
+    <Compile Include="MultipartRelated.cs" />
     <Compile Include="Parameter.cs" />
     <Compile Include="ParameterList.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="ParserOptions.cs" />
+    <Compile Include="RfcComplianceMode.cs" />
     <Compile Include="TextPart.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +229,7 @@
     <Folder Include="Encodings\" />
     <Folder Include="IO\Filters\" />
     <Folder Include="IO\" />
+    <Folder Include="Tnef\" />
     <Folder Include="Utils\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

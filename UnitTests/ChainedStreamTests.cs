@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jeff@xamarin.com>
 //
-// Copyright (c) 2013 Jeffrey Stedfast
+// Copyright (c) 2013-2014 Xamarin Inc. (www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ namespace UnitTests {
 				int n = Math.Min (bytes.Length - position, random.Next () % 4096);
 
 				var segment = new byte[n];
-				Array.Copy (bytes, position, segment, 0, n);
+				Buffer.BlockCopy (bytes, position, segment, 0, n);
 				lengths.Add (n);
 				position += n;
 
